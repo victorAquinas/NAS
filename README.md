@@ -1,3 +1,37 @@
+# This is a template prject to start new products on React with typescript
+
+# Packages Installed:
+
+- [Vite](https://www.npmjs.com/package/vite)
+- [React](https://www.npmjs.com/package/react)
+- [React-router-dom](https://www.npmjs.com/package/react-router-dom)
+- [React-toastify](https://www.npmjs.com/package/react-toastify)
+
+# Folder Structure
+
+```js
+
+  └── src/
+    ├── assets/
+    ├── components/
+    │   ├── Header/
+    │   ├──── index.tsx
+    ├── constants/
+    ├── context/
+    ├── hooks/
+    │   ├── usePayment.ts
+    │   ├── useUpdateEmployee.ts
+    │   ├── useEmployees.ts
+    │   └── useAuth.tsx
+    ├── layouts/
+    ├── routes/
+    ├── services/
+    ├── utils/
+    ├── views/
+    │   ├── Home/
+    │   ├──── index.tsx
+```
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
@@ -15,14 +49,14 @@ If you are developing a production application, we recommend updating the config
 
 ```js
 export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+	languageOptions: {
+		// other options...
+		parserOptions: {
+			project: ['./tsconfig.node.json', './tsconfig.app.json'],
+			tsconfigRootDir: import.meta.dirname,
+		},
+	},
+});
 ```
 
 - Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
@@ -31,20 +65,20 @@ export default tseslint.config({
 
 ```js
 // eslint.config.js
-import react from 'eslint-plugin-react'
+import react from 'eslint-plugin-react';
 
 export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+	// Set the react version
+	settings: { react: { version: '18.3' } },
+	plugins: {
+		// Add the react plugin
+		react,
+	},
+	rules: {
+		// other rules...
+		// Enable its recommended rules
+		...react.configs.recommended.rules,
+		...react.configs['jsx-runtime'].rules,
+	},
+});
 ```

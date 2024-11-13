@@ -33,11 +33,11 @@ export const theme = {
 	},
 	extend: {
 		colors: {
-			primary: '#1B2831',
-			primary_light: '#4c708c',
-			secondary: '#33C79D',
-			'gray-primary': '#f6f8fa',
-			green: '#d9fdd3',
+			background: '#F4F5F9', // Gray light
+			primary: '#00BC92', // Green 
+			primary_light: '#DFF3EF', // Green light
+			secondary: '#1B2831', // Dark blue
+			red_primary: '#FF0004', // Red
 		},
 		boxShadow: {
 			header: '-8px 0px 15px 0px rgba(0, 0, 0, 0.15)',

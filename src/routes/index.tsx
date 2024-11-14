@@ -4,6 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import { UserWelcome } from '../views/UserWelcome';
 import { Semesters } from '../views/Semesters';
 import { Courses } from '../views/Courses';
+import CalendarPage from '../views/CalendarPage';
 
 const Router = () => {
 	const routes = createBrowserRouter([
@@ -11,6 +12,7 @@ const Router = () => {
 		{ path: '/welcome', element: <UserWelcome /> },
 		{ path: '/semesters', element: <Semesters /> },
 		{ path: '/my-courses', element: <Courses /> },
+		{ path: '/calendar', element: <CalendarPage /> },
 	]);
 
 	return (

@@ -4,7 +4,7 @@ export const theme = {
 			sm: '640px',
 			md: '768px',
 			lg: '1024px',
-			xl: '1280px',
+			xl: '1680px',
 		},
 	},
 	screens: {
@@ -34,7 +34,7 @@ export const theme = {
 	extend: {
 		colors: {
 			background: '#F4F5F9', // Gray light
-			primary: '#00BC92', // Green 
+			primary: '#00BC92', // Green
 			primary_light: '#DFF3EF', // Green light
 			secondary: '#1B2831', // Dark blue
 			red_primary: '#FF0004', // Red

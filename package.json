@@ -10,6 +10,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@szhsin/react-accordion": "^1.2.6",
 		"@types/react-modal": "^3.16.3",
 		"@types/react-portal": "^4.0.7",
 		"axios": "^1.7.7",

@@ -1,15 +1,17 @@
 import { ReactNode } from 'react';
 
-type AtButtonVariants = 'white' | 'primary' | 'info';
+type AtButtonVariants = 'white' | 'primary' | 'info' | 'transparent';
 interface AtButtonProps {
 	className?: string;
 	children: ReactNode;
 	variant?: AtButtonVariants;
+	onClick?: () => void;
 }
 const AtButton = ({
 	className,
 	children,
 	variant = 'white',
+	onClick,
 }: AtButtonProps) => {
 	const getVariant = (variant: AtButtonVariants) => {
 		switch (variant) {
@@ -19,6 +21,8 @@ const AtButton = ({
 				return 'bg-primary_light text-primary hover:bg-primary hover:text-white hover:duration-150';
 			case 'info':
 				return 'bg-white text-gray-700 hover:bg-primary hover:text-white hover:duration-150';
+			case 'transparent':
+				return 'bg-transparent text-primary hover:bg-primary hover:text-white hover:duration-150 !shadow-none';
 		}
 	};
 	return (
@@ -26,6 +30,7 @@ const AtButton = ({
 			className={` ${getVariant(
 				variant
 			)} p-4 px-6 font-medium rounded-md shadow-md ${className}`}
+			onClick={onClick}
 		>
 			{children}
 		</button>

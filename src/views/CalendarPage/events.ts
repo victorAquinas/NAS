@@ -20,27 +20,7 @@ export default [
 		start: new Date(2024, 3, 0),
 		end: new Date(2024, 3, 1),
 	},
-	{
-		title: 'Harvad University...',
-		group: '4',
-		shift: '5AM - 5PM',
-		start: new Date(2024, 3, 0),
-		end: new Date(2024, 3, 1),
-	},
-	{
-		title: 'Angeles Rehabilita...',
-		group: '4',
-		shift: '5AM - 5PM',
-		start: new Date(2024, 3, 0),
-		end: new Date(2024, 3, 1),
-	},
-	{
-		title: 'Victoria Rehab',
-		group: '1',
-		shift: '7AM - 7PM',
-		start: new Date(2024, 3, 5),
-		end: new Date(2024, 3, 5),
-	},
+
 	{
 		title: 'Victoria Rehab',
 		group: '2',

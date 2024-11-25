@@ -6,6 +6,7 @@ import { ReactNode } from 'react';
 import { AtSidebarItem } from '../../components/AtSidebarItem';
 import { LuCalendarDays } from 'react-icons/lu';
 import { IoBriefcaseOutline } from 'react-icons/io5';
+import { Link } from 'react-router-dom';
 
 interface AppLayoutProps {
 	children: ReactNode;
@@ -28,8 +29,12 @@ export const AppLayout = ({
 					</div>
 
 					<div className='nav-list flex-col  mt-12'>
-						<AtSidebarItem label='Calendar' isActive icon={LuCalendarDays} />
-						<AtSidebarItem label='My shifts' icon={IoBriefcaseOutline} />
+						<Link to={'/calendar'}>
+							<AtSidebarItem label='Calendar' isActive icon={LuCalendarDays} />
+						</Link>
+						<Link to={'/my-shifts'}>
+							<AtSidebarItem label='My shifts' icon={IoBriefcaseOutline} />
+						</Link>
 					</div>
 
 					<div className='logout absolute bottom-0 p-4 left-0 text-white font-light text-sm'>

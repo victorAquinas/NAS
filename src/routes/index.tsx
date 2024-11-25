@@ -5,6 +5,7 @@ import { UserWelcome } from '../views/UserWelcome';
 import { Semesters } from '../views/Semesters';
 import { Courses } from '../views/Courses';
 import CalendarPage from '../views/CalendarPage';
+import MyShiftsPage from '../views/MyShiftsPage';
 
 const Router = () => {
 	const routes = createBrowserRouter([
@@ -13,6 +14,7 @@ const Router = () => {
 		{ path: '/semesters', element: <Semesters /> },
 		{ path: '/my-courses', element: <Courses /> },
 		{ path: '/calendar', element: <CalendarPage /> },
+		{ path: '/my-shifts', element: <MyShiftsPage /> },
 	]);
 
 	return (

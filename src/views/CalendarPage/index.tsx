@@ -10,7 +10,7 @@ const localizer = momentLocalizer(moment);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomEvent: React.FC<any> = ({ event }) => {
 	return (
-		<div className='text-sm p-1 '>
+		<div className='text-[0.65rem] p-1 '>
 			<p className='font-medium'>{event.title}</p>
 			<p>
 				{event.shift} - <span className='font-medium'>Group</span>:{' '}
@@ -21,6 +21,41 @@ const CustomEvent: React.FC<any> = ({ event }) => {
 };
 
 const CalendarPage = () => {
+	const getBackgroundColor = (group: number) => {
+		switch (group) {
+			case 1:
+				return '#DFF3EF';
+			case 2:
+				return '#90CAF9';
+			case 3:
+				return '#E9D8A6';
+			case 4:
+				return '#94D2BD';
+			case 5:
+				return '#FF99C8';
+			case 6:
+				return '#E0AAFF';
+			case 7:
+				return '#FFFF3F';
+			case 8:
+				return '#F19C79';
+			case 9:
+				return '#D4E09B';
+			case 10:
+				return '#FDE2E4';
+			case 11:
+				return '#98F5E1';
+			case 12:
+				return '#B9FBC0';
+			case 13:
+				return '#CFBAF0';
+			case 14:
+				return '#FF70A6';
+
+			default:
+				return '#8AC926';
+		}
+	};
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const eventPropGetter = (event: any) => {
 		let backgroundColor;
@@ -30,13 +65,19 @@ const CalendarPage = () => {
 				backgroundColor = '#DFF3EF';
 				break;
 			case '2':
-				backgroundColor = '#E6E6E6';
+				backgroundColor = '#90CAF9';
 				break;
 			case '3':
-				backgroundColor = '#DDF2FF';
+				backgroundColor = '#E9D8A6';
+				break;
+			case '4':
+				backgroundColor = '#94D2BD';
+				break;
+			case '5':
+				backgroundColor = '#FF99C8';
 				break;
 			default:
-				backgroundColor = '#9747FF'; // Default color
+				backgroundColor = '#8AC926'; // Default color
 		}
 
 		return { style: { backgroundColor } };
@@ -52,73 +93,78 @@ const CalendarPage = () => {
 					bookings quickly and effortlessly.
 				</p>
 
-				<div className='opportunities bg-white rounded-md mt-10 '>
-					<h3 className='font-medium py-4 px-2'>Opportunities</h3>
+				<div className='grid-container min-[1440px]:flex min-[1440px]:justify-between '>
+					<div className='opportunities bg-white rounded-md mt-10 '>
+						<h3 className='font-medium py-4 px-2'>Opportunities</h3>
 
-					<div className='table w-full'>
-						<table className='border-collapse border border-slate-500 w-full'>
-							<thead>
-								<tr>
-									<th className='border border-gray-200 bg-gray-100 font-normal text-sm px-3 py-2'>
-										Available
-									</th>
-									<th className='border border-gray-200 bg-gray-100 font-normal text-sm px-3 py-2'>
-										Group
-									</th>
-									<th className='border border-gray-200 bg-gray-100 font-normal text-sm px-3 py-2'>
-										Hospital
-									</th>
-									<th className='border border-gray-200 bg-gray-100 font-normal text-sm px-3 py-2'>
-										Time
-									</th>
-									<th className='border border-gray-200 bg-gray-100 font-normal text-sm px-3 py-2'>
-										Instructor
-									</th>
-								</tr>
-							</thead>
-							<tbody>
-								{Array.from({ length: 5 }).map((_, index) => (
-									<tr className='text-center bg-[#FAF8F0]'>
-										<td className='border border-gray-200 px-3 text-sm p-3'>
-											5
-										</td>
-										<td className='border border-gray-200 px-3 text-sm p-3'>
-											1
-										</td>
-										<td className='border border-gray-200 px-3 text-sm p-3'>
-											<p>Victoria Rehab</p>
-											<p>955 NW 3rd St, Miami, FL 33128...</p>
-										</td>
-										<td className='border border-gray-200 px-3 text-sm p-3'>
-											7AM - 7PM
-										</td>
-										<td className='border border-gray-200 px-3 text-sm p-3'>
-											F. Garcia
-										</td>
+						<div className='table w-full min-[1440px]:w-[400px] '>
+							<table className='border-collapse border border-slate-500 w-full'>
+								<thead>
+									<tr>
+										{/* <th className='border border-gray-200 bg-gray-100 font-normal text-sm min-[1440px]:text-xs px-3 py-2'>
+											Free
+										</th> */}
+										<th className='border border-gray-200 bg-gray-100 font-normal text-sm min-[1440px]:text-xs px-3 py-2'>
+											Group
+										</th>
+										<th className='border border-gray-200 bg-gray-100 font-normal text-sm min-[1440px]:text-xs px-3 py-2'>
+											Hospital
+										</th>
+										<th className='border border-gray-200 bg-gray-100 font-normal text-sm min-[1440px]:text-xs px-3 py-2'>
+											Shift
+										</th>
+										<th className='border border-gray-200 bg-gray-100 font-normal text-sm min-[1440px]:text-xs px-3 py-2'>
+											Tutor
+										</th>
 									</tr>
-								))}
-							</tbody>
-						</table>
+								</thead>
+								<tbody>
+									{Array.from({ length: 8 }).map((_, index) => (
+										<tr
+											className={`text-center`}
+											style={{ backgroundColor: getBackgroundColor(index + 1) }}
+											key={index}
+										>
+											<td className='border border-gray-200 text-sm min-[1440px]:text-xs '>
+												{index + 1}
+											</td>
+											<td className='border border-gray-200 px-3 text-sm min-[1440px]:text-xxs p-3 min-[1440px]:px-1'>
+												<p className='min-[1440px]:text-[0.65rem]'>
+													University Of London Charles (0/9)
+												</p>
+												<p>955 NW 3rd St, Miami, FL 33128...</p>
+											</td>
+											<td className='border border-gray-200 px-3 text-sm min-[1440px]:text-xxs p-3'>
+												7AM - 7PM
+											</td>
+											<td className='border border-gray-200 px-3 text-sm min-[1440px]:text-xxs p-3'>
+												F. Garcia
+											</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
 					</div>
-				</div>
 
-				<div className='calendar mt-12 bg-white p-6'>
-					<Calendar
-						localizer={localizer}
-						events={events}
-						startAccessor='start'
-						endAccessor='end'
-						style={{ height: 800 }}
-						defaultDate={new Date(2024, 3, 1)}
-						components={{
-							event: CustomEvent,
-						}}
-						eventPropGetter={eventPropGetter}
-						showAllEvents
-						onShowMore={() => console.log('Ver mas')}
-						popup={true}
-						onSelectEvent={(event) => console.log('OnSelect', event)}
-					/>
+					<div className='calendar mt-12 bg-white p-6 min-[1440px]:mt-10 min-[1440px]:ml-8 min-[1440px]:min-w-[calc(100%-400px)] rounded-md'>
+						<Calendar
+							localizer={localizer}
+							events={events}
+							startAccessor='start'
+							endAccessor='end'
+							style={{ height: 800 }}
+							defaultDate={new Date(2024, 3, 1)}
+							components={{
+								event: CustomEvent,
+							}}
+							eventPropGetter={eventPropGetter}
+							showAllEvents
+							onShowMore={() => console.log('Ver mas')}
+							popup={true}
+							onSelectEvent={(event) => console.log('OnSelect', event)}
+						/>
+					</div>
 				</div>
 			</AppLayout>
 		</>

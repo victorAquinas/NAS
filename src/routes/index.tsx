@@ -12,7 +12,7 @@ const Router = () => {
 		{ path: '/', element: <Home /> },
 		{ path: '/welcome', element: <UserWelcome /> },
 		{ path: '/semesters', element: <Semesters /> },
-		{ path: '/my-courses', element: <Courses /> },
+		{ path: '/my-courses/:semesterID', element: <Courses /> },
 		{ path: '/calendar', element: <CalendarPage /> },
 		{ path: '/my-shifts', element: <MyShiftsPage /> },
 	]);

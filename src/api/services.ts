@@ -1,6 +1,6 @@
 import { transformToUrlParams } from '../utils/stringToUrlParam';
 import api from './fetch';
-import { SemesterResponse } from './types';
+import { GroupResponse, SemesterResponse } from './types';
 
 export const getSemesters = async (
 	email: string
@@ -25,5 +25,17 @@ export const getStudentCourses = async (
 			emailUrlParams
 		)}`}`
 	);
+	return response.data;
+};
+
+export const getCalendarGroups = async (
+	program_semester_id: string
+): Promise<GroupResponse> => {
+	const response = await api.get(
+		`${
+			import.meta.env.VITE_API_URL
+		}${`group?program_semester_id=${program_semester_id}`}`
+	);
+
 	return response.data;
 };

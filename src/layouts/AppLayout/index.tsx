@@ -1,4 +1,3 @@
-import NotificationOn from '../../assets/notification-on.svg';
 import BadgeIcon from '../../assets/badge-icon.svg';
 import NasLogoNoText from '../../assets/nas-logo-no-text.svg';
 
@@ -7,6 +6,8 @@ import { AtSidebarItem } from '../../components/AtSidebarItem';
 import { LuCalendarDays } from 'react-icons/lu';
 import { IoBriefcaseOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
+import MlNotifications from './MlNotifications';
+import AtNotificationItem from './MlNotifications/AtNotificationItem';
 
 interface AppLayoutProps {
 	children: ReactNode;
@@ -57,13 +58,10 @@ export const AppLayout = ({
 									</p>
 								</div>
 							</div>
-							<div className='right'>
-								<img
-									src={NotificationOn}
-									alt='notification'
-									className='w-[22px]'
-								/>
-							</div>
+							<MlNotifications>
+								<AtNotificationItem type='approved' group='1' />
+								<AtNotificationItem type='rejected' group='2' />
+							</MlNotifications>
 						</div>
 					</div>
 

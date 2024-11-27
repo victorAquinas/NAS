@@ -9,8 +9,9 @@ type BadgeVariantType =
 interface AtBadgeProps {
 	label: string;
 	variant: BadgeVariantType;
+	className?: string;
 }
-export const AtBadge = ({ label, variant }: AtBadgeProps) => {
+export const AtBadge = ({ label, variant, className }: AtBadgeProps) => {
 	const getBadgeVariant = (variant: BadgeVariantType) => {
 		switch (variant) {
 			case 'primary':
@@ -31,7 +32,7 @@ export const AtBadge = ({ label, variant }: AtBadgeProps) => {
 	};
 	return (
 		<span
-			className={`inline-flex items-center rounded-md  px-2 py-1 text-xs font-medium  ring-1 ring-inset ring-gray-500/10 ${getBadgeVariant(
+			className={`inline-flex items-center rounded-md  px-2 py-1 text-xs font-medium  ring-1 ring-inset ring-gray-500/10 ${className} ${getBadgeVariant(
 				variant
 			)}`}
 		>

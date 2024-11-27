@@ -22,3 +22,60 @@ export interface Semester {
 	semester_status: boolean;
 	student_programs: StudentProgram[];
 }
+export interface GroupResponse {
+	data: Group[];
+	success: boolean;
+}
+export interface Group {
+	group_id: number;
+	group_name: string;
+	max_students: number;
+	spaces_available: number;
+	start_date: string; // Date string in "YYYY-MM-DD" format
+	end_date: string; // Date string in "YYYY-MM-DD" format
+	program_semester_id: number;
+	verity_group_id: string;
+	in_days: string[]; // Array of days, e.g., ["MONDAY", "WEDNESDAY"]
+	weeks: Week[];
+}
+
+export interface Week {
+	week_id: number;
+	week_number: number;
+	instructor: Instructor;
+	week_schedule: WeekSchedule;
+}
+
+export interface Instructor {
+	role_id: number;
+	institution_id: number;
+	email: string;
+	name: string;
+	id: number;
+	phone: string | null;
+	is_active: boolean;
+}
+
+export interface WeekSchedule {
+	week_schedule_id: number;
+	practica_place: PracticaPlace;
+	start_time: string; // Time string in "HH:MM:SS" format
+	end_time: string; // Time string in "HH:MM:SS" format
+	dates: string[]; // Array of date strings in "YYYY-MM-DD" format
+}
+
+export enum PracticaPlaceTypeName {
+	IN_SITE = 'In-Site',
+	OFF_SITE = 'Off-Site',
+}
+export interface PracticaPlace {
+	program_semester_id: number;
+	name: string;
+	id: number;
+	address: string;
+	status: boolean;
+	type: {
+		name: PracticaPlaceTypeName;
+		type: number;
+	};
+}

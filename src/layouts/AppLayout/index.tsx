@@ -3,8 +3,8 @@ import NasLogoNoText from '../../assets/nas-logo-no-text.svg';
 
 import { ReactNode } from 'react';
 import { AtSidebarItem } from '../../components/AtSidebarItem';
-import { LuCalendarDays } from 'react-icons/lu';
-import { IoBriefcaseOutline } from 'react-icons/io5';
+import { LuCalendarDays, LuSchool2 } from 'react-icons/lu';
+import { IoBriefcaseOutline, IoSchoolOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import MlNotifications from './MlNotifications';
 import AtNotificationItem from './MlNotifications/AtNotificationItem';
@@ -14,13 +14,17 @@ interface AppLayoutProps {
 	className?: string;
 	userName: string;
 	course: string;
+	programSemesterId: string;
 }
 export const AppLayout = ({
 	children,
 	className,
 	userName,
 	course,
+	programSemesterId,
 }: AppLayoutProps) => {
+	const isActive = (path: string) => location.pathname.includes(path);
+
 	return (
 		<>
 			<div className='full flex'>
@@ -30,11 +34,26 @@ export const AppLayout = ({
 					</div>
 
 					<div className='nav-list flex-col  mt-12'>
-						<Link to={'/calendar'}>
-							<AtSidebarItem label='Calendar' isActive icon={LuCalendarDays} />
+						<Link to={`/calendar/${programSemesterId}`}>
+							<AtSidebarItem
+								label='Calendar'
+								isActive={isActive('calendar')}
+								icon={LuCalendarDays}
+							/>
 						</Link>
-						<Link to={'/my-shifts'}>
-							<AtSidebarItem label='My shifts' icon={IoBriefcaseOutline} />
+						<Link to={`/my-shifts/${programSemesterId}`}>
+							<AtSidebarItem
+								label='My shifts'
+								isActive={isActive('my-shifts')}
+								icon={IoBriefcaseOutline}
+							/>
+						</Link>
+						<Link to={`/semesters`}>
+							<AtSidebarItem
+								label='Semesters'
+								isActive={isActive('semesters')}
+								icon={IoSchoolOutline}
+							/>
 						</Link>
 					</div>
 

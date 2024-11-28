@@ -14,7 +14,7 @@ const Router = () => {
 		{ path: '/semesters', element: <Semesters /> },
 		{ path: '/my-courses/:semesterID', element: <Courses /> },
 		{ path: '/calendar/:programSemesterId', element: <CalendarPage /> },
-		{ path: '/my-shifts', element: <MyShiftsPage /> },
+		{ path: '/my-shifts/:programSemesterId', element: <MyShiftsPage /> },
 	]);
 
 	return (

@@ -3,6 +3,7 @@ import api from './fetch';
 import {
 	GroupByIdResponse,
 	GroupResponse,
+	RequestGroupResponse,
 	SemesterResponse,
 	UserStatusResponse,
 } from './types';
@@ -66,5 +67,19 @@ export const getCalendarGroupById = async (
 		`${import.meta.env.VITE_API_URL}${`group/id?group_id=${group_id}`}`
 	);
 
+	return response.data;
+};
+
+export const requestGroup = async (
+	email: string,
+	group_id: string
+): Promise<RequestGroupResponse> => {
+	const emailUrlParams = `user_email=${email}&group_id=${group_id}`;
+
+	const response = await api.put(
+		`${
+			import.meta.env.VITE_API_URL
+		}${`user/group/request?${transformToUrlParams(emailUrlParams)}`}`
+	);
 	return response.data;
 };

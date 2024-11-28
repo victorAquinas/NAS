@@ -9,7 +9,11 @@ import { UserStatus } from '../../api/types';
 import { AtBadge } from '../../components/AtBadge';
 import { canShowStatus } from '../../utils/canShowForStatus';
 import { FiAlertCircle } from 'react-icons/fi';
-
+import { AtLoadingWrapper } from '../../components/AtLoadingWrapper';
+import { MlActionModal } from '../../components/MlModal/MlActionModal';
+import { toast } from 'react-toastify';
+import { MlInfoModal } from '../../components/MlModal/MlInfoModal';
+import { MODAL_TEXT } from '../../constants/text';
 const localizer = momentLocalizer(moment);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,12 +41,33 @@ const CalendarPage = () => {
 		showEventDetailModal,
 		handleCloseEventDetailModal,
 		userStatus,
+		isLoading,
+		programSemesterId,
+		navigate,
+		hasGroups,
+		handleRequestGroup,
+		showGroupConfirmationModal,
+		setShowGroupConfirmationModal,
 	} = useCalendarPage();
 	return (
 		<>
 			<MlGroupDetailModal
 				isOpen={showEventDetailModal}
-				onAction={() => {}}
+				onAction={() => {
+					if (eventDetail?.group_id) {
+						toast.promise(
+							handleRequestGroup(
+								import.meta.env.VITE_TEST_EMAIL_USER,
+								eventDetail?.group_id,
+								programSemesterId as string
+							),
+							{
+								pending: 'Requesting group...',
+								error: 'Error requesting group',
+							}
+						);
+					}
+				}}
 				onClose={() => handleCloseEventDetailModal()}
 				closeButtonLabel='Close'
 				actionButtonLabel='Request'
@@ -50,7 +75,30 @@ const CalendarPage = () => {
 				variant={userStatus as UserStatus}
 			/>
 
-			<AppLayout course='Nursing' userName='Victor Escalona'>
+			<MlInfoModal
+				isOpen={showGroupConfirmationModal}
+				title={MODAL_TEXT.MODAL__INFO_PENDING_TITLE}
+				description={MODAL_TEXT.MODAL_INFO_PENDING_DESCRIPTION}
+				closeButtonLabel='Close'
+				onClose={() => setShowGroupConfirmationModal(false)}
+			/>
+
+			<MlActionModal
+				isOpen={!isLoading && !hasGroups}
+				onAction={() => navigate('/semesters')}
+				onClose={() => {}}
+				title='Could not find groups '
+				description="Please go to semesters to find the groups you're looking for"
+				actionButtonLabel='Go to semesters'
+				closeButtonLabel=''
+			/>
+
+			<AppLayout
+				course='Nursing'
+				userName='Victor Escalona'
+				programSemesterId={programSemesterId as string}
+			>
+				<AtLoadingWrapper isLoading={isLoading} />
 				<h2 className='text-xl font-medium'>Monthly Calendar</h2>
 				<p className='text-sm max-w-[50rem]'>
 					Easily explore and select available shifts for your clinical
@@ -68,15 +116,13 @@ const CalendarPage = () => {
 					>
 						<h3 className='font-medium py-4 px-2'>
 							{canShowStatus(userStatus as UserStatus, [UserStatus.ACCEPTED])
-								? 'Selected Group'
+								? ''
 								: 'Opportunities'}
 
 							{canShowStatus(userStatus as UserStatus, [
 								UserStatus.ACCEPTED,
 							]) && (
 								<>
-									{' '}
-									-{' '}
 									<AtBadge
 										label={`You are in group ${opportunities[0]?.group_name}`}
 										variant='info'
@@ -190,7 +236,6 @@ const CalendarPage = () => {
 								localizer={localizer}
 								events={eventsCopy}
 								views={['month', 'agenda']}
-								// startAccessor='start'
 								endAccessor='end'
 								style={{ height: 800 }}
 								defaultDate={new Date(2024, 1, 1)}

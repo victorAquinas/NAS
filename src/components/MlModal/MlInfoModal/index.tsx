@@ -26,7 +26,7 @@ export const MlInfoModal = ({
 			bottom: 'auto',
 			marginRight: '-50%',
 			transform: 'translate(-50%, -50%)',
-			padding: '4rem',
+			padding: '2rem',
 			width: '650px',
 			borderRadius: '0.5rem',
 			// zIndex: zIndex.modal,

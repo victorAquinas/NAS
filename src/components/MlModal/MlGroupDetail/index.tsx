@@ -6,6 +6,7 @@ import { AtBadge } from '../../AtBadge';
 import { CalendarEvent } from '../../../views/CalendarPage/types';
 import { UserStatus } from '../../../api/types';
 import { canShowStatus } from '../../../utils/canShowForStatus';
+import { getPracticalPlaceColor } from '../../../utils/getPracticalPlaceColor';
 
 interface MlGroupDetailModalProps {
 	isOpen: boolean;
@@ -72,7 +73,7 @@ export const MlGroupDetailModal = ({
 					<p className='text-sm w-[350px]'>{event?.offsiteAddress}</p>
 
 					<ul className='list flex flex-col gap-y-3 mt-4'>
-						{event?.dates?.in_site?.map((date, index) => (
+						{event?.dates?.off_site?.map((date, index) => (
 							<li
 								className='listItem flex items-center justify-between border-b border-gray-300 pb-1 last:border-none'
 								key={`offsite-${index}`}
@@ -82,7 +83,10 @@ export const MlGroupDetailModal = ({
 									<div>{date.shift}</div>
 								</div>
 								<div className='right'>
-									<AtBadge label={date.tutor} variant='dark' />
+									<AtBadge
+										label={date.tutor}
+										variant={getPracticalPlaceColor('off-site')}
+									/>
 								</div>
 							</li>
 						))}
@@ -97,7 +101,7 @@ export const MlGroupDetailModal = ({
 					<p className='text-sm w-[350px]'>{event?.campusAddress}</p>
 
 					<ul className='list flex flex-col gap-y-3 mt-4'>
-						{event?.dates?.off_site?.map((date, index) => (
+						{event?.dates?.in_site?.map((date, index) => (
 							<li
 								className='listItem flex items-center justify-between border-b border-gray-300 pb-1 last:border-none'
 								key={`offsite-${index}`}
@@ -107,7 +111,10 @@ export const MlGroupDetailModal = ({
 									<p>{date.shift}</p>
 								</div>
 								<div className='right'>
-									<AtBadge label={date.tutor} variant='info' />
+									<AtBadge
+										label={date.tutor}
+										variant={getPracticalPlaceColor('in-site')}
+									/>
 								</div>
 							</li>
 						))}
@@ -131,7 +138,7 @@ export const MlGroupDetailModal = ({
 						</AtButton>
 
 						{canShowStatus(variant as UserStatus, [
-							UserStatus.NONE,
+							UserStatus.OPEN,
 							UserStatus.REJECTED,
 						]) && (
 							<AtButton

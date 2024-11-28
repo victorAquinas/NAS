@@ -7,7 +7,9 @@ import { Link } from 'react-router-dom';
 import { BiLoader } from 'react-icons/bi';
 
 export const Courses = () => {
-	const { courses, isLoading } = useCourses('daniel+student');
+	const { courses, isLoading } = useCourses(
+		import.meta.env.VITE_TEST_EMAIL_USER
+	);
 	return (
 		<>
 			<BasicLayout className='!items-start !pt-12'>

@@ -5,12 +5,12 @@ import { CgChevronRight } from 'react-icons/cg';
 
 interface MlActionModalProps {
 	isOpen: boolean;
-	onAction: () => void;
-	onClose: () => void;
+	onAction?: () => void;
+	onClose?: () => void;
 	title: string;
 	description: string;
-	closeButtonLabel: string;
-	actionButtonLabel: string;
+	closeButtonLabel?: string;
+	actionButtonLabel?: string;
 }
 export const MlActionModal = ({
 	isOpen,
@@ -51,24 +51,28 @@ export const MlActionModal = ({
 
 				<div className='buttons-container w-full flex justify-center mt-2'>
 					<div className='buttons flex items-center jsutify-center gap-6'>
-						<AtButton
-							variant='transparent'
-							className='flex items-center mt-6'
-							onClick={onClose}
-						>
-							{closeButtonLabel}
-						</AtButton>
-						<AtButton
-							variant='primary'
-							className='flex items-center mt-6'
-							onClick={onAction}
-						>
-							{actionButtonLabel}
-							<span className='text-2xl'>
-								{' '}
-								<CgChevronRight />
-							</span>
-						</AtButton>
+						{closeButtonLabel && (
+							<AtButton
+								variant='transparent'
+								className='flex items-center mt-6'
+								onClick={onClose}
+							>
+								{closeButtonLabel}
+							</AtButton>
+						)}
+						{actionButtonLabel && (
+							<AtButton
+								variant='primary'
+								className='flex items-center mt-6'
+								onClick={onAction}
+							>
+								{actionButtonLabel}
+								<span className='text-2xl'>
+									{' '}
+									<CgChevronRight />
+								</span>
+							</AtButton>
+						)}
 					</div>
 				</div>
 			</Modal>

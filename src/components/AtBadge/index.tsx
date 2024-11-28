@@ -1,4 +1,4 @@
-type BadgeVariantType =
+export type BadgeVariantType =
 	| 'primary'
 	| 'success'
 	| 'danger'

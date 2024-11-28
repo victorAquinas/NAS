@@ -87,12 +87,12 @@ export interface UserStatusResponse {
 		student_name: string;
 		student_email: string;
 		requested_group: number;
-		requested_group_status: 'PENDING' | 'REJECTED' | 'ACCEPTED' | 'NONE';
+		requested_group_status: 'PENDING' | 'REJECTED' | 'ACCEPTED' | 'OPEN';
 	};
 }
 
 export enum UserStatus {
-	NONE = 'NONE',
+	OPEN = 'OPEN',
 	PENDING = 'PENDING',
 	REJECTED = 'REJECTED',
 	ACCEPTED = 'ACCEPTED',
@@ -101,4 +101,9 @@ export enum UserStatus {
 export interface GroupByIdResponse {
 	data: Group;
 	success: boolean;
+}
+
+export interface RequestGroupResponse {
+	success: boolean;
+	data: number[];
 }

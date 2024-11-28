@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import { CalendarEvent } from './types';
 import { getOneEventPerGroup } from '../../utils/getOneEventPerGroup';
@@ -5,9 +6,13 @@ import {
 	getCalendarGroupById,
 	getCalendarGroups,
 	getUserStatus,
+	requestGroup,
 } from '../../api/services';
 import { transformAndFillAddresses } from '../../utils/transformAndFillEvents';
 import { UserStatus } from '../../api/types';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { ErrorMessages } from '../../constants/text';
 
 export const useCalendarPage = () => {
 	const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -16,6 +21,19 @@ export const useCalendarPage = () => {
 	const [showEventDetailModal, setShowEventDetailModal] = useState(false);
 	const [eventDetail, setEventDetail] = useState<CalendarEvent | null>(null);
 	const [userStatus, setUserStatus] = useState<UserStatus>();
+	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [hasGroups, setHasGroups] = useState<boolean>(true);
+	const [groupId, setGroupId] = useState<string | null>(null);
+	const [showGroupConfirmationModal, setShowGroupConfirmationModal] =
+		useState<boolean>(false);
+	const { programSemesterId } = useParams();
+	const navigate = useNavigate();
+
+	const handleCloseLoading = () => {
+		setTimeout(() => {
+			setIsLoading(false);
+		}, 500);
+	};
 
 	const handleShowEventDetailModal = (event: CalendarEvent) => {
 		setShowEventDetailModal(true);
@@ -85,13 +103,19 @@ export const useCalendarPage = () => {
 	const getCalendarGroupsEvents = async (user_program_semester_id: string) => {
 		try {
 			const groups = await getCalendarGroups(user_program_semester_id);
+			if (groups.data.length === 0) {
+				toast.error(ErrorMessages.NO_GROUPS_FOUND);
+				setHasGroups(false);
+			}
 			const transformedCalendarEvents = transformAndFillAddresses(groups.data);
-			console.log('transformedCalendarEvents', transformedCalendarEvents);
 			setEvents(transformedCalendarEvents);
 			setEventsCopy(transformedCalendarEvents);
 			return transformedCalendarEvents;
 		} catch (error) {
 			console.error(error);
+			toast.error(ErrorMessages.GENERAL_ERROR);
+		} finally {
+			handleCloseLoading();
 		}
 	};
 
@@ -105,6 +129,9 @@ export const useCalendarPage = () => {
 			return transformedCalendarEvents;
 		} catch (error) {
 			console.error(error);
+			toast.error(ErrorMessages.GENERAL_ERROR);
+		} finally {
+			handleCloseLoading();
 		}
 	};
 
@@ -113,45 +140,71 @@ export const useCalendarPage = () => {
 		user_program_semester_id: string
 	) => {
 		try {
-			console.log('El email', email);
 			const statusResponse = await getUserStatus(
 				email,
 				user_program_semester_id
 			);
-			const { requested_group_status: status } = statusResponse.data;
-			// setUserStatus(status as UserStatus);
-			// setUserStatus(UserStatus.ACCEPTED);
-			// setUserStatus(UserStatus.REJECTED);
-			// setUserStatus(UserStatus.PENDING);
-			setUserStatus(UserStatus.NONE);
-			console.log('Status', status);
+			const { requested_group_status: status, requested_group } =
+				statusResponse.data;
+			setUserStatus(status as UserStatus);
+
+			if (status === UserStatus.PENDING || status === UserStatus.ACCEPTED) {
+				setGroupId(requested_group.toString());
+			}
+		} catch (error) {
+			console.error(error);
+			toast.error(ErrorMessages.GENERAL_ERROR);
+		} finally {
+			handleCloseLoading();
+		}
+	};
+
+	const handleRequestGroup = async (
+		email: string,
+		groupId: string,
+		programSemesterId: string
+	) => {
+		try {
+			const requestedGroup = await requestGroup(email, groupId);
+			if (!requestedGroup.success) {
+				return toast.error(ErrorMessages.GROUP_ALREADY_SELECTED);
+			}
+
+			await handleUserStatus(email, programSemesterId);
+
+			setShowEventDetailModal(false);
+			setShowGroupConfirmationModal(true);
+			console.log('Requested Group', requestedGroup);
 		} catch (error) {
 			console.error(error);
 		}
 	};
 
 	useEffect(() => {
-		handleUserStatus('daniel+student', '4');
-	}, []);
-	useEffect(() => {
-		// handleUserStatus('daniel+student', '4');
-		// // getCalendarGroupById('14').then((res) => console.log(res));
-		// getCalendarGroupByIdEvents('14');
-		// // getCalendarGroupsEvents('4');
+		if (programSemesterId) {
+			handleUserStatus(import.meta.env.VITE_TEST_EMAIL_USER, programSemesterId);
+		}
+	}, [programSemesterId]);
 
-		if (userStatus) {
+	useEffect(() => {
+		if (userStatus && programSemesterId) {
 			if (
 				userStatus === UserStatus.ACCEPTED ||
 				userStatus === UserStatus.PENDING
 			) {
-				getCalendarGroupByIdEvents('14');
+				if (groupId) {
+					getCalendarGroupByIdEvents(groupId);
+				}
 			}
 
-			if (userStatus === UserStatus.NONE) {
-				getCalendarGroupsEvents('4');
+			if (
+				userStatus === UserStatus.OPEN ||
+				userStatus === UserStatus.REJECTED
+			) {
+				getCalendarGroupsEvents(programSemesterId);
 			}
 		}
-	}, [userStatus]);
+	}, [userStatus, programSemesterId]);
 
 	useEffect(() => {
 		if (events.length > 0) {
@@ -171,5 +224,12 @@ export const useCalendarPage = () => {
 		showEventDetailModal,
 		handleCloseEventDetailModal,
 		userStatus,
+		isLoading,
+		programSemesterId,
+		navigate,
+		hasGroups,
+		handleRequestGroup,
+		showGroupConfirmationModal,
+		setShowGroupConfirmationModal,
 	};
 };

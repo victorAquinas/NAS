@@ -2,7 +2,9 @@ import { BasicLayout } from '../../layouts/BasicLayout';
 import { useSemesters } from './useSemesters';
 
 export const Semesters = () => {
-	const { renderSemesterList } = useSemesters('daniel+student');
+	const { renderSemesterList } = useSemesters(
+		import.meta.env.VITE_TEST_EMAIL_USER
+	);
 
 	return (
 		<BasicLayout className='!items-start !pt-12'>

@@ -68,7 +68,9 @@ export const MlGroupDetailModal = ({
 				<div className='box shadow-md bg-white p-2 md:p-4 border border-gray-200 rounded-md mt-4'>
 					<div className='flex items-center justify-between'>
 						<h3 className='font-semibold'>Clinical offsite</h3>
-						<p className='text-primary text-sm font-medium'>Total Hours: 100</p>
+						<p className='text-primary text-sm font-medium'>
+							Total Hours: {event?.offsite_total_hours}
+						</p>
 					</div>
 					<p className='text-sm w-[350px]'>{event?.offsiteAddress}</p>
 
@@ -96,7 +98,9 @@ export const MlGroupDetailModal = ({
 				<div className='box shadow-md bg-white p-2 md:p-4 border border-gray-200 rounded-md mt-4'>
 					<div className='flex items-center justify-between'>
 						<h3 className='font-semibold'>Clinical in campus</h3>
-						<p className='text-primary text-sm font-medium'>Total Hours: 35</p>
+						<p className='text-primary text-sm font-medium'>
+							Total Hours: {event?.insite_total_hours}
+						</p>
 					</div>
 					<p className='text-sm w-[350px]'>{event?.campusAddress}</p>
 

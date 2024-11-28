@@ -3,7 +3,7 @@ import NasLogoNoText from '../../assets/nas-logo-no-text.svg';
 
 import { ReactNode } from 'react';
 import { AtSidebarItem } from '../../components/AtSidebarItem';
-import { LuCalendarDays, LuSchool2 } from 'react-icons/lu';
+import { LuCalendarDays } from 'react-icons/lu';
 import { IoBriefcaseOutline, IoSchoolOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import MlNotifications from './MlNotifications';
@@ -72,8 +72,7 @@ export const AppLayout = ({
 								<div className='content text-xs'>
 									<p>{userName}</p>
 									<p>
-										Assigned course:{' '}
-										<span className='font-medium'>{course}</span>
+										Course: <span className='font-medium'>{course}</span>
 									</p>
 								</div>
 							</div>

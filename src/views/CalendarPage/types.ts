@@ -1,3 +1,4 @@
+import { Step } from 'react-joyride';
 import { PracticaPlaceTypeName } from '../../api/types';
 
 export interface CalendarEvent {
@@ -19,10 +20,17 @@ export interface CalendarEvent {
 		off_site: DateTypeEvent[];
 	};
 	rawDate: string;
+	offsite_total_hours?: number;
+	insite_total_hours?: number;
 }
 
 export interface DateTypeEvent {
 	date: string;
 	shift: string;
 	tutor: string;
+}
+
+export interface TutorialState {
+	run: boolean;
+	steps: Step[];
 }

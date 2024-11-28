@@ -39,6 +39,47 @@ export const transformAndFillAddresses = (data: Group[]): CalendarEvent[] => {
 		);
 	};
 
+	const calculateHours = (shift: string): number => {
+		const [start, end] = shift.split(' - ').map((time) => {
+			const [hours, minutes] = time.split(':').map(Number);
+			return hours + minutes / 60;
+		});
+		return end >= start ? end - start : 24 - start + end; // Handles shifts crossing midnight
+	};
+
+	const calculateTotalHoursByGroup = (events: CalendarEvent[]) => {
+		const groupHours: Record<string, { inSite: number; offSite: number }> = {};
+
+		events.forEach((event) => {
+			if (!groupHours[event.group_id]) {
+				groupHours[event.group_id] = { inSite: 0, offSite: 0 };
+			}
+			const hours = calculateHours(event.shift);
+			if (event.type === PracticaPlaceTypeName.IN_SITE) {
+				groupHours[event.group_id].inSite += hours;
+			} else if (event.type === PracticaPlaceTypeName.OFF_SITE) {
+				groupHours[event.group_id].offSite += hours;
+			}
+		});
+
+		return groupHours;
+	};
+
+	const addHoursToEvents = (
+		events: CalendarEvent[],
+		groupHours: Record<string, { inSite: number; offSite: number }>
+	): CalendarEvent[] => {
+		return events.map((event) => {
+			const insite_total_hours = groupHours[event.group_id]?.inSite || 0;
+			const offsite_total_hours = groupHours[event.group_id]?.offSite || 0;
+			return {
+				...event,
+				insite_total_hours, // Add separate total hours for In-Site
+				offsite_total_hours, // Add separate total hours for Off-Site
+			};
+		});
+	};
+
 	const groupDatesByType = (
 		events: CalendarEvent[]
 	): Record<
@@ -130,11 +171,23 @@ export const transformAndFillAddresses = (data: Group[]): CalendarEvent[] => {
 		});
 	};
 
-	// Transform and then fill addresses
+	// Transform and fill addresses
 	const events = transformToCalendarEvents(data);
-	console.log('events', events);
 	const eventsWithAddresses = fillAddressesForGroups(events);
 	const groupedDates = groupDatesByType(eventsWithAddresses);
-	return addDatesField(eventsWithAddresses, groupedDates);
+	const groupHours = calculateTotalHoursByGroup(eventsWithAddresses);
+	const eventsWithDatesAndHours = addDatesField(
+		eventsWithAddresses,
+		groupedDates
+	);
+	return addHoursToEvents(eventsWithDatesAndHours, groupHours);
+
+	// Transform and then fill addresses
+	// const events = transformToCalendarEvents(data);
+	// console.log('events', events);
+	// const eventsWithAddresses = fillAddressesForGroups(events);
+	// const groupedDates = groupDatesByType(eventsWithAddresses);
+	// return addDatesField(eventsWithAddresses, groupedDates);
+
 	// return eventsWithAddresses
 };

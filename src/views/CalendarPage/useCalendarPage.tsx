@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
-import { CalendarEvent } from './types';
+import { CalendarEvent, TutorialState } from './types';
 import { getOneEventPerGroup } from '../../utils/getOneEventPerGroup';
 import {
 	getCalendarGroupById,
@@ -13,6 +13,9 @@ import { UserStatus } from '../../api/types';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ErrorMessages } from '../../constants/text';
+import useSetState from '../../hooks/useSetState';
+import { CallBackProps, STATUS } from 'react-joyride';
+import { TUTORIAL_STEPS } from './steps';
 
 export const useCalendarPage = () => {
 	const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -24,10 +27,38 @@ export const useCalendarPage = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [hasGroups, setHasGroups] = useState<boolean>(true);
 	const [groupId, setGroupId] = useState<string | null>(null);
+	const [{ run, steps }, setState] = useSetState<TutorialState>({
+		run: false,
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		steps: TUTORIAL_STEPS as any,
+	});
 	const [showGroupConfirmationModal, setShowGroupConfirmationModal] =
 		useState<boolean>(false);
+	const [hasSeenTutorial, setHasSeenTutorial] = useState<boolean>(() => {
+		const storedValue = localStorage.getItem('hasSeenTutorial');
+		return storedValue === 'true'; // Convert to a boolean (assumes the value is stored as 'true' or 'false')
+	});
 	const { programSemesterId } = useParams();
 	const navigate = useNavigate();
+
+	// JoyRide tutorial
+	const handleClickStart = (event: React.MouseEvent<HTMLElement>) => {
+		event.preventDefault();
+
+		setState({
+			run: true,
+		});
+	};
+
+	const handleJoyrideCallback = (data: CallBackProps) => {
+		const { status } = data;
+		const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
+
+		if (finishedStatuses.includes(status)) {
+			localStorage.setItem('hasSeenTutorial', 'true');
+			setState({ run: false });
+		}
+	};
 
 	const handleCloseLoading = () => {
 		setTimeout(() => {
@@ -181,8 +212,21 @@ export const useCalendarPage = () => {
 	};
 
 	useEffect(() => {
+		if (!hasSeenTutorial && !isLoading) {
+			setState({
+				run: true,
+			});
+		}
+	}, [hasSeenTutorial, isLoading]);
+
+	useEffect(() => {
 		if (programSemesterId) {
 			handleUserStatus(import.meta.env.VITE_TEST_EMAIL_USER, programSemesterId);
+			console.log(
+				'LocalStorage',
+				localStorage.getItem('hasSeenTutorial') ?? false
+			);
+			setHasSeenTutorial(localStorage.getItem('hasSeenTutorial') === 'true');
 		}
 	}, [programSemesterId]);
 
@@ -211,7 +255,7 @@ export const useCalendarPage = () => {
 			setOpportunities(getOneEventPerGroup(events));
 		}
 	}, [events]);
-
+	console.log('Events', events);
 	return {
 		events,
 		eventsCopy,
@@ -231,5 +275,10 @@ export const useCalendarPage = () => {
 		handleRequestGroup,
 		showGroupConfirmationModal,
 		setShowGroupConfirmationModal,
+		run,
+		steps,
+		handleClickStart,
+		handleJoyrideCallback,
+		hasSeenTutorial,
 	};
 };

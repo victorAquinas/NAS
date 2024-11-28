@@ -14,20 +14,12 @@ import { MlActionModal } from '../../components/MlModal/MlActionModal';
 import { toast } from 'react-toastify';
 import { MlInfoModal } from '../../components/MlModal/MlInfoModal';
 import { MODAL_TEXT } from '../../constants/text';
-const localizer = momentLocalizer(moment);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const CustomEvent: React.FC<any> = ({ event }) => {
-	return (
-		<div className='text-[0.65rem] p-1 transition duration-200 ease-in-out hover:scale-[1.05]'>
-			<p className='font-medium'>{event.title}</p>
-			<p>
-				{event.shift} -{' '}
-				<span className='font-semibold'>{event.group_name}</span>
-			</p>
-		</div>
-	);
-};
+import { AtCalendarEvent } from '../../components/AtCalendarEvent';
+import { MlCalendarToolbar } from '../../components/MlCalendarToolbar';
+import Joyride from 'react-joyride';
+
+const localizer = momentLocalizer(moment);
 
 const CalendarPage = () => {
 	const {
@@ -48,7 +40,12 @@ const CalendarPage = () => {
 		handleRequestGroup,
 		showGroupConfirmationModal,
 		setShowGroupConfirmationModal,
+		steps,
+		run,
+		handleJoyrideCallback,
+		hasSeenTutorial,
 	} = useCalendarPage();
+
 	return (
 		<>
 			<MlGroupDetailModal
@@ -106,9 +103,38 @@ const CalendarPage = () => {
 					bookings quickly and effortlessly.
 				</p>
 
+				{canShowStatus(userStatus as UserStatus, [UserStatus.OPEN]) &&
+					!hasSeenTutorial && (
+						<>
+							<Joyride
+								callback={handleJoyrideCallback}
+								continuous
+								run={run}
+								scrollOffset={64}
+								scrollToFirstStep
+								showProgress={false}
+								showSkipButton
+								steps={steps}
+								styles={{
+									options: {
+										zIndex: 10000,
+									},
+									buttonNext: {
+										backgroundColor: '#dff3ef',
+										color: '#32c4a0',
+										padding: '1rem',
+									},
+									buttonBack: {
+										color: '#32c4a0',
+									},
+								}}
+							/>
+						</>
+					)}
+
 				<div className='grid-container min-[1440px]:flex min-[1440px]:justify-between '>
 					<div
-						className={`opportunities bg-white rounded-md mt-10 h-max pb-6 ${
+						className={`opportunities-container bg-white rounded-md mt-10 h-max pb-6 ${
 							canShowStatus(userStatus as UserStatus, [UserStatus.PENDING])
 								? 'h-max'
 								: ''
@@ -122,12 +148,12 @@ const CalendarPage = () => {
 							{canShowStatus(userStatus as UserStatus, [
 								UserStatus.ACCEPTED,
 							]) && (
-								<>
+								<div className='w-full text-center'>
 									<AtBadge
 										label={`You are in group ${opportunities[0]?.group_name}`}
 										variant='info'
 									/>
-								</>
+								</div>
 							)}
 						</h3>
 
@@ -168,7 +194,7 @@ const CalendarPage = () => {
 								<tbody>
 									{opportunities.map((event, index) => (
 										<tr
-											className={`text-center relative cursor-pointer transition duration-200 ease-in-out hover:scale-[1.05]`}
+											className={`text-center relative cursor-pointer transition duration-200 ease-in-out hover:scale-[1.02]`}
 											style={{ backgroundColor: getBackgroundColor(index + 1) }}
 											key={index}
 											onClick={() => handleShowEventDetailModal(event)}
@@ -178,8 +204,17 @@ const CalendarPage = () => {
 											</td>
 											<td className='border border-gray-200 px-3 text-sm min-[1440px]:text-xxs p-3 min-[1440px]:px-1'>
 												<p className='min-[1440px]:text-[0.65rem]'>
-													{event.title} ({event.max_students - event.available}/
-													{event.max_students})
+													{event.title}
+													{canShowStatus(userStatus as UserStatus, [
+														UserStatus.REJECTED,
+														UserStatus.OPEN,
+														UserStatus.PENDING,
+													]) && (
+														<>
+															({event.max_students - event.available}/
+															{event.max_students})
+														</>
+													)}
 												</p>
 												<p>{truncateText(event.offsiteAddress, 40)}</p>
 											</td>
@@ -215,23 +250,29 @@ const CalendarPage = () => {
 					</div>
 
 					<div className='calendar mt-12 bg-white p-6 min-[1440px]:mt-10 min-[1440px]:ml-8 min-[1440px]:min-w-[calc(100%-400px)] rounded-md'>
-						<div className='filter-by-group flex items-center justify-end'>
-							<p>Filter by group</p>
-							<select
-								name='#'
-								id='#'
-								className='bg-gray-100 p-2 rounded-md ml-4'
-								onChange={(e) => filterCalendarByGroup(e.target.value)}
-							>
-								<option value='all'>Show all groups</option>
-								{opportunities?.map((group) => (
-									<option key={group.group_name} value={group.group_id}>
-										Group {group.group_name}
-									</option>
-								))}
-							</select>
-						</div>
-						<div className='pt-4'>
+						{canShowStatus(userStatus as UserStatus, [
+							UserStatus.OPEN,
+							UserStatus.REJECTED,
+						]) && (
+							<div className='filter-by-group flex items-center justify-end'>
+								<p>Filter by group</p>
+								<select
+									name='#'
+									id='#'
+									className='bg-gray-100 p-2 rounded-md ml-4'
+									onChange={(e) => filterCalendarByGroup(e.target.value)}
+								>
+									<option value='all'>Show all groups</option>
+									{opportunities?.map((group) => (
+										<option key={group.group_name} value={group.group_id}>
+											Group {group.group_name}
+										</option>
+									))}
+								</select>
+							</div>
+						)}
+
+						<div className='pt-4 calendar-id'>
 							<Calendar
 								localizer={localizer}
 								events={eventsCopy}
@@ -240,7 +281,8 @@ const CalendarPage = () => {
 								style={{ height: 800 }}
 								defaultDate={new Date(2024, 1, 1)}
 								components={{
-									event: CustomEvent,
+									event: AtCalendarEvent,
+									toolbar: MlCalendarToolbar,
 								}}
 								eventPropGetter={eventPropGetter}
 								showAllEvents

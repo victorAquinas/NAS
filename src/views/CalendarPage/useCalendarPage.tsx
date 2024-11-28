@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react';
 import { CalendarEvent } from './types';
 import { getOneEventPerGroup } from '../../utils/getOneEventPerGroup';
-import { getCalendarGroups } from '../../api/services';
+import {
+	getCalendarGroupById,
+	getCalendarGroups,
+	getUserStatus,
+} from '../../api/services';
 import { transformAndFillAddresses } from '../../utils/transformAndFillEvents';
+import { UserStatus } from '../../api/types';
 
 export const useCalendarPage = () => {
 	const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -10,6 +15,7 @@ export const useCalendarPage = () => {
 	const [opportunities, setOpportunities] = useState<CalendarEvent[]>([]);
 	const [showEventDetailModal, setShowEventDetailModal] = useState(false);
 	const [eventDetail, setEventDetail] = useState<CalendarEvent | null>(null);
+	const [userStatus, setUserStatus] = useState<UserStatus>();
 
 	const handleShowEventDetailModal = (event: CalendarEvent) => {
 		setShowEventDetailModal(true);
@@ -79,7 +85,7 @@ export const useCalendarPage = () => {
 	const getCalendarGroupsEvents = async (user_program_semester_id: string) => {
 		try {
 			const groups = await getCalendarGroups(user_program_semester_id);
-			const transformedCalendarEvents = transformAndFillAddresses(groups);
+			const transformedCalendarEvents = transformAndFillAddresses(groups.data);
 			console.log('transformedCalendarEvents', transformedCalendarEvents);
 			setEvents(transformedCalendarEvents);
 			setEventsCopy(transformedCalendarEvents);
@@ -89,9 +95,63 @@ export const useCalendarPage = () => {
 		}
 	};
 
+	const getCalendarGroupByIdEvents = async (group_id: string) => {
+		try {
+			const group = await getCalendarGroupById(group_id);
+			const transformedCalendarEvents = transformAndFillAddresses([group.data]);
+			console.log('Specific Group', transformedCalendarEvents);
+			setEvents(transformedCalendarEvents);
+			setEventsCopy(transformedCalendarEvents);
+			return transformedCalendarEvents;
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const handleUserStatus = async (
+		email: string,
+		user_program_semester_id: string
+	) => {
+		try {
+			console.log('El email', email);
+			const statusResponse = await getUserStatus(
+				email,
+				user_program_semester_id
+			);
+			const { requested_group_status: status } = statusResponse.data;
+			// setUserStatus(status as UserStatus);
+			// setUserStatus(UserStatus.ACCEPTED);
+			// setUserStatus(UserStatus.REJECTED);
+			// setUserStatus(UserStatus.PENDING);
+			setUserStatus(UserStatus.NONE);
+			console.log('Status', status);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	useEffect(() => {
-		getCalendarGroupsEvents('4');
+		handleUserStatus('daniel+student', '4');
 	}, []);
+	useEffect(() => {
+		// handleUserStatus('daniel+student', '4');
+		// // getCalendarGroupById('14').then((res) => console.log(res));
+		// getCalendarGroupByIdEvents('14');
+		// // getCalendarGroupsEvents('4');
+
+		if (userStatus) {
+			if (
+				userStatus === UserStatus.ACCEPTED ||
+				userStatus === UserStatus.PENDING
+			) {
+				getCalendarGroupByIdEvents('14');
+			}
+
+			if (userStatus === UserStatus.NONE) {
+				getCalendarGroupsEvents('4');
+			}
+		}
+	}, [userStatus]);
 
 	useEffect(() => {
 		if (events.length > 0) {
@@ -110,5 +170,6 @@ export const useCalendarPage = () => {
 		eventDetail,
 		showEventDetailModal,
 		handleCloseEventDetailModal,
+		userStatus,
 	};
 };

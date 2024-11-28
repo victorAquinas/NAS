@@ -5,6 +5,10 @@ import { AppLayout } from '../../layouts/AppLayout';
 import { MlGroupDetailModal } from '../../components/MlModal/MlGroupDetail';
 import { truncateText } from '../../utils/truncateText';
 import { useCalendarPage } from './useCalendarPage';
+import { UserStatus } from '../../api/types';
+import { AtBadge } from '../../components/AtBadge';
+import { canShowStatus } from '../../utils/canShowForStatus';
+import { FiAlertCircle } from 'react-icons/fi';
 
 const localizer = momentLocalizer(moment);
 
@@ -32,6 +36,7 @@ const CalendarPage = () => {
 		eventDetail,
 		showEventDetailModal,
 		handleCloseEventDetailModal,
+		userStatus,
 	} = useCalendarPage();
 	return (
 		<>
@@ -42,6 +47,7 @@ const CalendarPage = () => {
 				closeButtonLabel='Close'
 				actionButtonLabel='Request'
 				event={eventDetail || null}
+				variant={userStatus as UserStatus}
 			/>
 
 			<AppLayout course='Nursing' userName='Victor Escalona'>
@@ -53,10 +59,49 @@ const CalendarPage = () => {
 				</p>
 
 				<div className='grid-container min-[1440px]:flex min-[1440px]:justify-between '>
-					<div className='opportunities bg-white rounded-md mt-10 '>
-						<h3 className='font-medium py-4 px-2'>Opportunities</h3>
+					<div
+						className={`opportunities bg-white rounded-md mt-10 h-max pb-6 ${
+							canShowStatus(userStatus as UserStatus, [UserStatus.PENDING])
+								? 'h-max'
+								: ''
+						}`}
+					>
+						<h3 className='font-medium py-4 px-2'>
+							{canShowStatus(userStatus as UserStatus, [UserStatus.ACCEPTED])
+								? 'Selected Group'
+								: 'Opportunities'}
 
-						<div className='w-full min-[1440px]:w-[400px] h-[500px] min-[1440px]:h-[800px] overflow-y-auto'>
+							{canShowStatus(userStatus as UserStatus, [
+								UserStatus.ACCEPTED,
+							]) && (
+								<>
+									{' '}
+									-{' '}
+									<AtBadge
+										label={`You are in group ${opportunities[0]?.group_name}`}
+										variant='info'
+									/>
+								</>
+							)}
+						</h3>
+
+						<div
+							className={`w-full min-[1440px]:w-[400px] h-[500px] ${
+								canShowStatus(userStatus as UserStatus, [
+									UserStatus.ACCEPTED,
+									UserStatus.PENDING,
+								])
+									? 'h-max'
+									: 'min-[1440px]:h-[600px]'
+							}   ${
+								canShowStatus(userStatus as UserStatus, [
+									UserStatus.ACCEPTED,
+									UserStatus.PENDING,
+								])
+									? 'overflow-y-hidden overflow-x-hidden'
+									: 'overflow-y-auto'
+							}`}
+						>
 							<table className='border-collapse border border-slate-500 w-full'>
 								<thead>
 									<tr>
@@ -103,6 +148,24 @@ const CalendarPage = () => {
 								</tbody>
 							</table>
 						</div>
+						{canShowStatus(userStatus as UserStatus, [UserStatus.PENDING]) && (
+							<div className='p-2'>
+								<div className='flex justify-center pt-4'>
+									<span className='text-3xl text-cyan-700'>
+										<FiAlertCircle />
+									</span>
+								</div>
+								<div className='text-center pt-4 text-cyan-700'>
+									Your request to join group {opportunities[0]?.group_name} is
+									pending confirmation from the administrator.
+								</div>
+
+								<p className='text-center pt-4 text-cyan-700 text-[0.8rem]'>
+									You cannot switch groups until your request is either accepted
+									or rejected
+								</p>
+							</div>
+						)}
 					</div>
 
 					<div className='calendar mt-12 bg-white p-6 min-[1440px]:mt-10 min-[1440px]:ml-8 min-[1440px]:min-w-[calc(100%-400px)] rounded-md'>
@@ -122,23 +185,25 @@ const CalendarPage = () => {
 								))}
 							</select>
 						</div>
-						<Calendar
-							localizer={localizer}
-							events={eventsCopy}
-							views={['month']}
-							// startAccessor='start'
-							endAccessor='end'
-							style={{ height: 800 }}
-							defaultDate={new Date(2024, 1, 1)}
-							components={{
-								event: CustomEvent,
-							}}
-							eventPropGetter={eventPropGetter}
-							showAllEvents
-							popup={true}
-							onSelectEvent={(event) => handleShowEventDetailModal(event)}
-							showMultiDayTimes={false}
-						/>
+						<div className='pt-4'>
+							<Calendar
+								localizer={localizer}
+								events={eventsCopy}
+								views={['month', 'agenda']}
+								// startAccessor='start'
+								endAccessor='end'
+								style={{ height: 800 }}
+								defaultDate={new Date(2024, 1, 1)}
+								components={{
+									event: CustomEvent,
+								}}
+								eventPropGetter={eventPropGetter}
+								showAllEvents
+								popup={true}
+								onSelectEvent={(event) => handleShowEventDetailModal(event)}
+								showMultiDayTimes={false}
+							/>
+						</div>
 					</div>
 				</div>
 			</AppLayout>

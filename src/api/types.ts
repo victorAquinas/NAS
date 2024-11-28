@@ -79,3 +79,26 @@ export interface PracticaPlace {
 		type: number;
 	};
 }
+
+export interface UserStatusResponse {
+	success: boolean;
+	data: {
+		student_id: number;
+		student_name: string;
+		student_email: string;
+		requested_group: number;
+		requested_group_status: 'PENDING' | 'REJECTED' | 'ACCEPTED' | 'NONE';
+	};
+}
+
+export enum UserStatus {
+	NONE = 'NONE',
+	PENDING = 'PENDING',
+	REJECTED = 'REJECTED',
+	ACCEPTED = 'ACCEPTED',
+}
+
+export interface GroupByIdResponse {
+	data: Group;
+	success: boolean;
+}

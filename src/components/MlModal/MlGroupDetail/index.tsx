@@ -4,6 +4,8 @@ import AtButton from '../../AtButton';
 import { CgChevronRight } from 'react-icons/cg';
 import { AtBadge } from '../../AtBadge';
 import { CalendarEvent } from '../../../views/CalendarPage/types';
+import { UserStatus } from '../../../api/types';
+import { canShowStatus } from '../../../utils/canShowForStatus';
 
 interface MlGroupDetailModalProps {
 	isOpen: boolean;
@@ -12,6 +14,7 @@ interface MlGroupDetailModalProps {
 	closeButtonLabel: string;
 	actionButtonLabel: string;
 	event: CalendarEvent | null;
+	variant: UserStatus;
 }
 export const MlGroupDetailModal = ({
 	isOpen,
@@ -20,6 +23,7 @@ export const MlGroupDetailModal = ({
 	closeButtonLabel,
 	actionButtonLabel,
 	event,
+	variant,
 }: MlGroupDetailModalProps) => {
 	const customStyles = {
 		content: {
@@ -36,7 +40,7 @@ export const MlGroupDetailModal = ({
 			maxHeight: '90%',
 		},
 	};
-	console.log('El evento', event);
+
 	return (
 		<Portal>
 			<Modal
@@ -62,7 +66,7 @@ export const MlGroupDetailModal = ({
 
 				<div className='box shadow-md bg-white p-2 md:p-4 border border-gray-200 rounded-md mt-4'>
 					<div className='flex items-center justify-between'>
-						<h3 className='font-semibold'>Clinica offsite</h3>
+						<h3 className='font-semibold'>Clinical offsite</h3>
 						<p className='text-primary text-sm font-medium'>Total Hours: 100</p>
 					</div>
 					<p className='text-sm w-[350px]'>{event?.offsiteAddress}</p>
@@ -87,7 +91,7 @@ export const MlGroupDetailModal = ({
 
 				<div className='box shadow-md bg-white p-2 md:p-4 border border-gray-200 rounded-md mt-4'>
 					<div className='flex items-center justify-between'>
-						<h3 className='font-semibold'>Clinica in campus</h3>
+						<h3 className='font-semibold'>Clinical in campus</h3>
 						<p className='text-primary text-sm font-medium'>Total Hours: 35</p>
 					</div>
 					<p className='text-sm w-[350px]'>{event?.campusAddress}</p>
@@ -109,27 +113,39 @@ export const MlGroupDetailModal = ({
 						))}
 					</ul>
 				</div>
-
 				<div className='buttons-container w-full flex justify-center mt-2'>
 					<div className='buttons flex items-center jsutify-center gap-6'>
 						<AtButton
-							variant='transparent'
+							variant={
+								canShowStatus(variant as UserStatus, [
+									UserStatus.ACCEPTED,
+									UserStatus.PENDING,
+								])
+									? 'primary'
+									: 'transparent'
+							}
 							className='flex items-center mt-6'
 							onClick={onClose}
 						>
 							{closeButtonLabel}
 						</AtButton>
-						<AtButton
-							variant='primary'
-							className='flex items-center mt-6'
-							onClick={onAction}
-						>
-							{actionButtonLabel}
-							<span className='text-2xl'>
-								{' '}
-								<CgChevronRight />
-							</span>
-						</AtButton>
+
+						{canShowStatus(variant as UserStatus, [
+							UserStatus.NONE,
+							UserStatus.REJECTED,
+						]) && (
+							<AtButton
+								variant='primary'
+								className='flex items-center mt-6'
+								onClick={onAction}
+							>
+								{actionButtonLabel}
+								<span className='text-2xl'>
+									{' '}
+									<CgChevronRight />
+								</span>
+							</AtButton>
+						)}
 					</div>
 				</div>
 			</Modal>

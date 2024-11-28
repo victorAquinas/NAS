@@ -1,13 +1,13 @@
-import { GroupResponse, PracticaPlaceTypeName } from '../api/types';
+import { Group, PracticaPlaceTypeName } from '../api/types';
+import { DEFAULT_DATE_FORMAT } from '../constants/dateSettings';
 import { CalendarEvent, DateTypeEvent } from '../views/CalendarPage/types';
 import { toExactDate } from './toExactDate';
+import { transformDateString } from './transformDateString';
 import { transformTimeToShortFormat } from './transformTimeToShortFormat';
 
-export const transformAndFillAddresses = (
-	data: GroupResponse
-): CalendarEvent[] => {
-	const transformToCalendarEvents = (data: GroupResponse): CalendarEvent[] => {
-		return data.data.flatMap((group, index) =>
+export const transformAndFillAddresses = (data: Group[]): CalendarEvent[] => {
+	const transformToCalendarEvents = (data: Group[]): CalendarEvent[] => {
+		return data.flatMap((group, index) =>
 			group.weeks.flatMap((week) =>
 				week.week_schedule.dates.map((date) => ({
 					title: week.week_schedule.practica_place.name,
@@ -33,56 +33,11 @@ export const transformAndFillAddresses = (
 					)} - ${transformTimeToShortFormat(week.week_schedule.end_time)}`,
 					tutor: week.instructor.name,
 					type: week.week_schedule.practica_place.type.name,
-					rawDate: date,
+					rawDate: transformDateString(date, DEFAULT_DATE_FORMAT),
 				}))
 			)
 		);
 	};
-
-	// const groupDatesByType = (
-	// 	events: CalendarEvent[]
-	// ): Record<string, { InSite: Set<string>; OffSite: Set<string> }> => {
-	// 	const groupedDates: Record<
-	// 		string,
-	// 		{ InSite: Set<string>; OffSite: Set<string> }
-	// 	> = {};
-
-	// 	events.forEach((event) => {
-	// 		const formattedDate = event.rawDate.split('-').reverse().join('-');
-	// 		if (!groupedDates[event.group_id]) {
-	// 			groupedDates[event.group_id] = {
-	// 				InSite: new Set(),
-	// 				OffSite: new Set(),
-	// 			};
-	// 		}
-
-	// 		if (event.type === PracticaPlaceTypeName.IN_SITE) {
-	// 			groupedDates[event.group_id].InSite.add(formattedDate);
-	// 		} else if (event.type === PracticaPlaceTypeName.OFF_SITE) {
-	// 			groupedDates[event.group_id].OffSite.add(formattedDate);
-	// 		}
-	// 	});
-
-	// 	return groupedDates;
-	// };
-
-	// const addDatesField = (
-	// 	events: CalendarEvent[],
-	// 	groupedDates: Record<string, { InSite: Set<string>; OffSite: Set<string> }>
-	// ): CalendarEvent[] => {
-	// 	return events.map((event) => {
-	// 		const groupDates = groupedDates[event.group_id];
-	// 		return {
-	// 			...event,
-	// 			dates: [
-	// 				{
-	// 					InSite: Array.from(groupDates.InSite),
-	// 					OffSite: Array.from(groupDates.OffSite),
-	// 				},
-	// 			],
-	// 		};
-	// 	});
-	// };
 
 	const groupDatesByType = (
 		events: CalendarEvent[]
@@ -177,6 +132,7 @@ export const transformAndFillAddresses = (
 
 	// Transform and then fill addresses
 	const events = transformToCalendarEvents(data);
+	console.log('events', events);
 	const eventsWithAddresses = fillAddressesForGroups(events);
 	const groupedDates = groupDatesByType(eventsWithAddresses);
 	return addDatesField(eventsWithAddresses, groupedDates);

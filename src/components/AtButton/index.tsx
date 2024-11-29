@@ -6,12 +6,14 @@ interface AtButtonProps {
 	children: ReactNode;
 	variant?: AtButtonVariants;
 	onClick?: () => void;
+	type?: 'button' | 'submit' | 'reset' | undefined;
 }
 const AtButton = ({
 	className,
 	children,
 	variant = 'white',
 	onClick,
+	type = 'button',
 }: AtButtonProps) => {
 	const getVariant = (variant: AtButtonVariants) => {
 		switch (variant) {
@@ -31,6 +33,7 @@ const AtButton = ({
 				variant
 			)} p-4 px-6 font-medium rounded-md shadow-md ${className}`}
 			onClick={onClick}
+			type={type}
 		>
 			{children}
 		</button>

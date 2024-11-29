@@ -3,10 +3,12 @@ import { StudentProgram } from '../../api/types';
 import { useEffect, useState } from 'react';
 import { getSemesters } from '../../api/services';
 import { toast } from 'react-toastify';
+import { getCookieItem } from '../../utils/cookies';
 
-export const useCourses = (email: string) => {
+export const useCourses = () => {
 	const [courses, setCourses] = useState<StudentProgram[]>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const userEmail = getCookieItem('user_email');
 
 	const { semesterID } = useParams();
 	console.log('SEMESTRE', semesterID);
@@ -36,14 +38,14 @@ export const useCourses = (email: string) => {
 	};
 
 	useEffect(() => {
-		if (semesterID && email) {
-			handleGetSemesterCourses(email, semesterID);
+		if (semesterID && userEmail) {
+			handleGetSemesterCourses(userEmail, semesterID);
 		}
 
-		if (!semesterID || !email) {
+		if (!semesterID || !userEmail) {
 			toast.error('Error while finding email or semester id');
 		}
-	}, [email, semesterID]);
+	}, [userEmail, semesterID]);
 
 	return { isLoading, courses };
 };

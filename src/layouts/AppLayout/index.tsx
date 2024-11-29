@@ -1,6 +1,5 @@
 import BadgeIcon from '../../assets/badge-icon.svg';
 import NasLogoNoText from '../../assets/nas-logo-no-text.svg';
-
 import { ReactNode } from 'react';
 import { AtSidebarItem } from '../../components/AtSidebarItem';
 import { LuCalendarDays } from 'react-icons/lu';
@@ -8,22 +7,21 @@ import { IoBriefcaseOutline, IoSchoolOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import MlNotifications from './MlNotifications';
 import AtNotificationItem from './MlNotifications/AtNotificationItem';
+import { useAppLayout } from './useAppLayout';
 
 interface AppLayoutProps {
 	children: ReactNode;
 	className?: string;
-	userName: string;
-	course: string;
 	programSemesterId: string;
+	course: string;
 }
 export const AppLayout = ({
 	children,
 	className,
-	userName,
-	course,
 	programSemesterId,
+	course,
 }: AppLayoutProps) => {
-	const isActive = (path: string) => location.pathname.includes(path);
+	const { isSidebarItemActive, username, handleLogOut } = useAppLayout();
 
 	return (
 		<>
@@ -37,29 +35,32 @@ export const AppLayout = ({
 						<Link to={`/calendar/${programSemesterId}`}>
 							<AtSidebarItem
 								label='Calendar'
-								isActive={isActive('calendar')}
+								isActive={isSidebarItemActive('calendar')}
 								icon={LuCalendarDays}
 							/>
 						</Link>
 						<Link to={`/my-shifts/${programSemesterId}`}>
 							<AtSidebarItem
 								label='My shifts'
-								isActive={isActive('my-shifts')}
+								isActive={isSidebarItemActive('my-shifts')}
 								icon={IoBriefcaseOutline}
 							/>
 						</Link>
 						<Link to={`/semesters`}>
 							<AtSidebarItem
 								label='Semesters'
-								isActive={isActive('semesters')}
+								isActive={isSidebarItemActive('semesters')}
 								icon={IoSchoolOutline}
 							/>
 						</Link>
 					</div>
 
-					<div className='logout absolute bottom-0 p-4 left-0 text-white font-light text-sm'>
+					<button
+						className='logout absolute bottom-0 p-4 left-0 text-white font-light text-sm'
+						onClick={handleLogOut}
+					>
 						Log out
-					</div>
+					</button>
 				</div>
 
 				<div className='content w-full'>
@@ -70,10 +71,15 @@ export const AppLayout = ({
 									<img src={BadgeIcon} alt='badge' />
 								</div>
 								<div className='content text-xs'>
-									<p>{userName}</p>
-									<p>
-										Course: <span className='font-medium'>{course}</span>
-									</p>
+									{course && (
+										<>
+											{' '}
+											<p>{username}</p>
+											<p>
+												Course: <span className='font-medium'>{course}</span>
+											</p>
+										</>
+									)}
 								</div>
 							</div>
 							<MlNotifications>

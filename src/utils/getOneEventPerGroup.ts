@@ -9,6 +9,5 @@ export const getOneEventPerGroup = (events: CalendarEvent[]) => {
 		}
 	});
 
-	// Convert the Map values to an array
 	return Array.from(groupMap.values());
 };

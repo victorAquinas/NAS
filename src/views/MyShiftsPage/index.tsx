@@ -12,13 +12,18 @@ import { Link } from 'react-router-dom';
 import { MODAL_TEXT } from '../../constants/text';
 
 const MyShiftsPage = () => {
-	const { userStatus, activeEvents, isLoading, programSemesterId, navigate } =
-		useShiftsPage();
+	const {
+		userStatus,
+		activeEvents,
+		isLoading,
+		programSemesterId,
+		navigate,
+		selectedCourse,
+	} = useShiftsPage();
 
 	return (
 		<AppLayout
-			course='Nursing'
-			userName='Victor Escalona'
+			course={selectedCourse}
 			programSemesterId={programSemesterId as string}
 		>
 			<AtLoadingWrapper isLoading={isLoading} />

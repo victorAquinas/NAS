@@ -32,7 +32,6 @@ export const MlActionModal = ({
 			padding: '4rem',
 			width: '650px',
 			borderRadius: '0.5rem',
-			// zIndex: zIndex.modal,
 		},
 	};
 

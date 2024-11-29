@@ -29,7 +29,6 @@ export const MlInfoModal = ({
 			padding: '2rem',
 			width: '650px',
 			borderRadius: '0.5rem',
-			// zIndex: zIndex.modal,
 		},
 	};
 

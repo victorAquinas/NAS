@@ -31,11 +31,11 @@ export interface Group {
 	group_name: string;
 	max_students: number;
 	spaces_available: number;
-	start_date: string; // Date string in "YYYY-MM-DD" format
-	end_date: string; // Date string in "YYYY-MM-DD" format
+	start_date: string;
+	end_date: string;
 	program_semester_id: number;
 	verity_group_id: string;
-	in_days: string[]; // Array of days, e.g., ["MONDAY", "WEDNESDAY"]
+	in_days: string[];
 	weeks: Week[];
 }
 
@@ -59,9 +59,9 @@ export interface Instructor {
 export interface WeekSchedule {
 	week_schedule_id: number;
 	practica_place: PracticaPlace;
-	start_time: string; // Time string in "HH:MM:SS" format
-	end_time: string; // Time string in "HH:MM:SS" format
-	dates: string[]; // Array of date strings in "YYYY-MM-DD" format
+	start_time: string;
+	end_time: string;
+	dates: string[];
 }
 
 export enum PracticaPlaceTypeName {
@@ -88,6 +88,10 @@ export interface UserStatusResponse {
 		student_email: string;
 		requested_group: number;
 		requested_group_status: 'PENDING' | 'REJECTED' | 'ACCEPTED' | 'OPEN';
+		program: {
+			name: string;
+			id: number;
+		};
 	};
 }
 
@@ -106,4 +110,12 @@ export interface GroupByIdResponse {
 export interface RequestGroupResponse {
 	success: boolean;
 	data: number[];
+}
+
+export interface LoginUserResponse {
+	success: boolean;
+	data: {
+		token: string;
+		expiration_time: number;
+	};
 }

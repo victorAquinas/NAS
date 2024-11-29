@@ -24,7 +24,7 @@ const localizer = momentLocalizer(moment);
 const CalendarPage = () => {
 	const {
 		eventsCopy,
-		getBackgroundColor,
+		getEventsBackgroundColor,
 		eventPropGetter,
 		filterCalendarByGroup,
 		opportunities,
@@ -44,6 +44,8 @@ const CalendarPage = () => {
 		run,
 		handleJoyrideCallback,
 		hasSeenTutorial,
+		userEmail,
+		selectedCourse,
 	} = useCalendarPage();
 
 	return (
@@ -54,7 +56,7 @@ const CalendarPage = () => {
 					if (eventDetail?.group_id) {
 						toast.promise(
 							handleRequestGroup(
-								import.meta.env.VITE_TEST_EMAIL_USER,
+								userEmail as string,
 								eventDetail?.group_id,
 								programSemesterId as string
 							),
@@ -91,8 +93,7 @@ const CalendarPage = () => {
 			/>
 
 			<AppLayout
-				course='Nursing'
-				userName='Victor Escalona'
+				course={selectedCourse}
 				programSemesterId={programSemesterId as string}
 			>
 				<AtLoadingWrapper isLoading={isLoading} />
@@ -194,8 +195,10 @@ const CalendarPage = () => {
 								<tbody>
 									{opportunities.map((event, index) => (
 										<tr
-											className={`text-center relative cursor-pointer transition duration-200 ease-in-out hover:scale-[1.02]`}
-											style={{ backgroundColor: getBackgroundColor(index + 1) }}
+											className={`text-center relative cursor-pointer transition duration-200 ease-in-out hover:scale-[1.01]`}
+											style={{
+												backgroundColor: getEventsBackgroundColor(index + 1),
+											}}
 											key={index}
 											onClick={() => handleShowEventDetailModal(event)}
 										>
@@ -279,7 +282,7 @@ const CalendarPage = () => {
 								views={['month', 'agenda']}
 								endAccessor='end'
 								style={{ height: 800 }}
-								defaultDate={new Date(2024, 1, 1)}
+								defaultDate={new Date()}
 								components={{
 									event: AtCalendarEvent,
 									toolbar: MlCalendarToolbar,

@@ -4,10 +4,12 @@ import { getSemesters } from '../../api/services';
 import AtButton from '../../components/AtButton';
 import { AiOutlineEye } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
+import { getCookieItem } from '../../utils/cookies';
 
-export const useSemesters = (email: string) => {
+export const useSemesters = () => {
 	const [semesters, setSemesters] = useState<Semester[]>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const userEmail = getCookieItem('user_email');
 
 	const renderSemesterList = (filterActive: boolean, title: string) => {
 		const filteredSemesters = semesters.filter(
@@ -59,7 +61,7 @@ export const useSemesters = (email: string) => {
 		);
 	};
 
-	const handleGetSemesters = async () => {
+	const handleGetSemesters = async (email: string) => {
 		setIsLoading(true);
 		try {
 			const semesters = await getSemesters(email);
@@ -71,8 +73,10 @@ export const useSemesters = (email: string) => {
 		}
 	};
 	useEffect(() => {
-		handleGetSemesters();
-	}, [email]);
+		if (userEmail) {
+			handleGetSemesters(userEmail);
+		}
+	}, [userEmail]);
 
 	return { semesters, isLoading, renderSemesterList };
 };

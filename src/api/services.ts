@@ -3,6 +3,7 @@ import api from './fetch';
 import {
 	GroupByIdResponse,
 	GroupResponse,
+	LoginUserResponse,
 	RequestGroupResponse,
 	SemesterResponse,
 	UserStatusResponse,
@@ -80,6 +81,20 @@ export const requestGroup = async (
 		`${
 			import.meta.env.VITE_API_URL
 		}${`user/group/request?${transformToUrlParams(emailUrlParams)}`}`
+	);
+	return response.data;
+};
+
+export const loginUser = async (
+	email: string,
+	password: string
+): Promise<LoginUserResponse> => {
+	const emailUrlParams = `email=${email}&password=${password}`;
+
+	const response = await api.post(
+		`${import.meta.env.VITE_API_URL}${`login?${transformToUrlParams(
+			emailUrlParams
+		)}`}`
 	);
 	return response.data;
 };

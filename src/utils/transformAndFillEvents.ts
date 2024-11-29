@@ -44,7 +44,7 @@ export const transformAndFillAddresses = (data: Group[]): CalendarEvent[] => {
 			const [hours, minutes] = time.split(':').map(Number);
 			return hours + minutes / 60;
 		});
-		return end >= start ? end - start : 24 - start + end; // Handles shifts crossing midnight
+		return end >= start ? end - start : 24 - start + end;
 	};
 
 	const calculateTotalHoursByGroup = (events: CalendarEvent[]) => {
@@ -74,8 +74,8 @@ export const transformAndFillAddresses = (data: Group[]): CalendarEvent[] => {
 			const offsite_total_hours = groupHours[event.group_id]?.offSite || 0;
 			return {
 				...event,
-				insite_total_hours, // Add separate total hours for In-Site
-				offsite_total_hours, // Add separate total hours for Off-Site
+				insite_total_hours,
+				offsite_total_hours,
 			};
 		});
 	};
@@ -140,7 +140,6 @@ export const transformAndFillAddresses = (data: Group[]): CalendarEvent[] => {
 			{ offsiteAddress: string | null; campusAddress: string | null }
 		> = {};
 
-		// First pass: collect unique addresses for each group
 		events.forEach((event) => {
 			const { group_id, offsiteAddress, campusAddress } = event;
 
@@ -160,7 +159,6 @@ export const transformAndFillAddresses = (data: Group[]): CalendarEvent[] => {
 			}
 		});
 
-		// Second pass: populate missing addresses
 		return events.map((event) => {
 			const groupAddress = groupAddresses[event.group_id];
 			return {
@@ -171,7 +169,6 @@ export const transformAndFillAddresses = (data: Group[]): CalendarEvent[] => {
 		});
 	};
 
-	// Transform and fill addresses
 	const events = transformToCalendarEvents(data);
 	const eventsWithAddresses = fillAddressesForGroups(events);
 	const groupedDates = groupDatesByType(eventsWithAddresses);
@@ -181,13 +178,4 @@ export const transformAndFillAddresses = (data: Group[]): CalendarEvent[] => {
 		groupedDates
 	);
 	return addHoursToEvents(eventsWithDatesAndHours, groupHours);
-
-	// Transform and then fill addresses
-	// const events = transformToCalendarEvents(data);
-	// console.log('events', events);
-	// const eventsWithAddresses = fillAddressesForGroups(events);
-	// const groupedDates = groupDatesByType(eventsWithAddresses);
-	// return addDatesField(eventsWithAddresses, groupedDates);
-
-	// return eventsWithAddresses
 };

@@ -4,7 +4,7 @@ export const transformToUrlParams = (input: string) => {
 
 	keyValuePairs.forEach((pair) => {
 		const [key, value] = pair.split('=');
-		params.append(key, value); // Let URLSearchParams handle encoding
+		params.append(key, value);
 	});
 
 	return params.toString();

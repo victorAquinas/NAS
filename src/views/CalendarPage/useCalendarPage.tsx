@@ -16,8 +16,11 @@ import { ErrorMessages } from '../../constants/text';
 import useSetState from '../../hooks/useSetState';
 import { CallBackProps, STATUS } from 'react-joyride';
 import { TUTORIAL_STEPS } from './steps';
+import { getEventsBackgroundColor } from '../../utils/getEventsBackgroundColor';
+import { getCookieItem } from '../../utils/cookies';
 
 export const useCalendarPage = () => {
+	const userEmail = getCookieItem('user_email');
 	const [events, setEvents] = useState<CalendarEvent[]>([]);
 	const [eventsCopy, setEventsCopy] = useState<CalendarEvent[]>([]);
 	const [opportunities, setOpportunities] = useState<CalendarEvent[]>([]);
@@ -27,6 +30,7 @@ export const useCalendarPage = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [hasGroups, setHasGroups] = useState<boolean>(true);
 	const [groupId, setGroupId] = useState<string | null>(null);
+	const [selectedCourse, setSelectedCourse] = useState<string>('');
 	const [{ run, steps }, setState] = useSetState<TutorialState>({
 		run: false,
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,7 +40,7 @@ export const useCalendarPage = () => {
 		useState<boolean>(false);
 	const [hasSeenTutorial, setHasSeenTutorial] = useState<boolean>(() => {
 		const storedValue = localStorage.getItem('hasSeenTutorial');
-		return storedValue === 'true'; // Convert to a boolean (assumes the value is stored as 'true' or 'false')
+		return storedValue === 'true';
 	});
 	const { programSemesterId } = useParams();
 	const navigate = useNavigate();
@@ -76,46 +80,11 @@ export const useCalendarPage = () => {
 		setShowEventDetailModal(false);
 		setEventDetail(null);
 	};
-	const getBackgroundColor = (group: number) => {
-		switch (group) {
-			case 1:
-				return '#DFF3EF';
-			case 2:
-				return '#90CAF9';
-			case 3:
-				return '#E9D8A6';
-			case 4:
-				return '#94D2BD';
-			case 5:
-				return '#FF99C8';
-			case 6:
-				return '#E0AAFF';
-			case 7:
-				return '#FFFF3F';
-			case 8:
-				return '#F19C79';
-			case 9:
-				return '#D4E09B';
-			case 10:
-				return '#FDE2E4';
-			case 11:
-				return '#98F5E1';
-			case 12:
-				return '#B9FBC0';
-			case 13:
-				return '#CFBAF0';
-			case 14:
-				return '#FF70A6';
-
-			default:
-				return '#8AC926';
-		}
-	};
 
 	const eventPropGetter = (event: CalendarEvent) => {
 		return {
 			style: {
-				backgroundColor: getBackgroundColor(parseInt(event?.group)),
+				backgroundColor: getEventsBackgroundColor(parseInt(event?.group)),
 			},
 		};
 	};
@@ -178,7 +147,7 @@ export const useCalendarPage = () => {
 			const { requested_group_status: status, requested_group } =
 				statusResponse.data;
 			setUserStatus(status as UserStatus);
-
+			setSelectedCourse(statusResponse.data.program.name);
 			if (status === UserStatus.PENDING || status === UserStatus.ACCEPTED) {
 				setGroupId(requested_group.toString());
 			}
@@ -220,15 +189,15 @@ export const useCalendarPage = () => {
 	}, [hasSeenTutorial, isLoading]);
 
 	useEffect(() => {
-		if (programSemesterId) {
-			handleUserStatus(import.meta.env.VITE_TEST_EMAIL_USER, programSemesterId);
+		if (programSemesterId && userEmail) {
+			handleUserStatus(userEmail, programSemesterId);
 			console.log(
 				'LocalStorage',
 				localStorage.getItem('hasSeenTutorial') ?? false
 			);
 			setHasSeenTutorial(localStorage.getItem('hasSeenTutorial') === 'true');
 		}
-	}, [programSemesterId]);
+	}, [programSemesterId, userEmail]);
 
 	useEffect(() => {
 		if (userStatus && programSemesterId) {
@@ -259,7 +228,7 @@ export const useCalendarPage = () => {
 	return {
 		events,
 		eventsCopy,
-		getBackgroundColor,
+		getEventsBackgroundColor,
 		eventPropGetter,
 		filterCalendarByGroup,
 		opportunities,
@@ -280,5 +249,7 @@ export const useCalendarPage = () => {
 		handleClickStart,
 		handleJoyrideCallback,
 		hasSeenTutorial,
+		userEmail,
+		selectedCourse,
 	};
 };

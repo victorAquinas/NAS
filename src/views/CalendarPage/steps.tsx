@@ -4,6 +4,30 @@ export const TUTORIAL_STEPS = [
 	{
 		content: (
 			<div>
+				<div className='text-xl text-primary w-full flex justify-center mb-4 font-medium'>
+					Welcome to the NAS
+				</div>
+				<p className='text-left'>
+					Here you can easily manage your clinical practices. Select the{' '}
+					<span className='font-medium text-primary'>shift </span> that best
+					suits your schedule at the available{' '}
+					<span className='font-medium text-primary'>hospitals</span> through
+					the calendar.
+				</p>
+			</div>
+		),
+
+		placement: 'center',
+		target: 'body',
+		styles: {
+			options: {
+				width: 400,
+			},
+		},
+	},
+	{
+		content: (
+			<div>
 				<div className='text-4xl text-primary w-full flex justify-center mb-4'>
 					<PiLightbulbFilamentLight />
 				</div>

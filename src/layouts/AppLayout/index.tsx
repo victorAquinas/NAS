@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import MlNotifications from './MlNotifications';
 import AtNotificationItem from './MlNotifications/AtNotificationItem';
 import { useAppLayout } from './useAppLayout';
+import { RiComputerLine } from 'react-icons/ri';
 
 interface AppLayoutProps {
 	children: ReactNode;
@@ -25,7 +26,20 @@ export const AppLayout = ({
 
 	return (
 		<>
-			<div className='full flex'>
+			<div className='md:hidden bg-primary h-full min-h-screen overflow-hidden flex items-center justify-center flex-col'>
+				<div className='text-center mt-4 text-[5rem] text-white'>
+					<RiComputerLine />
+				</div>
+				<div className='p-4 text-lg md:text-4xl text-white text-center'>
+					This content can only be accessed from a tablet device or higher.
+				</div>
+				<div className=' text-lg md:text-4xl text-white text-center'>
+					If you're using a tablet, please rotate your device to landscape mode
+					for optimal viewing.
+				</div>
+			</div>
+
+			<div className='full hidden md:flex'>
 				<div className='sidebar w-[115px] bg-secondary h-screen p-4 relative'>
 					<div className='logo'>
 						<img src={NasLogoNoText} alt='' />

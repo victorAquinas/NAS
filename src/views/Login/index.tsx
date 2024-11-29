@@ -24,7 +24,7 @@ export const Login = () => {
 								{...register('email')}
 								className=' w-full h-full bg-white p-3 placeholder:text-gray-400 font-normal rounded-md'
 							/>
-							<div className='text-sm text-red_primary'>
+							<div className='text-sm text-red_primary pt-1'>
 								{' '}
 								{errors.email && <>{errors.email.message}</>}
 							</div>
@@ -32,13 +32,13 @@ export const Login = () => {
 
 						<div className='input-group w-full'>
 							<input
-								type='text'
+								type='password'
 								id='password'
 								placeholder='Password'
 								{...register('password')}
 								className=' w-full h-full bg-white p-3 placeholder:text-gray-400 font-normal rounded-md'
 							/>
-							<div className='text-sm text-red_primary'>
+							<div className='text-sm text-red_primary pt-1'>
 								{errors.password && <>{errors.password.message}</>}
 							</div>
 						</div>

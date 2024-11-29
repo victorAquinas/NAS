@@ -6,8 +6,10 @@ import { getCalendarGroupById, getUserStatus } from '../../api/services';
 import { toast } from 'react-toastify';
 import { ErrorMessages } from '../../constants/text';
 import { useNavigate, useParams } from 'react-router-dom';
+import { getCookieItem } from '../../utils/cookies';
 
 export const useShiftsPage = () => {
+	const userEmail = getCookieItem('user_email');
 	const [activeEvents, setActiveEvents] = useState<CalendarEvent[]>([]);
 	const [userStatus, setUserStatus] = useState<UserStatus>();
 	const [activeGroup, setActiveGroup] = useState<string>();
@@ -65,11 +67,11 @@ export const useShiftsPage = () => {
 	};
 
 	useEffect(() => {
-		if (programSemesterId) {
-			handleUserStatus('daniel+student', programSemesterId);
+		if (programSemesterId && userEmail) {
+			handleUserStatus(userEmail, programSemesterId);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [programSemesterId]);
+	}, [programSemesterId, userEmail]);
 
 	useEffect(() => {
 		if (userStatus && userStatus === UserStatus.ACCEPTED) {

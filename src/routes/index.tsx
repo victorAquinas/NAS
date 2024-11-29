@@ -7,10 +7,12 @@ import { Courses } from '../views/Courses';
 import CalendarPage from '../views/CalendarPage';
 import MyShiftsPage from '../views/MyShiftsPage';
 import PrivateRoute from './PrivateRoute';
+import { NotFoundPage } from '../views/NotFoundPage';
 
 const Router = () => {
 	const routes = createBrowserRouter([
 		{ path: '/', element: <Login /> },
+		{ path: '*', element: <NotFoundPage /> },
 		{
 			element: <PrivateRoute />,
 			children: [

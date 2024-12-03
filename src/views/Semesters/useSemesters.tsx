@@ -47,12 +47,12 @@ export const useSemesters = () => {
 							>
 								<AtButton
 									variant={filterActive ? 'primary' : 'white'}
-									className='flex items-center w-[330px] justify-center'
+									className='flex items-center w-[330px]  text-[0.9rem] text-left'
 								>
-									{semester.semester_name}
-									<span className='text-[1.7rem] pl-4'>
+									<span className='text-[1.7rem] pr-4'>
 										<AiOutlineEye />
 									</span>
+									<div>{semester.semester_name}</div>
 								</AtButton>
 							</Link>
 						))}

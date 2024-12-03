@@ -78,6 +78,7 @@ export interface PracticaPlace {
 		name: PracticaPlaceTypeName;
 		type: number;
 	};
+	semester_status: boolean;
 }
 
 export interface UserStatusResponse {
@@ -92,6 +93,7 @@ export interface UserStatusResponse {
 			name: string;
 			id: number;
 		};
+		semester_status: boolean;
 	};
 }
 

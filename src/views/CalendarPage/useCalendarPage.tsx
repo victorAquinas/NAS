@@ -31,6 +31,7 @@ export const useCalendarPage = () => {
 	const [hasGroups, setHasGroups] = useState<boolean>(true);
 	const [groupId, setGroupId] = useState<string | null>(null);
 	const [selectedCourse, setSelectedCourse] = useState<string>('');
+	const [isSemesterOpen, setIsSemesterOpen] = useState<boolean>(false);
 	const [{ run, steps }, setState] = useSetState<TutorialState>({
 		run: false,
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -148,6 +149,7 @@ export const useCalendarPage = () => {
 				statusResponse.data;
 			setUserStatus(status as UserStatus);
 			setSelectedCourse(statusResponse.data.program.name);
+			setIsSemesterOpen(statusResponse.data.semester_status);
 			if (status === UserStatus.PENDING || status === UserStatus.ACCEPTED) {
 				setGroupId(requested_group.toString());
 			}
@@ -251,5 +253,6 @@ export const useCalendarPage = () => {
 		hasSeenTutorial,
 		userEmail,
 		selectedCourse,
+		isSemesterOpen,
 	};
 };

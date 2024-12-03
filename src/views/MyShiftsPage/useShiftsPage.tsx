@@ -15,6 +15,7 @@ export const useShiftsPage = () => {
 	const [activeGroup, setActiveGroup] = useState<string>();
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [selectedCourse, setSelectedCourse] = useState<string>('');
+	const [isSemesterOpen, setIsSemesterOpen] = useState<boolean>(false);
 	const { programSemesterId } = useParams();
 	const navigate = useNavigate();
 
@@ -54,6 +55,7 @@ export const useShiftsPage = () => {
 				statusResponse.data;
 
 			setUserStatus(status as UserStatus);
+			setIsSemesterOpen(statusResponse.data.semester_status);
 			setSelectedCourse(statusResponse.data.program.name);
 			if (requested_group) {
 				setActiveGroup(requested_group.toString());
@@ -88,5 +90,6 @@ export const useShiftsPage = () => {
 		programSemesterId,
 		navigate,
 		selectedCourse,
+		isSemesterOpen,
 	};
 };

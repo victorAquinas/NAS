@@ -16,6 +16,7 @@ interface MlGroupDetailModalProps {
 	actionButtonLabel: string;
 	event: CalendarEvent | null;
 	variant: UserStatus;
+	isSemesterOpen: boolean;
 }
 export const MlGroupDetailModal = ({
 	isOpen,
@@ -25,6 +26,7 @@ export const MlGroupDetailModal = ({
 	actionButtonLabel,
 	event,
 	variant,
+	isSemesterOpen,
 }: MlGroupDetailModalProps) => {
 	const customStyles = {
 		content: {
@@ -144,19 +146,20 @@ export const MlGroupDetailModal = ({
 						{canShowStatus(variant as UserStatus, [
 							UserStatus.OPEN,
 							UserStatus.REJECTED,
-						]) && (
-							<AtButton
-								variant='primary'
-								className='flex items-center mt-6'
-								onClick={onAction}
-							>
-								{actionButtonLabel}
-								<span className='text-2xl'>
-									{' '}
-									<CgChevronRight />
-								</span>
-							</AtButton>
-						)}
+						]) &&
+							isSemesterOpen && (
+								<AtButton
+									variant='primary'
+									className='flex items-center mt-6'
+									onClick={onAction}
+								>
+									{actionButtonLabel}
+									<span className='text-2xl'>
+										{' '}
+										<CgChevronRight />
+									</span>
+								</AtButton>
+							)}
 					</div>
 				</div>
 			</Modal>

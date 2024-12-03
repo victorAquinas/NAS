@@ -9,7 +9,8 @@ import { PracticaPlaceTypeName, UserStatus } from '../../api/types';
 import { getPracticalPlaceColor } from '../../utils/getPracticalPlaceColor';
 import { AtLoadingWrapper } from '../../components/AtLoadingWrapper';
 import { Link } from 'react-router-dom';
-import { MODAL_TEXT } from '../../constants/text';
+import { GENERAL_TEXT, MODAL_TEXT } from '../../constants/text';
+import { AtAlert } from '../../components/AtAlert';
 
 const MyShiftsPage = () => {
 	const {
@@ -19,6 +20,7 @@ const MyShiftsPage = () => {
 		programSemesterId,
 		navigate,
 		selectedCourse,
+		isSemesterOpen,
 	} = useShiftsPage();
 
 	return (
@@ -35,6 +37,14 @@ const MyShiftsPage = () => {
 				actionButtonLabel='Continue'
 				onAction={() => navigate(`/calendar/${programSemesterId}`)}
 			/>
+
+			{!isSemesterOpen && (
+				<AtAlert
+					title={GENERAL_TEXT.CLOSED_SEMESTER_TITLE}
+					description={GENERAL_TEXT.CLOSED_SEMESTER_DESCRIPTION}
+					className='mb-4'
+				/>
+			)}
 
 			{canShowStatus(userStatus as UserStatus, [
 				UserStatus.OPEN,

@@ -13,11 +13,12 @@ import { AtLoadingWrapper } from '../../components/AtLoadingWrapper';
 import { MlActionModal } from '../../components/MlModal/MlActionModal';
 import { toast } from 'react-toastify';
 import { MlInfoModal } from '../../components/MlModal/MlInfoModal';
-import { MODAL_TEXT } from '../../constants/text';
+import { GENERAL_TEXT, MODAL_TEXT } from '../../constants/text';
 
 import { AtCalendarEvent } from '../../components/AtCalendarEvent';
 import { MlCalendarToolbar } from '../../components/MlCalendarToolbar';
 import Joyride from 'react-joyride';
+import { AtAlert } from '../../components/AtAlert';
 
 const localizer = momentLocalizer(moment);
 
@@ -46,6 +47,7 @@ const CalendarPage = () => {
 		hasSeenTutorial,
 		userEmail,
 		selectedCourse,
+		isSemesterOpen,
 	} = useCalendarPage();
 
 	return (
@@ -72,6 +74,7 @@ const CalendarPage = () => {
 				actionButtonLabel='Request'
 				event={eventDetail || null}
 				variant={userStatus as UserStatus}
+				isSemesterOpen={isSemesterOpen}
 			/>
 
 			<MlInfoModal
@@ -97,6 +100,13 @@ const CalendarPage = () => {
 				programSemesterId={programSemesterId as string}
 			>
 				<AtLoadingWrapper isLoading={isLoading} />
+				{!isSemesterOpen && (
+					<AtAlert
+						title={GENERAL_TEXT.CLOSED_SEMESTER_TITLE}
+						description={GENERAL_TEXT.CLOSED_SEMESTER_DESCRIPTION}
+						className='mb-2'
+					/>
+				)}
 				<h2 className='text-xl font-medium'>Monthly Calendar</h2>
 				<p className='text-sm max-w-[50rem]'>
 					Easily explore and select available shifts for your clinical
@@ -282,7 +292,8 @@ const CalendarPage = () => {
 								views={['month', 'agenda']}
 								endAccessor='end'
 								style={{ height: 800 }}
-								defaultDate={new Date()}
+								// defaultDate={new Date()}
+								defaultDate={new Date(2024, 8, 1)}
 								components={{
 									event: AtCalendarEvent,
 									toolbar: MlCalendarToolbar,

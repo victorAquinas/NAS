@@ -12,3 +12,9 @@ export const MODAL_TEXT = {
 	MODAL_INFO_PENDING_DESCRIPTION:
 		'You will receive a response within the next hours via email. ',
 };
+
+export const GENERAL_TEXT = {
+	CLOSED_SEMESTER_TITLE: 'This semester is closed',
+	CLOSED_SEMESTER_DESCRIPTION:
+		'You will only be able to view information in closed semesters.',
+};

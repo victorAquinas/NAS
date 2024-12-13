@@ -8,9 +8,12 @@ interface MlActionModalProps {
 	onAction?: () => void;
 	onClose?: () => void;
 	title: string;
-	description: string;
+	description?: string;
 	closeButtonLabel?: string;
 	actionButtonLabel?: string;
+	children?: React.ReactNode;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	styles?: any;
 }
 export const MlActionModal = ({
 	isOpen,
@@ -20,6 +23,8 @@ export const MlActionModal = ({
 	description,
 	closeButtonLabel,
 	actionButtonLabel,
+	children,
+	styles,
 }: MlActionModalProps) => {
 	const customStyles = {
 		content: {
@@ -32,6 +37,7 @@ export const MlActionModal = ({
 			padding: '4rem',
 			width: '650px',
 			borderRadius: '0.5rem',
+			...styles,
 		},
 	};
 
@@ -46,8 +52,8 @@ export const MlActionModal = ({
 				<div className='font-medium text-2xl text-center flex justify-center flex-col'>
 					<h2>{title}</h2>
 				</div>
-				<p className='pt-4 text-center'>{description}</p>
-
+				{description && <p className='pt-4 text-center'>{description}</p>}
+				{children && children}
 				<div className='buttons-container w-full flex justify-center mt-2'>
 					<div className='buttons flex items-center jsutify-center gap-6'>
 						{closeButtonLabel && (

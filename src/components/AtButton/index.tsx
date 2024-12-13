@@ -1,6 +1,11 @@
 import { ReactNode } from 'react';
 
-type AtButtonVariants = 'white' | 'primary' | 'info' | 'transparent';
+type AtButtonVariants =
+	| 'white'
+	| 'primary'
+	| 'info'
+	| 'transparent'
+	| 'secondary';
 interface AtButtonProps {
 	className?: string;
 	children: ReactNode;
@@ -21,6 +26,8 @@ const AtButton = ({
 				return 'bg-white text-primary hover:bg-primary hover:text-white hover:duration-150';
 			case 'primary':
 				return 'bg-primary_light text-primary hover:bg-primary hover:text-white hover:duration-150';
+			case 'secondary':
+				return 'bg-secondary text-white hover:bg-primary hover:text-white hover:duration-150';
 			case 'info':
 				return 'bg-white text-gray-700 hover:bg-primary hover:text-white hover:duration-150';
 			case 'transparent':

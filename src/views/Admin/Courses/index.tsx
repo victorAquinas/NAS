@@ -10,6 +10,7 @@ const AdminCourses = () => {
 		isAddCourseModalOpen,
 		handleOpenAddCourseModal,
 		handleCloseAddCourseModal,
+		courses,
 	} = useCourses();
 	return (
 		<AppLayout course={'Administrator'} programSemesterId={'4' as string}>
@@ -45,21 +46,14 @@ const AdminCourses = () => {
 			</div>
 
 			<div className='location-list pt-6 flex flex-wrap gap-8 w-full justify-center lg:justify-start'>
-				<AtIconButton
-					href='/admin/course/1'
-					label='Nursing'
-					Icon={RiBookMarkedLine}
-				/>
-				<AtIconButton
-					href='/admin/semester/1'
-					label='Dental Assistant'
-					Icon={RiBookMarkedLine}
-				/>
-				<AtIconButton
-					href='/admin/semester/1'
-					label='Pharmacy Technician'
-					Icon={RiBookMarkedLine}
-				/>
+				{courses.map((course) => (
+					<AtIconButton
+						href={`/admin/group/${course.program_semester_id}`}
+						label={course.program.name}
+						Icon={RiBookMarkedLine}
+						key={course.program.id}
+					/>
+				))}
 			</div>
 		</AppLayout>
 	);

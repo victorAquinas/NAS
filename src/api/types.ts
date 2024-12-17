@@ -121,3 +121,34 @@ export interface LoginUserResponse {
 		expiration_time: number;
 	};
 }
+
+// Admin Types
+
+export interface AdminProgramIn {
+	program_semester_id: number;
+	program: Program;
+}
+
+export interface AdminSemester {
+	semester_name: string;
+	semester_id: number;
+	semester_start_date: string; // ISO Date string format
+	semester_end_date: string; // ISO Date string format
+	semester_status: boolean;
+	programs_in: AdminProgramIn[];
+}
+
+export interface AdminHeadquarter {
+	headquarter_name: string;
+	headquarter_id: number;
+	institution_id: number;
+	semesters_in: AdminSemester[];
+}
+
+export type HeadquartersData = AdminHeadquarter[];
+
+export interface ResponseCreateLocation {
+	institution_id: string;
+	name: string;
+	id: number;
+}

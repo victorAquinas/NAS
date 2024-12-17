@@ -4,12 +4,15 @@ import { MlActionModal } from '../../../components/MlModal/MlActionModal';
 import { useAdminSemesters } from './useAdminSemesters';
 import { AtBadge } from '../../../components/AtBadge';
 import { LuEye } from 'react-icons/lu';
+import { Link } from 'react-router-dom';
+import { transformDateString } from '../../../utils/transformDateString';
 
 const AdminSemesters = () => {
 	const {
 		isAddSemesterModalOpen,
 		handleOpenAddLocationModal,
 		handleCloseAddLocationModal,
+		semesters,
 	} = useAdminSemesters();
 	return (
 		<AppLayout course={'Administrator'} programSemesterId={'4' as string}>
@@ -80,38 +83,33 @@ const AdminSemesters = () => {
 						</tr>
 					</thead>
 					<tbody>
-						<tr className='text-center bg-white'>
-							<td className='border-b border-gray-200 px-3 p-3  text-start'>
-								Primavera 2024
-							</td>
-							<td className='border-b border-gray-200 px-3 p-3  text-start'>
-								01/01/2024 - 06/30/2024
-							</td>
-							<td className='border-b border-gray-200 px-3 p-3  text-start'>
-								<AtBadge label='Active' variant='primary' />
-							</td>
-							<td className='border-b border-gray-200 px-3 p-3  text-start'>
-								<span className='text-2xl'>
-									<LuEye />
-								</span>
-							</td>
-						</tr>
-						<tr className='text-center bg-white'>
-							<td className='border-b border-gray-200 px-3 p-3  text-start'>
-								Otoño 2023
-							</td>
-							<td className='border-b border-gray-200 px-3 p-3  text-start'>
-								01/01/2024 - 06/30/2024
-							</td>
-							<td className='border-b border-gray-200 px-3 p-3  text-start'>
-								<AtBadge label='Inactive' variant='danger' />
-							</td>
-							<td className='border-b border-gray-200 px-3 p-3  text-start'>
-								<span className='text-2xl'>
-									<LuEye />
-								</span>
-							</td>
-						</tr>
+						{semesters?.semesters_in.map((semester) => (
+							<tr className='text-center bg-white' key={semester.semester_id}>
+								<td className='border-b border-gray-200 px-3 p-3  text-start'>
+									{semester.semester_name}
+								</td>
+								<td className='border-b border-gray-200 px-3 p-3  text-start'>
+									{transformDateString(semester.semester_start_date)} -{' '}
+									{transformDateString(semester.semester_end_date)}
+								</td>
+								<td className='border-b border-gray-200 px-3 p-3  text-start'>
+									{semester.semester_status ? (
+										<AtBadge label='Active' variant='primary' />
+									) : (
+										<AtBadge label='Inactive' variant='danger' />
+									)}
+								</td>
+								<td className='border-b border-gray-200 px-3 p-3  text-start'>
+									<Link
+										to={`/admin/courses/${semester?.programs_in[0]?.program_semester_id}`}
+									>
+										<span className='text-2xl'>
+											<LuEye />
+										</span>
+									</Link>
+								</td>
+							</tr>
+						))}
 					</tbody>
 				</table>
 			</div>

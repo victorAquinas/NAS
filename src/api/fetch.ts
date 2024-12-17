@@ -17,6 +17,9 @@ api.interceptors.request.use(
 			config.headers.Authorization = `Bearer ${token}`;
 		}
 
+		// // Add the Origin header dynamically
+		// config.headers.Origin = window.location.origin;
+
 		return config;
 	},
 	(error) => {

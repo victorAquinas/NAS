@@ -27,20 +27,26 @@ const Router = () => {
 				{ path: '/my-shifts/:programSemesterId', element: <MyShiftsPage /> },
 			],
 		},
+
 		//Admin
 		{ children: [{ path: '/admin/locations', element: <AdminLocations /> }] },
 		{
 			children: [
-				{ path: '/admin/semesters/:locationId', element: <AdminSemesters /> },
+				{ path: '/admin/semester/:locationId', element: <AdminSemesters /> },
 			],
 		},
 		{
 			children: [
-				{ path: '/admin/courses/:semesterId', element: <AdminCourses /> },
+				{
+					path: '/admin/courses/:programSemesterId',
+					element: <AdminCourses />,
+				},
 			],
 		},
 		{
-			children: [{ path: '/admin/group/:groupId', element: <AdminGroup /> }],
+			children: [
+				{ path: '/admin/group/:programSemesterId', element: <AdminGroup /> },
+			],
 		},
 	]);
 

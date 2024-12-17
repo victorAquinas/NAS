@@ -38,7 +38,7 @@ const Router = () => {
 		{
 			children: [
 				{
-					path: '/admin/courses/:programSemesterId',
+					path: '/admin/courses/:programSemesterId/semester/:semesterId',
 					element: <AdminCourses />,
 				},
 			],

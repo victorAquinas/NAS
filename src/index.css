@@ -20,3 +20,14 @@ h6 {
 .rbc-off-range {
 	background-color: #f4f5f9; /* Replace with your desired color */
 }
+.react-datepicker__header {
+	background-color: #1b2831 !important;
+}
+
+.react-datepicker__current-month {
+	color: white !important;
+}
+
+.react-datepicker__day-name {
+	color: white !important;
+}

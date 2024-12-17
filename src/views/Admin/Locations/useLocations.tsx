@@ -44,12 +44,11 @@ export const useLocations = () => {
 			}
 
 			await createLocation(locationName, institutionId);
-			toast.success('Location created successfully');
 			getInstitutionLocations();
 			handleCloseAddLocationModal();
+			setLocationName('');
 		} catch (error) {
 			console.error(error);
-			toast.error(ErrorMessages.GENERAL_ERROR);
 		}
 	};
 

@@ -5,6 +5,7 @@ import AtButton from '../../../components/AtButton';
 import { MlActionModal } from '../../../components/MlModal/MlActionModal';
 import { useLocations } from './useLocations';
 import { AtLoadingWrapper } from '../../../components/AtLoadingWrapper';
+import { toast } from 'react-toastify';
 
 const AdminLocations = () => {
 	const {
@@ -26,9 +27,16 @@ const AdminLocations = () => {
 				actionButtonLabel='Add Location'
 				title='Add a location'
 				onAction={() =>
-					handleAddLocation(
-						locationName,
-						locations[0]?.institution_id?.toString()
+					toast.promise(
+						handleAddLocation(
+							locationName,
+							locations[0]?.institution_id?.toString()
+						),
+						{
+							pending: 'Adding location',
+							success: 'Location created successfully',
+							error: 'Error adding location',
+						}
 					)
 				}
 			>

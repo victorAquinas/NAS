@@ -6,6 +6,9 @@ import { AtBadge } from '../../../components/AtBadge';
 import { LuEye } from 'react-icons/lu';
 import { Link } from 'react-router-dom';
 import { transformDateString } from '../../../utils/transformDateString';
+import { AtLoadingWrapper } from '../../../components/AtLoadingWrapper';
+import DatePicker from 'react-datepicker';
+import { toast } from 'react-toastify';
 
 const AdminSemesters = () => {
 	const {
@@ -13,6 +16,15 @@ const AdminSemesters = () => {
 		handleOpenAddLocationModal,
 		handleCloseAddLocationModal,
 		semesters,
+		isLoading,
+		handleAddSemester,
+		semesterName,
+		setSemesterName,
+		startDate,
+		setStartDate,
+		setEndDate,
+		endDate,
+		locationId,
 	} = useAdminSemesters();
 	return (
 		<AppLayout course={'Administrator'} programSemesterId={'4' as string}>
@@ -22,33 +34,54 @@ const AdminSemesters = () => {
 				onClose={handleCloseAddLocationModal}
 				actionButtonLabel='Add Semester'
 				title='Add a Semester'
+				styles={{
+					height: '550px',
+					display: 'flex',
+					flexDirection: 'column',
+					justifyContent: 'center',
+				}}
+				onAction={() =>
+					toast.promise(
+						handleAddSemester(
+							semesterName,
+							startDate,
+							endDate,
+							locationId ?? ''
+						),
+						{
+							pending: 'Creating semester',
+							success: 'Semester created successfully',
+							error: 'Error creating semester',
+						}
+					)
+				}
 			>
 				<form className='flex flex-col gap-4 mt-4'>
 					<input
 						type='text'
 						id='email'
+						onChange={(e) => setSemesterName(e.target.value)}
 						placeholder='Name'
-						// {...register('email')}
-						className=' w-full h-full bg-white p-3 placeholder:text-gray-400 font-normal rounded-md border border-gray-400'
+						className='w-full h-full bg-white p-3 placeholder:text-gray-400 font-normal rounded-md border border-gray-400'
 					/>
-					<input
-						type='text'
-						id='start-date'
-						placeholder='Start date'
-						// {...register('email')}
-						className=' w-full h-full bg-white p-3 placeholder:text-gray-400 font-normal rounded-md border border-gray-400'
+					<DatePicker
+						selected={startDate}
+						onChange={(date) => setStartDate(date)}
+						placeholderText='Start Date'
+						className='w-full h-full bg-white p-3 text-gray-700 placeholder:text-gray-400 font-normal rounded-md border border-gray-400'
 					/>
-					<input
-						type='text'
-						id='email'
-						placeholder='End date'
-						// {...register('email')}
-						className=' w-full h-full bg-white p-3 placeholder:text-gray-400 font-normal rounded-md border border-gray-400'
+					<DatePicker
+						selected={endDate}
+						onChange={(date) => setEndDate(date)}
+						placeholderText='End date'
+						className='w-full h-full bg-white p-3 text-gray-700 placeholder:text-gray-400 font-normal rounded-md border border-gray-400'
 					/>
 				</form>
 			</MlActionModal>
 
-			<div className='header flex justify-between'>
+			<AtLoadingWrapper isLoading={isLoading} />
+
+			<div className='header flex justify-between' id='content-semester'>
 				<div className='left'>
 					<h2 className='text-xl font-medium'>
 						Administration Panel - Semesters
@@ -101,7 +134,10 @@ const AdminSemesters = () => {
 								</td>
 								<td className='border-b border-gray-200 px-3 p-3  text-start'>
 									<Link
-										to={`/admin/courses/${semester?.programs_in[0]?.program_semester_id}`}
+										to={`/admin/courses/${
+											semester?.programs_in[0]?.program_semester_id ??
+											'no-courses'
+										}/semester/${semester.semester_id}`}
 									>
 										<span className='text-2xl'>
 											<LuEye />

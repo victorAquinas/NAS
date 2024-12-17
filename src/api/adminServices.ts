@@ -9,15 +9,31 @@ export const getLocations = async (): Promise<AdminHeadquarter[]> => {
 };
 
 export const createLocation = async (
-	email: string,
-	password: string
+	name: string,
+	institutionId: string
 ): Promise<ResponseCreateLocation> => {
-	const emailUrlParams = `name=${email}&institution_id=${password}`;
+	const params = `name=${name}&institution_id=${institutionId}`;
 
 	const response = await api.post(
 		`${
 			import.meta.env.VITE_API_URL
-		}${`create-headquarter?${transformToUrlParams(emailUrlParams)}`}`
+		}${`create-headquarter?${transformToUrlParams(params)}`}`
+	);
+	return response.data;
+};
+
+export const createSemester = async (
+	name: string,
+	startDate: string,
+	endtDate: string,
+	headquarterId: string
+): Promise<ResponseCreateLocation> => {
+	const emailUrlParams = `name=${name}&start_date=${startDate}&end_date=${endtDate}&headquarter_id=${headquarterId}`;
+
+	const response = await api.post(
+		`${import.meta.env.VITE_API_URL}${`create-semester?${transformToUrlParams(
+			emailUrlParams
+		)}`}`
 	);
 	return response.data;
 };

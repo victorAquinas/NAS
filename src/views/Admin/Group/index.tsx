@@ -1,7 +1,7 @@
 import AtButton from '../../../components/AtButton';
 import { MlGroupCard } from '../../../components/MlGroupCard';
 import { MlActionModal } from '../../../components/MlModal/MlActionModal';
-import { AppLayout } from '../../../layouts/AppLayout';
+import { AdminLayout } from '../../../layouts/AdminLayout';
 import { useAdminGroup } from './useAdminGroup';
 
 const AdminGroup = () => {
@@ -11,7 +11,7 @@ const AdminGroup = () => {
 		handleOpenAddGroupModal,
 	} = useAdminGroup();
 	return (
-		<AppLayout course={'Administrator'} programSemesterId={'4' as string}>
+		<AdminLayout>
 			<MlActionModal
 				isOpen={isAddGroupModalOpen}
 				closeButtonLabel='Cancel'
@@ -237,7 +237,7 @@ const AdminGroup = () => {
 					<AtButton variant='primary'>Add New Group</AtButton>
 				</div>
 			</div>
-		</AppLayout>
+		</AdminLayout>
 	);
 };
 

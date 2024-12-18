@@ -29,7 +29,7 @@ export const MlGroupCard = ({
 							type='text'
 							placeholder='Time'
 							className='w-[200px] h-full bg-white p-1 placeholder:text-gray-400 font-normal rounded-md border border-gray-400'
-							value={shift}
+							defaultValue={shift}
 						/>
 					</div>
 				</div>

@@ -6,6 +6,7 @@ const api = axios.create({
 	headers: {
 		'Content-Type': 'application/json',
 	},
+	timeout: 10000,
 });
 
 api.interceptors.request.use(
@@ -16,9 +17,6 @@ api.interceptors.request.use(
 		if (token) {
 			config.headers.Authorization = `Bearer ${token}`;
 		}
-
-		// // Add the Origin header dynamically
-		// config.headers.Origin = window.location.origin;
 
 		return config;
 	},

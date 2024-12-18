@@ -1,4 +1,3 @@
-import { AppLayout } from '../../../layouts/AppLayout';
 import AtButton from '../../../components/AtButton';
 import { MlActionModal } from '../../../components/MlModal/MlActionModal';
 import { useAdminSemesters } from './useAdminSemesters';
@@ -9,6 +8,7 @@ import { transformDateString } from '../../../utils/transformDateString';
 import { AtLoadingWrapper } from '../../../components/AtLoadingWrapper';
 import DatePicker from 'react-datepicker';
 import { toast } from 'react-toastify';
+import { AdminLayout } from '../../../layouts/AdminLayout';
 
 const AdminSemesters = () => {
 	const {
@@ -27,7 +27,7 @@ const AdminSemesters = () => {
 		locationId,
 	} = useAdminSemesters();
 	return (
-		<AppLayout course={'Administrator'} programSemesterId={'4' as string}>
+		<AdminLayout>
 			<MlActionModal
 				isOpen={isAddSemesterModalOpen}
 				closeButtonLabel='Cancel'
@@ -148,8 +148,11 @@ const AdminSemesters = () => {
 						))}
 					</tbody>
 				</table>
+				{semesters?.semesters_in.length === 0 && (
+					<div className='text-center bg-white w-full p-4'>No data found</div>
+				)}
 			</div>
-		</AppLayout>
+		</AdminLayout>
 	);
 };
 

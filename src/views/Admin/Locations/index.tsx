@@ -1,4 +1,3 @@
-import { AppLayout } from '../../../layouts/AppLayout';
 import { SlLocationPin } from 'react-icons/sl';
 import { AtIconButton } from '../../../components/AtIconButton';
 import AtButton from '../../../components/AtButton';
@@ -6,6 +5,7 @@ import { MlActionModal } from '../../../components/MlModal/MlActionModal';
 import { useLocations } from './useLocations';
 import { AtLoadingWrapper } from '../../../components/AtLoadingWrapper';
 import { toast } from 'react-toastify';
+import { AdminLayout } from '../../../layouts/AdminLayout';
 
 const AdminLocations = () => {
 	const {
@@ -19,7 +19,7 @@ const AdminLocations = () => {
 		isLoading,
 	} = useLocations();
 	return (
-		<AppLayout course={'Administrator'} programSemesterId={'4' as string}>
+		<AdminLayout>
 			<MlActionModal
 				isOpen={isAddLocationModalOpen}
 				closeButtonLabel='Cancel'
@@ -86,7 +86,7 @@ const AdminLocations = () => {
 					</>
 				)}
 			</div>
-		</AppLayout>
+		</AdminLayout>
 	);
 };
 

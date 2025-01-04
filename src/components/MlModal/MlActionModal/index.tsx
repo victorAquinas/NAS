@@ -2,6 +2,10 @@ import { Portal } from 'react-portal';
 import Modal from 'react-modal';
 import AtButton from '../../AtButton';
 import { CgChevronRight } from 'react-icons/cg';
+import {
+	IoAlertCircleOutline,
+	IoCheckmarkCircleOutline,
+} from 'react-icons/io5';
 
 interface MlActionModalProps {
 	isOpen: boolean;
@@ -14,6 +18,8 @@ interface MlActionModalProps {
 	children?: React.ReactNode;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	styles?: any;
+	variant?: 'success' | 'danger';
+	isLoading?: boolean;
 }
 export const MlActionModal = ({
 	isOpen,
@@ -25,6 +31,8 @@ export const MlActionModal = ({
 	actionButtonLabel,
 	children,
 	styles,
+	variant = 'success',
+	isLoading = false,
 }: MlActionModalProps) => {
 	const customStyles = {
 		content: {
@@ -49,6 +57,14 @@ export const MlActionModal = ({
 				style={customStyles}
 				overlayClassName={'fixed inset-0 bg-black/85 z-[3000]'}
 			>
+				<div
+					className={`text-[3rem] flex justify-center w-full pb-4 ${
+						variant === 'success' ? 'text-primary' : 'text-red_primary'
+					}`}
+				>
+					{variant === 'success' && <IoCheckmarkCircleOutline />}
+					{variant === 'danger' && <IoAlertCircleOutline />}
+				</div>
 				<div className='font-medium text-2xl text-center flex justify-center flex-col'>
 					<h2>{title}</h2>
 				</div>
@@ -61,19 +77,20 @@ export const MlActionModal = ({
 								variant='transparent'
 								className='flex items-center mt-6'
 								onClick={onClose}
+								isLoading={isLoading}
 							>
 								{closeButtonLabel}
 							</AtButton>
 						)}
 						{actionButtonLabel && (
 							<AtButton
-								variant='primary'
+								variant={variant === 'success' ? 'primary' : 'danger'}
 								className='flex items-center mt-6'
 								onClick={onAction}
+								isLoading={isLoading}
 							>
 								{actionButtonLabel}
 								<span className='text-2xl'>
-									{' '}
 									<CgChevronRight />
 								</span>
 							</AtButton>

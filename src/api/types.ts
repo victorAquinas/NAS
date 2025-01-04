@@ -31,6 +31,7 @@ export interface Group {
 	group_name: string;
 	max_students: number;
 	spaces_available: number;
+	is_active: boolean;
 	start_date: string;
 	end_date: string;
 	program_semester_id: number;
@@ -42,7 +43,6 @@ export interface Group {
 export interface Week {
 	week_id: number;
 	week_number: number;
-	instructor: Instructor;
 	week_schedule: WeekSchedule;
 }
 
@@ -58,16 +58,23 @@ export interface Instructor {
 
 export interface WeekSchedule {
 	week_schedule_id: number;
-	practica_place: PracticaPlace;
+	practice_place: PracticaPlace;
 	start_time: string;
 	end_time: string;
-	dates: string[];
+	dates: DateSchedule[];
+}
+
+export interface DateSchedule {
+	day_id: number;
+	date: string;
+	instructor: Instructor;
 }
 
 export enum PracticaPlaceTypeName {
 	IN_SITE = 'In-Site',
 	OFF_SITE = 'Off-Site',
 }
+
 export interface PracticaPlace {
 	program_semester_id: number;
 	name: string;
@@ -152,3 +159,90 @@ export interface ResponseCreateLocation {
 	name: string;
 	id: number;
 }
+
+export interface AvailablePlace {
+	id: number;
+	name: string;
+	address: string;
+	type: {
+		id: number;
+		name: string;
+	};
+}
+
+export interface Place {
+	program_semester_id: number;
+	max_enrollment_date: string;
+	status: boolean;
+	available_places: AvailablePlace[];
+}
+export interface SourcesResponse {
+	places: Place[];
+	instructors: Instructor[];
+}
+
+export type updateGroupType = 'group' | 'week' | 'week_schedule' | 'day';
+
+export interface ResponseCreateDay {
+	success: boolean;
+	data: {
+		date: string;
+		id: number;
+		instructor_id: number;
+	};
+}
+
+export interface ResponseDeleteDay {
+	success: boolean;
+	data: {
+		message: string;
+	};
+}
+
+export interface ResponseCreateWeek {
+	sucess: boolean;
+	data: {
+		week_number: number;
+		in_site_off_site_id: number;
+		id: number;
+	};
+}
+
+export interface CreateGroupBody {
+	groupName: string;
+	verityGroupId: string;
+	maxStudents: number;
+	inDays: string[];
+	startDate: string;
+	endDate: string;
+	defaultStartTime: string;
+	defaultEndTime: string;
+	defaultInstructorId: number;
+	defaultInsidePracticePlaceId: number;
+	defaultOffsidePracticePlaceId: number;
+	offsideNumWeeksForGenerate: number;
+	insideNumWeeksForGenerate: number;
+	programSemesterId: number;
+}
+
+export interface GroupDetails {
+	group_name: string;
+	start_date: string;
+	end_date: string;
+	default_end_time: string;
+	default_start_time: string;
+	max_students: number;
+	default_instructor_id: number;
+	verity_group_id: string;
+	in_days: string[];
+	offsite_num_weeks_for_generate: number;
+	default_insite_practice_place_id: number;
+	default_offsite_practice_place_id: number;
+	insite_num_weeks_for_generate: number;
+	program_semester_id?: number;
+}
+
+export type OptionType = {
+	value: string;
+	label: string;
+};

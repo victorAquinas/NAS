@@ -104,10 +104,12 @@ export const useCalendarPage = () => {
 	const getCalendarGroupsEvents = async (user_program_semester_id: string) => {
 		try {
 			const groups = await getCalendarGroups(user_program_semester_id);
+
 			if (groups.data.length === 0) {
 				toast.error(ErrorMessages.NO_GROUPS_FOUND);
 				setHasGroups(false);
 			}
+
 			const transformedCalendarEvents = transformAndFillAddresses(groups.data);
 			setEvents(transformedCalendarEvents);
 			setEventsCopy(transformedCalendarEvents);

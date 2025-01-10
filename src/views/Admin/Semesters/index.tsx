@@ -9,6 +9,7 @@ import { AtLoadingWrapper } from '../../../components/AtLoadingWrapper';
 import DatePicker from 'react-datepicker';
 import { toast } from 'react-toastify';
 import { AdminLayout } from '../../../layouts/AdminLayout';
+import { MdOutlineDelete } from 'react-icons/md';
 
 const AdminSemesters = () => {
 	const {
@@ -25,6 +26,11 @@ const AdminSemesters = () => {
 		setEndDate,
 		endDate,
 		locationId,
+		showDeleteSemesterModal,
+		semesterIdToDelete,
+		handleDesactivateSemester,
+		handleCloseDeleteSemesterModal,
+		handleShowDeleteSemesterModal,
 	} = useAdminSemesters();
 	return (
 		<AdminLayout>
@@ -79,6 +85,20 @@ const AdminSemesters = () => {
 				</form>
 			</MlActionModal>
 
+			<MlActionModal
+				isOpen={showDeleteSemesterModal}
+				onAction={() => {
+					handleDesactivateSemester(semesterIdToDelete);
+				}}
+				isLoading={false}
+				onClose={handleCloseDeleteSemesterModal}
+				title='Are you sure you want to delete this semester?'
+				description='This action cannot be undone.'
+				closeButtonLabel='Cancel'
+				actionButtonLabel='Delete'
+				variant='danger'
+			></MlActionModal>
+
 			<AtLoadingWrapper isLoading={isLoading} />
 
 			<div className='header flex justify-between' id='content-semester'>
@@ -132,7 +152,7 @@ const AdminSemesters = () => {
 										<AtBadge label='Inactive' variant='danger' />
 									)}
 								</td>
-								<td className='border-b border-gray-200 px-3 p-3  text-start'>
+								<td className='border-b border-gray-200 px-3 p-3  text-start flex items-center'>
 									<Link
 										to={`/admin/courses/${
 											semester?.programs_in[0]?.program_semester_id ??
@@ -143,6 +163,15 @@ const AdminSemesters = () => {
 											<LuEye />
 										</span>
 									</Link>
+
+									<button
+										className='text-2xl pl-2'
+										onClick={() =>
+											handleShowDeleteSemesterModal(semester.semester_id)
+										}
+									>
+										<MdOutlineDelete className='text-red_primary' />
+									</button>
 								</td>
 							</tr>
 						))}

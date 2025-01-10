@@ -292,8 +292,7 @@ const CalendarPage = () => {
 								views={['month', 'agenda']}
 								endAccessor='end'
 								style={{ height: 800 }}
-								// defaultDate={new Date()}
-								defaultDate={new Date(2024, 8, 1)}
+								defaultDate={new Date()}
 								components={{
 									event: AtCalendarEvent,
 									toolbar: MlCalendarToolbar,

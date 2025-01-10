@@ -134,6 +134,7 @@ export interface LoginUserResponse {
 export interface AdminProgramIn {
 	program_semester_id: number;
 	program: Program;
+	program_semester_status: boolean;
 }
 
 export interface AdminSemester {
@@ -143,6 +144,7 @@ export interface AdminSemester {
 	semester_end_date: string; // ISO Date string format
 	semester_status: boolean;
 	programs_in: AdminProgramIn[];
+	semester_is_active: boolean;
 }
 
 export interface AdminHeadquarter {
@@ -150,6 +152,7 @@ export interface AdminHeadquarter {
 	headquarter_id: number;
 	institution_id: number;
 	semesters_in: AdminSemester[];
+	is_active: boolean;
 }
 
 export type HeadquartersData = AdminHeadquarter[];

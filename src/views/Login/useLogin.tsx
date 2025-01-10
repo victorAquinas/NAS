@@ -5,6 +5,7 @@ import { loginUser } from '../../api/services';
 import { toast } from 'react-toastify';
 import { setTokenInCookies } from '../../utils/cookies';
 import { useNavigate } from 'react-router-dom';
+import { decodeToken } from '../../utils/decodeToken';
 
 export const useLogin = () => {
 	const {
@@ -19,6 +20,7 @@ export const useLogin = () => {
 	const handleLogin = async (email: string, password: string) => {
 		try {
 			const loginResponse = await loginUser(email, password);
+			const tokenData = decodeToken(loginResponse.data.token);
 
 			if (!loginResponse.data.token)
 				return toast.error('Internal server error, please try again later');
@@ -27,6 +29,11 @@ export const useLogin = () => {
 				loginResponse.data.token,
 				loginResponse.data.expiration_time
 			);
+
+			if (tokenData?.role.role_name === 'admin') {
+				return navigate('/admin/locations');
+			}
+
 			navigate('/semesters');
 		} catch (error) {
 			console.error(error);

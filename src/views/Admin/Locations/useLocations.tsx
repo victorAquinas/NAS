@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
-import { createLocation, getLocations } from '../../../api/adminServices';
+import {
+	createLocation,
+	desactivateLocation,
+	getLocations,
+} from '../../../api/adminServices';
 import { AdminHeadquarter } from '../../../api/types';
 import { toast } from 'react-toastify';
 import { ErrorMessages } from '../../../constants/text';
@@ -10,6 +14,9 @@ export const useLocations = () => {
 	const [locationName, setLocationName] = useState<string>('');
 	const [locations, setLocations] = useState<AdminHeadquarter[]>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [showDeleteLocationModal, setShowDeleteLocationModal] =
+		useState<boolean>(false);
+	const [locationIdToDelete, setLocationIdToDelete] = useState<number>(-99);
 
 	const handleOpenAddLocationModal = () => {
 		setIsAddLocationModalOpen(true);
@@ -23,7 +30,9 @@ export const useLocations = () => {
 		setIsLoading(true);
 		try {
 			const req = await getLocations();
-			setLocations(req);
+			const activeLocations = req?.filter((location) => location.is_active);
+
+			setLocations(activeLocations);
 			return req;
 		} catch (error) {
 			console.error(error);
@@ -31,6 +40,29 @@ export const useLocations = () => {
 			toast.error(ErrorMessages.GENERAL_ERROR);
 		} finally {
 			setIsLoading(false);
+		}
+	};
+
+	const handleDesactivateLocation = async (locationId: number) => {
+		const idLoading = toast.loading('Deleting location');
+		try {
+			await desactivateLocation(locationId);
+			await getInstitutionLocations();
+			toast.update(idLoading, {
+				render: 'Location deleted',
+				type: 'success',
+				isLoading: false,
+				autoClose: 1000,
+			});
+			handleCloseDeleteLocationModal();
+		} catch (error) {
+			toast.update(idLoading, {
+				render: 'Error',
+				type: 'error',
+				isLoading: false,
+				autoClose: 1000,
+			});
+			console.error(error);
 		}
 	};
 
@@ -52,6 +84,16 @@ export const useLocations = () => {
 		}
 	};
 
+	const handleShowDeleteLocationModal = (locationId: number) => {
+		setShowDeleteLocationModal(true);
+		setLocationIdToDelete(locationId);
+	};
+
+	const handleCloseDeleteLocationModal = () => {
+		setShowDeleteLocationModal(false);
+		setLocationIdToDelete(-99);
+	};
+
 	useEffect(() => {
 		getInstitutionLocations();
 	}, []);
@@ -65,5 +107,10 @@ export const useLocations = () => {
 		locationName,
 		setLocationName,
 		isLoading,
+		handleDesactivateLocation,
+		showDeleteLocationModal,
+		handleShowDeleteLocationModal,
+		handleCloseDeleteLocationModal,
+		locationIdToDelete,
 	};
 };

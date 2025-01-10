@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { createCourse, getLocations } from '../../../api/adminServices';
+import {
+	createCourse,
+	desactivateCourse,
+	getLocations,
+} from '../../../api/adminServices';
 import { AdminProgramIn } from '../../../api/types';
 import { toast } from 'react-toastify';
 import { transformDateString } from '../../../utils/transformDateString';
@@ -15,6 +19,11 @@ export const useCourses = () => {
 	const [isAddCourseModalOpen, setIsAddCourseModalOpen] =
 		useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [showDeleteCourseModal, setShowDeleteCourseModal] =
+		useState<boolean>(false);
+	const [programSemesterIdToDelete, setProgramSemesterIdToDelete] =
+		useState<number>(-99);
+
 	const handleOpenAddCourseModal = () => {
 		setIsAddCourseModalOpen(true);
 	};
@@ -33,8 +42,12 @@ export const useCourses = () => {
 				parseInt(semesterId ?? '')
 			);
 
+			const activeCourses = currentSemester.programs_in.filter(
+				(program) => program.program_semester_status
+			);
+
 			if (currentSemester) {
-				setCourses(currentSemester.programs_in);
+				setCourses(activeCourses);
 			}
 
 			return currentSemester;
@@ -85,6 +98,42 @@ export const useCourses = () => {
 		}
 	};
 
+	const handleDesactivateCourse = async (programSemesterId: number) => {
+		const idLoading = toast.loading('Deleting course');
+		try {
+			await desactivateCourse(programSemesterId);
+			if (semesterId) {
+				getCourses(semesterId);
+			}
+			toast.update(idLoading, {
+				render: 'Course deleted',
+				type: 'success',
+				isLoading: false,
+				autoClose: 500,
+			});
+			getCourses(semesterId ?? '');
+			handleCloseDeleteCourseModal();
+		} catch (error) {
+			console.error(error);
+			toast.update(idLoading, {
+				render: 'Error',
+				type: 'error',
+				isLoading: false,
+				autoClose: 1000,
+			});
+		}
+	};
+
+	const handleShowDeleteCourseModal = (programSemesterId: number) => {
+		setShowDeleteCourseModal(true);
+		setProgramSemesterIdToDelete(programSemesterId);
+	};
+
+	const handleCloseDeleteCourseModal = () => {
+		setShowDeleteCourseModal(false);
+		setProgramSemesterIdToDelete(-99);
+	};
+
 	useEffect(() => {
 		if (programSemesterId && programSemesterId !== 'no-courses') {
 			getCourses(semesterId ?? '');
@@ -106,5 +155,10 @@ export const useCourses = () => {
 		handleAddCourse,
 		semesterId,
 		isLoading,
+		handleDesactivateCourse,
+		handleCloseDeleteCourseModal,
+		handleShowDeleteCourseModal,
+		programSemesterIdToDelete,
+		showDeleteCourseModal,
 	};
 };

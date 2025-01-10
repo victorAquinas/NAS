@@ -17,7 +17,13 @@ const AdminLocations = () => {
 		locations,
 		handleAddLocation,
 		isLoading,
+		handleDesactivateLocation,
+		showDeleteLocationModal,
+		handleShowDeleteLocationModal,
+		handleCloseDeleteLocationModal,
+		locationIdToDelete,
 	} = useLocations();
+
 	return (
 		<AdminLayout>
 			<MlActionModal
@@ -51,6 +57,21 @@ const AdminLocations = () => {
 					/>
 				</form>
 			</MlActionModal>
+
+			<MlActionModal
+				isOpen={showDeleteLocationModal}
+				onAction={() => {
+					handleDesactivateLocation(locationIdToDelete);
+				}}
+				isLoading={false}
+				onClose={handleCloseDeleteLocationModal}
+				title='Are you sure you want to delete this location?'
+				description='This action cannot be undone.'
+				closeButtonLabel='Cancel'
+				actionButtonLabel='Delete'
+				variant='danger'
+			></MlActionModal>
+
 			<AtLoadingWrapper isLoading={isLoading} />
 			<div className='header flex justify-between'>
 				<div className='left'>
@@ -73,18 +94,20 @@ const AdminLocations = () => {
 					<div className='font-medium text-lg'>No Locations Found</div>
 				)}
 
-				{locations.length > 0 && (
-					<>
-						{locations.map((location) => (
-							<AtIconButton
-								href={`/admin/semester/${location.headquarter_id}`}
-								key={location.headquarter_id}
-								label={location.headquarter_name}
-								Icon={SlLocationPin}
-							/>
-						))}
-					</>
-				)}
+				{locations.length > 0 &&
+					locations.map((location) => (
+						<AtIconButton
+							key={location.headquarter_id}
+							href={`/admin/semester/${location.headquarter_id}`}
+							label={location.headquarter_name}
+							Icon={SlLocationPin}
+							tooltipId={`tooltip-${location.headquarter_id}`}
+							tooltipContent='Delete Location'
+							deleteLocationClick={() =>
+								handleShowDeleteLocationModal(location.headquarter_id)
+							}
+						/>
+					))}
 			</div>
 		</AdminLayout>
 	);

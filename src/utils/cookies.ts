@@ -13,6 +13,7 @@ export const setTokenInCookies = (token: string, expirationTime: number) => {
 
 	cookies.set('user_email', decodedToken?.user_email ?? '', {
 		expires,
+		path: '/',
 	});
 };
 

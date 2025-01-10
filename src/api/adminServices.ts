@@ -150,3 +150,36 @@ export const createGroup = async (
 	);
 	return response.data;
 };
+
+export const desactivateLocation = async (
+	location_id: number
+): Promise<ResponseCreateDay> => {
+	const response = await api.patch(
+		`${
+			import.meta.env.VITE_API_URL
+		}deactivate-headquarter?headquarter_id=${location_id}`
+	);
+	return response.data;
+};
+
+export const desactivateSemester = async (
+	semester_id: number
+): Promise<ResponseCreateDay> => {
+	const response = await api.patch(
+		`${
+			import.meta.env.VITE_API_URL
+		}deactivate-semester?semester_id=${semester_id}`
+	);
+	return response.data;
+};
+
+export const desactivateCourse = async (
+	program_semester_id: number
+): Promise<ResponseCreateDay> => {
+	const response = await api.patch(
+		`${
+			import.meta.env.VITE_API_URL
+		}deactivate-program-semester?program_semester_id=${program_semester_id}`
+	);
+	return response.data;
+};

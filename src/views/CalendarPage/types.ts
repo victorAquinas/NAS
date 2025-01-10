@@ -22,6 +22,7 @@ export interface CalendarEvent {
 	rawDate: string;
 	offsite_total_hours?: number;
 	insite_total_hours?: number;
+	is_active: boolean;
 }
 
 export interface DateTypeEvent {

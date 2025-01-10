@@ -269,11 +269,11 @@ const AdminGroup = () => {
 							<Controller
 								name='default_end_time'
 								control={control}
-								rules={{ required: 'Shift start time is required' }}
+								rules={{ required: 'Shift end time is required' }}
 								render={({ field }) => (
 									<AtInputTime
 										{...field}
-										placeholder='Shift start time'
+										placeholder='Shift end time'
 										selectedTime={''}
 										className='!w-full'
 										wrapperClassName='!w-full'
@@ -697,7 +697,7 @@ const AdminGroup = () => {
 																		className={`pr-2 pb-6 text-2xl rounded-tl-md rounded-tr-md font-medium w-full ${
 																			placeData.type === 'in-site'
 																				? 'bg-blue-600 text-white '
-																				: 'bg-primary '
+																				: 'bg-secondary text-white '
 																		} p-4 lg:p-8 mb-6`}
 																	>
 																		{placeData.type === 'in-site'

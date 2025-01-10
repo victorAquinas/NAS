@@ -12,6 +12,7 @@ import AdminLocations from '../views/Admin/Locations';
 import AdminSemesters from '../views/Admin/Semesters';
 import AdminCourses from '../views/Admin/Courses';
 import AdminGroup from '../views/Admin/Group';
+import AdminPrivateRoute from './AdminPrivateRoute';
 
 const Router = () => {
 	const routes = createBrowserRouter([
@@ -27,24 +28,16 @@ const Router = () => {
 				{ path: '/my-shifts/:programSemesterId', element: <MyShiftsPage /> },
 			],
 		},
-
 		//Admin
-		{ children: [{ path: '/admin/locations', element: <AdminLocations /> }] },
 		{
+			element: <AdminPrivateRoute />,
 			children: [
+				{ path: '/admin/locations', element: <AdminLocations /> },
 				{ path: '/admin/semester/:locationId', element: <AdminSemesters /> },
-			],
-		},
-		{
-			children: [
 				{
 					path: '/admin/courses/:programSemesterId/semester/:semesterId',
 					element: <AdminCourses />,
 				},
-			],
-		},
-		{
-			children: [
 				{ path: '/admin/group/:programSemesterId', element: <AdminGroup /> },
 			],
 		},

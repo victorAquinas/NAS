@@ -6,37 +6,74 @@ import { transformDateString } from './transformDateString';
 import { transformTimeToShortFormat } from './transformTimeToShortFormat';
 
 export const transformAndFillAddresses = (data: Group[]): CalendarEvent[] => {
+	// const transformToCalendarEvents = (data: Group[]): CalendarEvent[] => {
+	// 	return data.flatMap((group, index) =>
+	// 		group.weeks.flatMap((week) =>
+	// 			week.week_schedule.dates.map((date) => ({
+	// 				title: week.week_schedule.practice_place.name,
+	// 				group_name: group.group_name,
+	// 				available: group.spaces_available,
+	// 				max_students: group.max_students,
+	// 				group_id: group.group_id.toString(),
+	// 				group: (index + 1).toString(),
+	// 				start: toExactDate(date.date),
+	// 				end: toExactDate(date.date),
+	// 				offsiteAddress:
+	// 					week.week_schedule.practice_place.type.name ===
+	// 					PracticaPlaceTypeName.OFF_SITE
+	// 						? week.week_schedule.practice_place.address
+	// 						: '',
+	// 				campusAddress:
+	// 					week.week_schedule.practice_place.type.name ===
+	// 					PracticaPlaceTypeName.IN_SITE
+	// 						? week.week_schedule.practice_place.address
+	// 						: '',
+	// 				shift: `${transformTimeToShortFormat(
+	// 					week.week_schedule.start_time
+	// 				)} - ${transformTimeToShortFormat(week.week_schedule.end_time)}`,
+	// 				tutor: date.instructor.name,
+	// 				type: week.week_schedule.practice_place.type.name,
+	// 				rawDate: transformDateString(date.date, DEFAULT_DATE_FORMAT),
+	// 				is_active: group.is_active,
+	// 			}))
+	// 		)
+	// 	);
+	// };
+
 	const transformToCalendarEvents = (data: Group[]): CalendarEvent[] => {
-		return data.flatMap((group, index) =>
-			group.weeks.flatMap((week) =>
-				week.week_schedule.dates.map((date) => ({
-					title: week.week_schedule.practice_place.name,
-					group_name: group.group_name,
-					available: group.spaces_available,
-					max_students: group.max_students,
-					group_id: group.group_id.toString(),
-					group: (index + 1).toString(),
-					start: toExactDate(date.date),
-					end: toExactDate(date.date),
-					offsiteAddress:
-						week.week_schedule.practice_place.type.name ===
-						PracticaPlaceTypeName.OFF_SITE
-							? week.week_schedule.practice_place.address
-							: '',
-					campusAddress:
-						week.week_schedule.practice_place.type.name ===
-						PracticaPlaceTypeName.IN_SITE
-							? week.week_schedule.practice_place.address
-							: '',
-					shift: `${transformTimeToShortFormat(
-						week.week_schedule.start_time
-					)} - ${transformTimeToShortFormat(week.week_schedule.end_time)}`,
-					tutor: date.instructor.name,
-					type: week.week_schedule.practice_place.type.name,
-					rawDate: transformDateString(date.date, DEFAULT_DATE_FORMAT),
-				}))
-			)
-		);
+		return data
+			.filter((group) => group.is_active) // Filter only active groups
+			.flatMap((group, index) =>
+				group.weeks.flatMap((week) =>
+					week.week_schedule.dates.map((date) => ({
+						title: week.week_schedule.practice_place.name,
+						group_name: group.group_name,
+						available: group.spaces_available,
+						max_students: group.max_students,
+						group_id: group.group_id.toString(),
+						group: (index + 1).toString(),
+						start: toExactDate(date.date),
+						end: toExactDate(date.date),
+						offsiteAddress:
+							week.week_schedule.practice_place.type.name ===
+							PracticaPlaceTypeName.OFF_SITE
+								? week.week_schedule.practice_place.address
+								: '',
+						campusAddress:
+							week.week_schedule.practice_place.type.name ===
+							PracticaPlaceTypeName.IN_SITE
+								? week.week_schedule.practice_place.address
+								: '',
+						shift: `${transformTimeToShortFormat(
+							week.week_schedule.start_time
+						)} - ${transformTimeToShortFormat(week.week_schedule.end_time)}`,
+						tutor: date.instructor.name,
+						type: week.week_schedule.practice_place.type.name,
+						rawDate: transformDateString(date.date, DEFAULT_DATE_FORMAT),
+						is_active: group.is_active,
+					}))
+				)
+			);
 	};
 
 	const calculateHours = (shift: string): number => {
@@ -170,6 +207,7 @@ export const transformAndFillAddresses = (data: Group[]): CalendarEvent[] => {
 	};
 
 	const events = transformToCalendarEvents(data);
+	console.log('Eventitos', events);
 	const eventsWithAddresses = fillAddressesForGroups(events);
 	const groupedDates = groupDatesByType(eventsWithAddresses);
 	const groupHours = calculateTotalHoursByGroup(eventsWithAddresses);

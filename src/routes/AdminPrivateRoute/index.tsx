@@ -5,13 +5,14 @@ import { decodeToken } from '../../utils/decodeToken';
 
 const validateAuthToken = (token: string): boolean => {
 	const userData = decodeToken(token);
+
 	if (!token) return false;
-	if (userData?.role.role_name === 'admin') return false;
-	if (userData?.role.role_name === 'student') return true;
+	if (userData?.role.role_name === 'student') return false;
+	if (userData?.role.role_name === 'admin') return true;
 	return token !== '';
 };
 
-const PrivateRoute: React.FC = () => {
+const AdminPrivateRoute: React.FC = () => {
 	const authToken = getTokenFromCookies();
 
 	if (authToken && validateAuthToken(authToken)) {
@@ -21,4 +22,4 @@ const PrivateRoute: React.FC = () => {
 	}
 };
 
-export default PrivateRoute;
+export default AdminPrivateRoute;

@@ -22,6 +22,11 @@ const AdminCourses = () => {
 		handleAddCourse,
 		semesterId,
 		isLoading,
+		handleDesactivateCourse,
+		handleCloseDeleteCourseModal,
+		handleShowDeleteCourseModal,
+		programSemesterIdToDelete,
+		showDeleteCourseModal,
 	} = useCourses();
 	return (
 		<AdminLayout>
@@ -64,6 +69,21 @@ const AdminCourses = () => {
 					/>
 				</form>
 			</MlActionModal>
+
+			<MlActionModal
+				isOpen={showDeleteCourseModal}
+				onAction={() => {
+					handleDesactivateCourse(programSemesterIdToDelete);
+				}}
+				isLoading={false}
+				onClose={handleCloseDeleteCourseModal}
+				title='Are you sure you want to delete this course?'
+				description='This action cannot be undone.'
+				closeButtonLabel='Cancel'
+				actionButtonLabel='Delete'
+				variant='danger'
+			></MlActionModal>
+
 			<AtLoadingWrapper isLoading={isLoading} />
 			<div className='header flex justify-between'>
 				<div className='left'>
@@ -81,7 +101,7 @@ const AdminCourses = () => {
 				</div>
 			</div>
 
-			{programSemesterId === 'no-courses' && (
+			{(programSemesterId === 'no-courses' || courses.length === 0) && (
 				<div className='content flex justify-center flex-col items-center mt-60'>
 					<h2 className='text-xl font-medium pb-6'>
 						There are no courses assigned to this semester.
@@ -100,6 +120,11 @@ const AdminCourses = () => {
 						label={course.program.name}
 						Icon={RiBookMarkedLine}
 						key={course.program.id}
+						tooltipId={`tooltip-${course.program_semester_id}`}
+						tooltipContent={'Delete course'}
+						deleteLocationClick={() =>
+							handleShowDeleteCourseModal(course.program_semester_id)
+						}
 					/>
 				))}
 			</div>

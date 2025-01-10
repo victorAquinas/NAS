@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { AdminHeadquarter } from '../../../api/types';
 import { useParams } from 'react-router-dom';
-import { createSemester, getLocations } from '../../../api/adminServices';
+import {
+	createSemester,
+	desactivateSemester,
+	getLocations,
+} from '../../../api/adminServices';
 import { toast } from 'react-toastify';
 import { transformDateString } from '../../../utils/transformDateString';
 
@@ -17,6 +21,9 @@ export const useAdminSemesters = () => {
 	const [semesterName, setSemesterName] = useState<string>('');
 	const [startDate, setStartDate] = useState<Date | null>(null);
 	const [endDate, setEndDate] = useState<Date | null>(null);
+	const [showDeleteSemesterModal, setShowDeleteSemesterModal] =
+		useState<boolean>(false);
+	const [semesterIdToDelete, setSemesterIdToDelete] = useState<number>(-99);
 
 	const handleOpenAddLocationModal = () => {
 		setIsAddSemesterModalOpen(true);
@@ -33,9 +40,14 @@ export const useAdminSemesters = () => {
 			const semesters = req.filter(
 				(location) => location.headquarter_id === parseInt(locationId)
 			);
+			const currentActiveSemesters = {
+				...semesters[0],
+				semesters_in: semesters[0].semesters_in.filter(
+					(semester) => semester.semester_is_active
+				),
+			};
 
-			console.log('Req', req);
-			setSemesters(semesters[0]);
+			setSemesters(currentActiveSemesters);
 			return req;
 		} catch (error) {
 			console.error(error);
@@ -74,6 +86,41 @@ export const useAdminSemesters = () => {
 		}
 	};
 
+	const handleDesactivateSemester = async (semesterId: number) => {
+		const idLoading = toast.loading('Deleting Semester');
+		try {
+			await desactivateSemester(semesterId);
+			if (locationId) {
+				getSemesters(locationId);
+			}
+			toast.update(idLoading, {
+				render: 'Semester deleted',
+				type: 'success',
+				isLoading: false,
+				autoClose: 1000,
+			});
+			handleCloseDeleteSemesterModal();
+		} catch (error) {
+			toast.update(idLoading, {
+				render: 'Error',
+				type: 'error',
+				isLoading: false,
+				autoClose: 1000,
+			});
+			console.error(error);
+		}
+	};
+
+	const handleShowDeleteSemesterModal = (semesterId: number) => {
+		setShowDeleteSemesterModal(true);
+		setSemesterIdToDelete(semesterId);
+	};
+
+	const handleCloseDeleteSemesterModal = () => {
+		setShowDeleteSemesterModal(false);
+		setSemesterIdToDelete(-99);
+	};
+
 	useEffect(() => {
 		if (locationId) {
 			getSemesters(locationId);
@@ -94,5 +141,10 @@ export const useAdminSemesters = () => {
 		setEndDate,
 		endDate,
 		locationId,
+		handleDesactivateSemester,
+		handleShowDeleteSemesterModal,
+		handleCloseDeleteSemesterModal,
+		semesterIdToDelete,
+		showDeleteSemesterModal,
 	};
 };

@@ -4,10 +4,14 @@ import {
 	AdminHeadquarter,
 	GroupDetails,
 	ResponseCreateDay,
+	ResponseCreateGroupPlace,
 	ResponseCreateLocation,
 	ResponseCreateWeek,
 	ResponseDeleteDay,
+	ResponseGetGroups,
+	ResponseRelocateStudent,
 	SourcesResponse,
+	StudentsResponse,
 	updateGroupType,
 } from './types';
 import { isBooleanString } from '../utils/isBooleanString';
@@ -180,6 +184,85 @@ export const desactivateCourse = async (
 		`${
 			import.meta.env.VITE_API_URL
 		}deactivate-program-semester?program_semester_id=${program_semester_id}`
+	);
+	return response.data;
+};
+
+export const getStudentsByProgramSemesterId = async (
+	program_semester_id: string
+): Promise<StudentsResponse[]> => {
+	const response = await api.post(
+		`${
+			import.meta.env.VITE_API_URL
+		}admin/program/students?program_semester_id=${program_semester_id}`,
+		{}
+	);
+
+	return response.data;
+};
+
+export const acceptUserInGroup = async (
+	user_email: string,
+	group_id: number
+): Promise<ResponseDeleteDay> => {
+	const params = `user_email=${user_email}&group_id=${group_id}`;
+	const response = await api.patch(
+		`${import.meta.env.VITE_API_URL}user/group/accept?${transformToUrlParams(
+			params
+		)}`
+	);
+	return response.data;
+};
+
+export const rejectUserInGroup = async (
+	user_email: string,
+	group_id: number
+): Promise<ResponseDeleteDay> => {
+	const params = `user_email=${user_email}&group_id=${group_id}`;
+	const response = await api.patch(
+		`${import.meta.env.VITE_API_URL}user/group/reject?${transformToUrlParams(
+			params
+		)}`
+	);
+	return response.data;
+};
+
+export const createGroupPlace = async (
+	name: string,
+	type_id: number,
+	address: string,
+	program_semester_id: string
+): Promise<ResponseCreateGroupPlace> => {
+	const response = await api.put(`${import.meta.env.VITE_API_URL}places`, {
+		name,
+		type_id,
+		address,
+		program_semester_id,
+	});
+	return response.data;
+};
+
+export const getGroups = async (
+	program_semester_id: string
+): Promise<ResponseGetGroups> => {
+	const response = await api.get(
+		`${
+			import.meta.env.VITE_API_URL
+		}relocations?program_semester_id=${program_semester_id}`
+	);
+
+	return response.data;
+};
+
+export const relocateStudent = async (
+	student_id: number,
+	new_group_id: number
+): Promise<ResponseRelocateStudent> => {
+	const params = `student_id=${student_id}&new_group_id=${new_group_id}`;
+	const response = await api.post(
+		`${
+			import.meta.env.VITE_API_URL
+		}relocations/change_student_group?${transformToUrlParams(params)}`
 	);
 	return response.data;
 };

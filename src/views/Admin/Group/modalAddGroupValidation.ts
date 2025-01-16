@@ -3,6 +3,7 @@ import { z } from 'zod';
 const selectOptionSchema = z.object({
 	label: z.string().min(1, { message: 'Label must not be empty' }),
 	value: z.number().min(1, { message: 'Value must not be empty' }),
+	description: z.optional(z.string()),
 });
 
 export const newGroupSchema = z.object({
@@ -30,6 +31,7 @@ export const newGroupSchema = z.object({
 			.number({ required_error: 'This field is required' })
 			.positive('Must be a positive number')
 			.int('Must be an integer')
+			.max(15, 'Must be less than 15 weeks')
 	),
 	default_insite_practice_place_id: selectOptionSchema,
 	insite_num_weeks_for_generate: z.preprocess(
@@ -38,6 +40,7 @@ export const newGroupSchema = z.object({
 			.number({ required_error: 'This field is required' })
 			.positive('Must be a positive number')
 			.int('Must be an integer')
+			.max(15, 'Must be less than 15 weeks')
 	),
 });
 

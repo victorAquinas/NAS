@@ -49,6 +49,7 @@ const MyShiftsPage = () => {
 			{canShowStatus(userStatus as UserStatus, [
 				UserStatus.OPEN,
 				UserStatus.REJECTED,
+				UserStatus.REJECT,
 			]) && (
 				<div className='content flex justify-center flex-col items-center mt-60'>
 					<h2 className='text-xl font-medium'>You haven't selected a group</h2>

@@ -10,6 +10,7 @@ import DatePicker from 'react-datepicker';
 import { toast } from 'react-toastify';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 import { MdOutlineDelete } from 'react-icons/md';
+import AtBreadcrumb from '../../../components/AtBreadCrumb';
 
 const AdminSemesters = () => {
 	const {
@@ -31,7 +32,14 @@ const AdminSemesters = () => {
 		handleDesactivateSemester,
 		handleCloseDeleteSemesterModal,
 		handleShowDeleteSemesterModal,
+		location,
 	} = useAdminSemesters();
+	const breadcrumbItems = [
+		{ label: 'Locations', link: '/admin/locations' },
+		{ label: 'Semesters' },
+		// { label: 'Courses', link: '/admin/courses/4/semester/3/location/1' },
+	];
+
 	return (
 		<AdminLayout>
 			<MlActionModal
@@ -100,10 +108,12 @@ const AdminSemesters = () => {
 			></MlActionModal>
 
 			<AtLoadingWrapper isLoading={isLoading} />
-
 			<div className='header flex justify-between' id='content-semester'>
 				<div className='left'>
-					<h2 className='text-xl font-medium'>
+					<h2 className='text-xl font-semibold'>{location.headquarter_name}</h2>
+					<AtBreadcrumb items={breadcrumbItems} separator='/' />
+
+					<h2 className='text-base font-medium pt-4'>
 						Administration Panel - Semesters
 					</h2>
 					<p className='text-sm max-w-[50rem]'>
@@ -152,26 +162,30 @@ const AdminSemesters = () => {
 										<AtBadge label='Inactive' variant='danger' />
 									)}
 								</td>
-								<td className='border-b border-gray-200 px-3 p-3  text-start flex items-center'>
-									<Link
-										to={`/admin/courses/${
-											semester?.programs_in[0]?.program_semester_id ??
-											'no-courses'
-										}/semester/${semester.semester_id}`}
-									>
-										<span className='text-2xl'>
-											<LuEye />
-										</span>
-									</Link>
+								<td className='border-b border-gray-200 px-3 p-3  text-start '>
+									<div className='flex items-center'>
+										<Link
+											to={`/admin/courses/${
+												semester?.programs_in[0]?.program_semester_id ??
+												'no-courses'
+											}/semester/${
+												semester.semester_id
+											}/location/${locationId}`}
+										>
+											<span className='text-2xl'>
+												<LuEye />
+											</span>
+										</Link>
 
-									<button
-										className='text-2xl pl-2'
-										onClick={() =>
-											handleShowDeleteSemesterModal(semester.semester_id)
-										}
-									>
-										<MdOutlineDelete className='text-red_primary' />
-									</button>
+										<button
+											className='text-2xl pl-2'
+											onClick={() =>
+												handleShowDeleteSemesterModal(semester.semester_id)
+											}
+										>
+											<MdOutlineDelete className='text-red_primary' />
+										</button>
+									</div>
 								</td>
 							</tr>
 						))}

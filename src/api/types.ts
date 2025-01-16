@@ -27,6 +27,7 @@ export interface GroupResponse {
 	success: boolean;
 }
 export interface Group {
+	headquarter: string;
 	group_id: number;
 	group_name: string;
 	max_students: number;
@@ -91,6 +92,8 @@ export interface PracticaPlace {
 export interface UserStatusResponse {
 	success: boolean;
 	data: {
+		can_enroll: boolean;
+		max_enrollment_date: string;
 		student_id: number;
 		student_name: string;
 		student_email: string;
@@ -108,6 +111,7 @@ export enum UserStatus {
 	OPEN = 'OPEN',
 	PENDING = 'PENDING',
 	REJECTED = 'REJECTED',
+	REJECT = 'REJECT',
 	ACCEPTED = 'ACCEPTED',
 }
 
@@ -182,6 +186,19 @@ export interface Place {
 export interface SourcesResponse {
 	places: Place[];
 	instructors: Instructor[];
+	only_places_without_repeat: [
+		{
+			name: string;
+			address: string;
+			id: number;
+			headquarter: string;
+			status: boolean;
+			type: {
+				id: number;
+				name: string;
+			};
+		}
+	];
 }
 
 export type updateGroupType = 'group' | 'week' | 'week_schedule' | 'day';
@@ -249,3 +266,52 @@ export type OptionType = {
 	value: string;
 	label: string;
 };
+
+export interface StudentsResponse {
+	id: number;
+	name: string;
+	email: string;
+	phone: string | null;
+	request: {
+		requested_group_id: number;
+		requested_group_status: string;
+		requested_group_name: string;
+	};
+}
+
+export interface SelectOptionDescription {
+	label: string;
+	value: number;
+	description?: string;
+}
+
+export interface ResponseCreateGroupPlace {
+	success: boolean;
+	data: {
+		address: string;
+		program_semester_id: number;
+		status: boolean;
+		type_id: number;
+		id: number;
+		name: string;
+	};
+}
+
+export interface ResponseGroups {
+	id: number;
+	name: string;
+	program_semester_id: number;
+	headquarter: string;
+}
+
+export interface ResponseGetGroups {
+	foreign_places: ResponseGroups[];
+	local_places: ResponseGroups[];
+}
+
+export interface ResponseRelocateStudent {
+	success: boolean;
+	data: {
+		message: string;
+	};
+}

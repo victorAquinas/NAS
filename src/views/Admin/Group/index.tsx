@@ -3,7 +3,11 @@ import AtButton from '../../../components/AtButton';
 import { MlActionModal } from '../../../components/MlModal/MlActionModal';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 import { useAdminGroup } from './useAdminGroup';
-import { Group, PracticaPlaceTypeName } from '../../../api/types';
+import {
+	Group,
+	PracticaPlaceTypeName,
+	SelectOptionDescription,
+} from '../../../api/types';
 import DatePicker from 'react-datepicker';
 import { IoIosAddCircleOutline } from 'react-icons/io';
 import { transformDateString } from '../../../utils/transformDateString';
@@ -16,12 +20,64 @@ import { LuCalendarPlus } from 'react-icons/lu';
 import { AtSelectCoordinator } from './components/AtSelectCoordinator';
 import { Controller } from 'react-hook-form';
 
-import Select from 'react-select';
+import Select, {
+	GroupBase,
+	OptionProps,
+	SingleValueProps,
+	StylesConfig,
+} from 'react-select';
 import { AtInputDate } from './components/AtInputDate';
 import { CgChevronRight } from 'react-icons/cg';
 import { toast } from 'react-toastify';
 import { AtLoadingWrapper } from '../../../components/AtLoadingWrapper';
 import AtInputGroup from './components/AtInputGroup';
+import { Link } from 'react-router-dom';
+import AtBreadcrumb from '../../../components/AtBreadCrumb';
+
+const CustomOption = ({
+	data,
+	innerRef,
+	innerProps,
+}: OptionProps<
+	SelectOptionDescription,
+	false,
+	GroupBase<SelectOptionDescription>
+>) => {
+	return (
+		<div
+			ref={innerRef}
+			{...innerProps}
+			className='cursor-pointer option p-2 hover:bg-gray-100 border-b border-gray-300'
+		>
+			<div className='font-semibold text-gray-800'>{data.label}</div>
+			<div className='text-sm text-gray-500'>{data.description}</div>
+		</div>
+	);
+};
+
+const CustomSingleValue = ({
+	data,
+}: SingleValueProps<
+	SelectOptionDescription,
+	false,
+	GroupBase<SelectOptionDescription>
+>) => {
+	return (
+		<div className='flex flex-col single-value'>
+			<span className='font-semibold text-gray-800'>{data.label}</span>
+			<span className='text-sm text-gray-500'>{data.description}</span>
+		</div>
+	);
+};
+
+// Custom Styles to fix white space issue
+const customStyles: StylesConfig<SelectOptionDescription, false> = {
+	valueContainer: (provided) => ({
+		...provided,
+		display: 'flex',
+		padding: '0.5312rem', // Adjusts padding inside the selected value container
+	}),
+};
 
 const AdminGroup = () => {
 	const {
@@ -53,6 +109,12 @@ const AdminGroup = () => {
 		isCreatingGroup,
 		isDeletingGroup,
 		hasActiveGroup,
+		programSemesterId,
+		locationId,
+		semesterId,
+		location,
+		// inSiteOptions,
+		// offsiteOptions,
 	} = useAdminGroup();
 
 	const groupNameRefs = useRef<{
@@ -171,6 +233,16 @@ const AdminGroup = () => {
 
 	const inputRef = useRef<HTMLInputElement>(null);
 	const maxStudentsRef = useRef<HTMLInputElement>(null);
+
+	const breadcrumbItems = [
+		{ label: 'Locations', link: '/admin/locations' },
+		{ label: 'Semesters', link: `/admin/semester/${locationId}` },
+		{
+			label: 'Courses',
+			link: `/admin/courses/${programSemesterId}/semester/${semesterId}/location/${locationId}`,
+		},
+		{ label: 'Groups' },
+	];
 
 	return (
 		<AdminLayout>
@@ -397,6 +469,12 @@ const AdminGroup = () => {
 											label: place.name,
 											value: place.id,
 										}))}
+									components={{
+										Option: CustomOption,
+										SingleValue: CustomSingleValue,
+									}}
+									styles={customStyles}
+									// options={offsiteOptions}
 									placeholder='Select Off-site place'
 									className='w-full h-full bg-white !placeholder:text-[#807f7f] !font-normal rounded-md'
 									onChange={(selected) => {
@@ -436,6 +514,12 @@ const AdminGroup = () => {
 							render={({ field }) => (
 								<Select
 									{...field}
+									components={{
+										Option: CustomOption,
+										SingleValue: CustomSingleValue,
+									}}
+									styles={customStyles}
+									// options={inSiteOptions}
 									options={places[0]?.available_places
 										.filter((place) => {
 											return place.type.name === 'In-Site';
@@ -447,6 +531,7 @@ const AdminGroup = () => {
 									placeholder='Select In-site place'
 									className='w-full h-full bg-white !placeholder:text-[#807f7f] !font-normal rounded-md'
 									onChange={(selected) => {
+										console.log('selected', selected);
 										field.onChange(selected ? selected : null);
 									}}
 								/>
@@ -503,17 +588,7 @@ const AdminGroup = () => {
 			<MlActionModal
 				isOpen={showDeleteGroupModal}
 				onAction={() => {
-					toast.promise(
-						handleDesactivateGroup(groupIdToDelete),
-						{
-							success: 'Group deleted',
-							error: 'Error',
-							pending: 'Deleting group',
-						},
-						{
-							autoClose: 500,
-						}
-					);
+					handleDesactivateGroup(groupIdToDelete);
 				}}
 				isLoading={isDeletingGroup}
 				onClose={handleCloseDeleteGroupModal}
@@ -525,10 +600,19 @@ const AdminGroup = () => {
 			></MlActionModal>
 
 			<AtLoadingWrapper isLoading={isLoading} />
-			<h2 className='text-xl font-medium'>Dental Assistant</h2>
+			<h2 className='text-xl font-semibold'>{location.headquarter_name}</h2>
+			<AtBreadcrumb items={breadcrumbItems} separator='/' />
+
+			<h2 className='text-xl font-medium pt-4'>Dental Assistant</h2>
+
 			<ul className='sub-menu flex items-center w-full gap-x-4 mt-6 border-b border-gray-300'>
 				<li className='border-b border-b-primary text-primary'>Groups</li>
-				<li>Applications</li>
+
+				<Link
+					to={`/admin/group/students/${programSemesterId}/semester/${semesterId}/location/${locationId}`}
+				>
+					<li>Students</li>
+				</Link>
 			</ul>
 
 			{/* If there are groups */}

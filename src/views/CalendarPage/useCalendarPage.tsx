@@ -5,6 +5,7 @@ import { getOneEventPerGroup } from '../../utils/getOneEventPerGroup';
 import {
 	getCalendarGroupById,
 	getCalendarGroups,
+	getCalendarWeeksByStudentId,
 	getUserStatus,
 	requestGroup,
 } from '../../api/services';
@@ -17,9 +18,12 @@ import useSetState from '../../hooks/useSetState';
 import { CallBackProps, STATUS } from 'react-joyride';
 import { TUTORIAL_STEPS } from './steps';
 import { getEventsBackgroundColor } from '../../utils/getEventsBackgroundColor';
-import { getCookieItem } from '../../utils/cookies';
+import { getCookieItem, getTokenFromCookies } from '../../utils/cookies';
+import { decodeToken } from '../../utils/decodeToken';
 
 export const useCalendarPage = () => {
+	const token = getTokenFromCookies();
+	const decodedToken = decodeToken(token ?? '');
 	const userEmail = getCookieItem('user_email');
 	const [events, setEvents] = useState<CalendarEvent[]>([]);
 	const [eventsCopy, setEventsCopy] = useState<CalendarEvent[]>([]);
@@ -37,6 +41,8 @@ export const useCalendarPage = () => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		steps: TUTORIAL_STEPS as any,
 	});
+	const [canRequestGroup, setCanRequestGroup] = useState<boolean>(true);
+
 	const [showGroupConfirmationModal, setShowGroupConfirmationModal] =
 		useState<boolean>(false);
 	const [hasSeenTutorial, setHasSeenTutorial] = useState<boolean>(() => {
@@ -138,6 +144,22 @@ export const useCalendarPage = () => {
 		}
 	};
 
+	const getSelectedGroupWeeks = async (student_id: number) => {
+		try {
+			const group = await getCalendarWeeksByStudentId(student_id);
+			const transformedCalendarEvents = transformAndFillAddresses([group.data]);
+			console.log('Specific Group', transformedCalendarEvents);
+			setEvents(transformedCalendarEvents);
+			setEventsCopy(transformedCalendarEvents);
+			return transformedCalendarEvents;
+		} catch (error) {
+			console.error(error);
+			toast.error(ErrorMessages.GENERAL_ERROR);
+		} finally {
+			handleCloseLoading();
+		}
+	};
+
 	const handleUserStatus = async (
 		email: string,
 		user_program_semester_id: string
@@ -150,6 +172,7 @@ export const useCalendarPage = () => {
 			const { requested_group_status: status, requested_group } =
 				statusResponse.data;
 			setUserStatus(status as UserStatus);
+			setCanRequestGroup(statusResponse.data.can_enroll);
 			setSelectedCourse(statusResponse.data.program.name);
 			setIsSemesterOpen(statusResponse.data.semester_status);
 			if (status === UserStatus.PENDING || status === UserStatus.ACCEPTED) {
@@ -205,19 +228,18 @@ export const useCalendarPage = () => {
 
 	useEffect(() => {
 		if (userStatus && programSemesterId) {
-			if (
-				userStatus === UserStatus.ACCEPTED ||
-				userStatus === UserStatus.PENDING
-			) {
+			if (userStatus === UserStatus.ACCEPTED) {
+				if (decodedToken) {
+					getSelectedGroupWeeks(decodedToken.user_id);
+				}
+			}
+			if (userStatus === UserStatus.PENDING) {
 				if (groupId) {
 					getCalendarGroupByIdEvents(groupId);
 				}
 			}
 
-			if (
-				userStatus === UserStatus.OPEN ||
-				userStatus === UserStatus.REJECTED
-			) {
+			if (userStatus === UserStatus.OPEN || userStatus === UserStatus.REJECT) {
 				getCalendarGroupsEvents(programSemesterId);
 			}
 		}
@@ -256,5 +278,6 @@ export const useCalendarPage = () => {
 		userEmail,
 		selectedCourse,
 		isSemesterOpen,
+		canRequestGroup,
 	};
 };

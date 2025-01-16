@@ -13,6 +13,7 @@ import AdminSemesters from '../views/Admin/Semesters';
 import AdminCourses from '../views/Admin/Courses';
 import AdminGroup from '../views/Admin/Group';
 import AdminPrivateRoute from './AdminPrivateRoute';
+import AdminStudents from '../views/Admin/Students';
 
 const Router = () => {
 	const routes = createBrowserRouter([
@@ -32,13 +33,23 @@ const Router = () => {
 		{
 			element: <AdminPrivateRoute />,
 			children: [
-				{ path: '/admin/locations', element: <AdminLocations /> },
+				{
+					path: '/admin/locations',
+					element: <AdminLocations />,
+				},
 				{ path: '/admin/semester/:locationId', element: <AdminSemesters /> },
 				{
-					path: '/admin/courses/:programSemesterId/semester/:semesterId',
+					path: '/admin/courses/:programSemesterId/semester/:semesterId/location/:locationId',
 					element: <AdminCourses />,
 				},
-				{ path: '/admin/group/:programSemesterId', element: <AdminGroup /> },
+				{
+					path: '/admin/group/:programSemesterId/semester/:semesterId/location/:locationId',
+					element: <AdminGroup />,
+				},
+				{
+					path: '/admin/group/students/:programSemesterId/semester/:semesterId/location/:locationId',
+					element: <AdminStudents />,
+				},
 			],
 		},
 	]);

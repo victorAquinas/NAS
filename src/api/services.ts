@@ -71,6 +71,18 @@ export const getCalendarGroupById = async (
 	return response.data;
 };
 
+export const getCalendarWeeksByStudentId = async (
+	student_id: number
+): Promise<GroupByIdResponse> => {
+	const response = await api.get(
+		`${
+			import.meta.env.VITE_API_URL
+		}${`user/current/group?student_id=${student_id}`}`
+	);
+
+	return response.data;
+};
+
 export const requestGroup = async (
 	email: string,
 	group_id: string

@@ -18,7 +18,7 @@ interface MlActionModalProps {
 	children?: React.ReactNode;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	styles?: any;
-	variant?: 'success' | 'danger';
+	variant?: 'success' | 'danger' | 'transparent';
 	isLoading?: boolean;
 }
 export const MlActionModal = ({
@@ -84,7 +84,11 @@ export const MlActionModal = ({
 						)}
 						{actionButtonLabel && (
 							<AtButton
-								variant={variant === 'success' ? 'primary' : 'danger'}
+								variant={
+									variant === 'success' || variant === 'transparent'
+										? 'primary'
+										: 'danger'
+								}
 								className='flex items-center mt-6'
 								onClick={onAction}
 								isLoading={isLoading}

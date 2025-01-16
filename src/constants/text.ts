@@ -17,4 +17,7 @@ export const GENERAL_TEXT = {
 	CLOSED_SEMESTER_TITLE: 'This semester is closed',
 	CLOSED_SEMESTER_DESCRIPTION:
 		'You will only be able to view information in closed semesters.',
+	CANNOT_REQUEST_GROUP_TITLE: 'Request group deadline expired',
+	CANNOT_REQUEST_GROUP_DESCRIPTION:
+		'You cannot request a group because the deadline for requests has passed.',
 };

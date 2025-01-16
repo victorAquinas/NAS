@@ -12,7 +12,7 @@ import { filterCoursesBySemesterId } from '../../../utils/filterCoursesByProgram
 
 export const useCourses = () => {
 	const navigate = useNavigate();
-	const { programSemesterId, semesterId } = useParams();
+	const { programSemesterId, semesterId, locationId } = useParams();
 	const [courses, setCourses] = useState<AdminProgramIn[]>([]);
 	const [maxEnrollmentDate, setMaxEnrollmentDate] = useState<Date | null>(null);
 	const [courseName, setCourseName] = useState<string>('');
@@ -23,6 +23,13 @@ export const useCourses = () => {
 		useState<boolean>(false);
 	const [programSemesterIdToDelete, setProgramSemesterIdToDelete] =
 		useState<number>(-99);
+	const [location, setLocation] = useState<{
+		headquarter_id: number;
+		headquarter_name: string;
+	}>({
+		headquarter_id: 0,
+		headquarter_name: '',
+	});
 
 	const handleOpenAddCourseModal = () => {
 		setIsAddCourseModalOpen(true);
@@ -32,11 +39,24 @@ export const useCourses = () => {
 		setIsAddCourseModalOpen(false);
 	};
 
-	const getCourses = async (semesterId: string) => {
+	const getCourses = async (semesterId: string, locationId: string) => {
 		setIsLoading(true);
 		try {
 			const req = await getLocations();
 
+			const semesters = req.filter(
+				(location) => location.headquarter_id === parseInt(locationId)
+			);
+			const currentActiveSemesters = {
+				...semesters[0],
+				semesters_in: semesters[0].semesters_in.filter(
+					(semester) => semester.semester_is_active
+				),
+			};
+			setLocation({
+				headquarter_id: currentActiveSemesters.headquarter_id,
+				headquarter_name: currentActiveSemesters.headquarter_name,
+			});
 			const currentSemester = filterCoursesBySemesterId(
 				req,
 				parseInt(semesterId ?? '')
@@ -45,6 +65,8 @@ export const useCourses = () => {
 			const activeCourses = currentSemester.programs_in.filter(
 				(program) => program.program_semester_status
 			);
+
+			console.log('Acive', activeCourses);
 
 			if (currentSemester) {
 				setCourses(activeCourses);
@@ -62,7 +84,8 @@ export const useCourses = () => {
 	const handleAddCourse = async (
 		name: string,
 		semesterId: string,
-		maxEnrollmentDate: Date | null
+		maxEnrollmentDate: Date | null,
+		locationId: string
 	) => {
 		const clearModal = () => {
 			setCourseName('');
@@ -78,7 +101,7 @@ export const useCourses = () => {
 				transformDateString(maxEnrollmentDate.toISOString(), 'YYYY-MM-DD')
 			);
 
-			const currentSemester = await getCourses(semesterId);
+			const currentSemester = await getCourses(semesterId, locationId);
 
 			if (currentSemester) {
 				if (
@@ -86,7 +109,7 @@ export const useCourses = () => {
 					programSemesterId === 'no-courses'
 				) {
 					navigate(
-						`/admin/courses/${currentSemester?.programs_in[0]?.program_semester_id}/semester/${currentSemester.semester_id}`
+						`/admin/courses/${currentSemester?.programs_in[0]?.program_semester_id}/semester/${currentSemester.semester_id}/location/${locationId}`
 					);
 				}
 			}
@@ -98,12 +121,15 @@ export const useCourses = () => {
 		}
 	};
 
-	const handleDesactivateCourse = async (programSemesterId: number) => {
+	const handleDesactivateCourse = async (
+		programSemesterId: number,
+		locationId: string
+	) => {
 		const idLoading = toast.loading('Deleting course');
 		try {
 			await desactivateCourse(programSemesterId);
 			if (semesterId) {
-				getCourses(semesterId);
+				getCourses(semesterId, locationId);
 			}
 			toast.update(idLoading, {
 				render: 'Course deleted',
@@ -111,7 +137,7 @@ export const useCourses = () => {
 				isLoading: false,
 				autoClose: 500,
 			});
-			getCourses(semesterId ?? '');
+			getCourses(semesterId ?? '', locationId);
 			handleCloseDeleteCourseModal();
 		} catch (error) {
 			console.error(error);
@@ -135,12 +161,12 @@ export const useCourses = () => {
 	};
 
 	useEffect(() => {
-		if (programSemesterId && programSemesterId !== 'no-courses') {
-			getCourses(semesterId ?? '');
+		if (programSemesterId && programSemesterId !== 'no-courses' && locationId) {
+			getCourses(semesterId ?? '', locationId);
 		} else {
 			setIsLoading(false);
 		}
-	}, [programSemesterId, semesterId]);
+	}, [programSemesterId, semesterId, locationId]);
 
 	return {
 		isAddCourseModalOpen,
@@ -160,5 +186,7 @@ export const useCourses = () => {
 		handleShowDeleteCourseModal,
 		programSemesterIdToDelete,
 		showDeleteCourseModal,
+		locationId,
+		location,
 	};
 };

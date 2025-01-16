@@ -146,6 +146,7 @@ export const MlGroupDetailModal = ({
 						{canShowStatus(variant as UserStatus, [
 							UserStatus.OPEN,
 							UserStatus.REJECTED,
+							UserStatus.REJECT,
 						]) &&
 							isSemesterOpen && (
 								<AtButton

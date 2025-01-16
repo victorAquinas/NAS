@@ -7,6 +7,7 @@ import DatePicker from 'react-datepicker';
 import { toast } from 'react-toastify';
 import { AtLoadingWrapper } from '../../../components/AtLoadingWrapper';
 import { AdminLayout } from '../../../layouts/AdminLayout';
+import AtBreadcrumb from '../../../components/AtBreadCrumb';
 
 const AdminCourses = () => {
 	const {
@@ -27,7 +28,17 @@ const AdminCourses = () => {
 		handleShowDeleteCourseModal,
 		programSemesterIdToDelete,
 		showDeleteCourseModal,
+		locationId,
+		location,
 	} = useCourses();
+
+	const breadcrumbItems = [
+		{ label: 'Locations', link: '/admin/locations' },
+		{ label: 'Semesters', link: `/admin/semester/${locationId}` },
+		{ label: 'Courses' },
+		// link: '/admin/courses/4/semester/3/location/1'
+	];
+
 	return (
 		<AdminLayout>
 			<MlActionModal
@@ -44,7 +55,12 @@ const AdminCourses = () => {
 				}}
 				onAction={() =>
 					toast.promise(
-						handleAddCourse(courseName, semesterId ?? '', maxEnrollmentDate),
+						handleAddCourse(
+							courseName,
+							semesterId ?? '',
+							maxEnrollmentDate,
+							locationId ?? ''
+						),
 						{
 							pending: 'Adding course',
 							success: 'Course added successfully',
@@ -73,7 +89,7 @@ const AdminCourses = () => {
 			<MlActionModal
 				isOpen={showDeleteCourseModal}
 				onAction={() => {
-					handleDesactivateCourse(programSemesterIdToDelete);
+					handleDesactivateCourse(programSemesterIdToDelete, locationId ?? '');
 				}}
 				isLoading={false}
 				onClose={handleCloseDeleteCourseModal}
@@ -87,7 +103,9 @@ const AdminCourses = () => {
 			<AtLoadingWrapper isLoading={isLoading} />
 			<div className='header flex justify-between'>
 				<div className='left'>
-					<h2 className='text-xl font-medium'>
+					<h2 className='text-xl font-semibold'>{location.headquarter_name}</h2>
+					<AtBreadcrumb items={breadcrumbItems} separator='/' />
+					<h2 className='text-base font-medium pt-4'>
 						Administration Panel - Courses
 					</h2>
 					<p className='text-sm max-w-[50rem]'>Manage and view all courses.</p>
@@ -116,7 +134,7 @@ const AdminCourses = () => {
 			<div className='location-list pt-6 flex flex-wrap gap-8 w-full justify-center lg:justify-start'>
 				{courses.map((course) => (
 					<AtIconButton
-						href={`/admin/group/${course.program_semester_id}`}
+						href={`/admin/group/${course.program_semester_id}/semester/${semesterId}/location/${locationId}`}
 						label={course.program.name}
 						Icon={RiBookMarkedLine}
 						key={course.program.id}

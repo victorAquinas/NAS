@@ -24,6 +24,13 @@ export const useAdminSemesters = () => {
 	const [showDeleteSemesterModal, setShowDeleteSemesterModal] =
 		useState<boolean>(false);
 	const [semesterIdToDelete, setSemesterIdToDelete] = useState<number>(-99);
+	const [location, setLocation] = useState<{
+		headquarter_id: number;
+		headquarter_name: string;
+	}>({
+		headquarter_id: 0,
+		headquarter_name: '',
+	});
 
 	const handleOpenAddLocationModal = () => {
 		setIsAddSemesterModalOpen(true);
@@ -46,7 +53,11 @@ export const useAdminSemesters = () => {
 					(semester) => semester.semester_is_active
 				),
 			};
-
+			setLocation({
+				headquarter_id: currentActiveSemesters.headquarter_id,
+				headquarter_name: currentActiveSemesters.headquarter_name,
+			});
+			console.log('Current Active Semester', currentActiveSemesters);
 			setSemesters(currentActiveSemesters);
 			return req;
 		} catch (error) {
@@ -146,5 +157,6 @@ export const useAdminSemesters = () => {
 		handleCloseDeleteSemesterModal,
 		semesterIdToDelete,
 		showDeleteSemesterModal,
+		location,
 	};
 };

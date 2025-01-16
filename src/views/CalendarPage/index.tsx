@@ -48,6 +48,7 @@ const CalendarPage = () => {
 		userEmail,
 		selectedCourse,
 		isSemesterOpen,
+		canRequestGroup,
 	} = useCalendarPage();
 
 	return (
@@ -74,7 +75,7 @@ const CalendarPage = () => {
 				actionButtonLabel='Request'
 				event={eventDetail || null}
 				variant={userStatus as UserStatus}
-				isSemesterOpen={isSemesterOpen}
+				isSemesterOpen={isSemesterOpen && canRequestGroup}
 			/>
 
 			<MlInfoModal
@@ -107,6 +108,15 @@ const CalendarPage = () => {
 						className='mb-2'
 					/>
 				)}
+
+				{!canRequestGroup && (
+					<AtAlert
+						title={GENERAL_TEXT.CANNOT_REQUEST_GROUP_TITLE}
+						description={GENERAL_TEXT.CANNOT_REQUEST_GROUP_DESCRIPTION}
+						className='mb-2'
+					/>
+				)}
+
 				<h2 className='text-xl font-medium'>Monthly Calendar</h2>
 				<p className='text-sm max-w-[50rem]'>
 					Easily explore and select available shifts for your clinical
@@ -220,6 +230,7 @@ const CalendarPage = () => {
 													{event.title}
 													{canShowStatus(userStatus as UserStatus, [
 														UserStatus.REJECTED,
+														UserStatus.REJECT,
 														UserStatus.OPEN,
 														UserStatus.PENDING,
 													]) && (
@@ -266,6 +277,7 @@ const CalendarPage = () => {
 						{canShowStatus(userStatus as UserStatus, [
 							UserStatus.OPEN,
 							UserStatus.REJECTED,
+							UserStatus.REJECT,
 						]) && (
 							<div className='filter-by-group flex items-center justify-end'>
 								<p>Filter by group</p>

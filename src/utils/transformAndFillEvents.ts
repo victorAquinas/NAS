@@ -42,7 +42,7 @@ export const transformAndFillAddresses = (data: Group[]): CalendarEvent[] => {
 
 	const transformToCalendarEvents = (data: Group[]): CalendarEvent[] => {
 		return data
-			.filter((group) => group.is_active) // Filter only active groups
+			.filter((group) => group.is_active && group.spaces_available > 0) // Filter only active groups
 			.flatMap((group, index) =>
 				group.weeks.flatMap((week) =>
 					week.week_schedule.dates.map((date) => ({

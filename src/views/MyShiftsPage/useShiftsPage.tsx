@@ -2,13 +2,20 @@ import { useEffect, useState } from 'react';
 import { CalendarEvent } from '../CalendarPage/types';
 import { UserStatus } from '../../api/types';
 import { transformAndFillAddresses } from '../../utils/transformAndFillEvents';
-import { getCalendarGroupById, getUserStatus } from '../../api/services';
+import {
+	// getCalendarGroupById,
+	getCalendarWeeksByStudentId,
+	getUserStatus,
+} from '../../api/services';
 import { toast } from 'react-toastify';
 import { ErrorMessages } from '../../constants/text';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getCookieItem } from '../../utils/cookies';
+import { getCookieItem, getTokenFromCookies } from '../../utils/cookies';
+import { decodeToken } from '../../utils/decodeToken';
 
 export const useShiftsPage = () => {
+	const token = getTokenFromCookies();
+	const decodedToken = decodeToken(token ?? '');
 	const userEmail = getCookieItem('user_email');
 	const [activeEvents, setActiveEvents] = useState<CalendarEvent[]>([]);
 	const [userStatus, setUserStatus] = useState<UserStatus>();
@@ -25,10 +32,26 @@ export const useShiftsPage = () => {
 		}, 500);
 	};
 
-	const getCalendarGroupByIdEvents = async (group_id: string) => {
+	// const getCalendarGroupByIdEvents = async (group_id: string) => {
+	// 	setIsLoading(true);
+	// 	try {
+	// 		const group = await getCalendarGroupById(group_id);
+	// 		const transformedCalendarEvents = transformAndFillAddresses([group.data]);
+	// 		setActiveEvents(transformedCalendarEvents);
+
+	// 		return transformedCalendarEvents;
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 		toast.error(ErrorMessages.GENERAL_ERROR);
+	// 	} finally {
+	// 		handleCloseLoading();
+	// 	}
+	// };
+
+	const getCalendarWeeks = async (student_id: number) => {
 		setIsLoading(true);
 		try {
-			const group = await getCalendarGroupById(group_id);
+			const group = await getCalendarWeeksByStudentId(student_id);
 			const transformedCalendarEvents = transformAndFillAddresses([group.data]);
 			setActiveEvents(transformedCalendarEvents);
 
@@ -76,8 +99,13 @@ export const useShiftsPage = () => {
 	}, [programSemesterId, userEmail]);
 
 	useEffect(() => {
+		// if (userStatus && userStatus === UserStatus.ACCEPTED) {
+		// 	getCalendarGroupByIdEvents(activeGroup as string);
+		// }
 		if (userStatus && userStatus === UserStatus.ACCEPTED) {
-			getCalendarGroupByIdEvents(activeGroup as string);
+			if (decodedToken) {
+				getCalendarWeeks(decodedToken.user_id);
+			}
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userStatus, activeGroup]);

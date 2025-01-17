@@ -40,6 +40,7 @@ const AdminStudents = () => {
 		updateTableFilter,
 		handleGetStudents,
 		tableFilterOptions,
+		location,
 	} = useAdminStudents();
 
 	const breadcrumbItems = [
@@ -247,10 +248,10 @@ const AdminStudents = () => {
 				)}
 			</MlActionModal>
 
+			<h2 className='text-xl font-semibold'>{location.headquarter_name}</h2>
 			<AtBreadcrumb items={breadcrumbItems} separator='/' />
 
-			<h2 className='text-xl font-medium pt-4'>Dental Assistant</h2>
-			<p className='text-gray-500'>Below is a list of all students</p>
+			<h2 className='text-xl font-medium pt-4'>{location.program_name}</h2>
 			<ul className='sub-menu flex items-center w-full gap-x-4 mt-6 border-b border-gray-300'>
 				<Link
 					to={`/admin/group/${programSemesterId}/semester/${semesterId}/location/${locationId}`}

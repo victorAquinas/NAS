@@ -62,6 +62,14 @@ export const useAdminStudents = () => {
 		request_status: null,
 	});
 
+	const [location, setLocation] = useState<{
+		headquarter_name: string;
+		program_name: string;
+	}>({
+		headquarter_name: '',
+		program_name: '',
+	});
+
 	const initialFilters = {
 		name: '',
 		email: '',
@@ -92,7 +100,10 @@ export const useAdminStudents = () => {
 				label: group.group_name,
 				value: String(group.group_id),
 			}));
-
+			setLocation({
+				program_name: groups.data[0].program_name,
+				headquarter_name: groups.data[0].headquarter,
+			});
 			updateTableFilterOptions({
 				// groups: filterGroups,
 				groups: [{ label: 'All', value: '' }, ...filterGroups],
@@ -332,5 +343,6 @@ export const useAdminStudents = () => {
 		tableFilter,
 		handleGetStudents,
 		tableFilterOptions,
+		location,
 	};
 };

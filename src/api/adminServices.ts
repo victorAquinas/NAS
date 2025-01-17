@@ -276,3 +276,17 @@ export const relocateStudent = async (
 	);
 	return response.data;
 };
+
+export const relocateStudentInWeek = async (
+	student_id: number,
+	week_id_origin: number,
+	week_id_destiny: number
+): Promise<ResponseRelocateStudent> => {
+	const params = `student_id=${student_id}&week_id_origin=${week_id_origin}&week_id_destiny=${week_id_destiny}`;
+	const response = await api.post(
+		`${import.meta.env.VITE_API_URL}relocations/week?${transformToUrlParams(
+			params
+		)}`
+	);
+	return response.data;
+};

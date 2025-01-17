@@ -15,6 +15,8 @@ import { Tooltip } from 'react-tooltip';
 import AtBreadcrumb from '../../../components/AtBreadCrumb';
 import { AtAlert } from '../../../components/AtAlert';
 import AtButton from '../../../components/AtButton';
+import { ExternalTransferChoice, ExternalTransferChoiceEnum } from './types';
+import { toast } from 'react-toastify';
 
 const AdminStudents = () => {
 	const {
@@ -41,6 +43,16 @@ const AdminStudents = () => {
 		handleGetStudents,
 		tableFilterOptions,
 		location,
+		moveWeek,
+		moveWeekOptions,
+		externalTransferChoice,
+		setExternalTransferChoice,
+		handleChangeExternalTransferChoice,
+		handleChangeSemester,
+		handleChangeCourse,
+		handleChangeOriginWeek,
+		updateMoveWeek,
+		handleRelocateStudentInWeek,
 	} = useAdminStudents();
 
 	const breadcrumbItems = [
@@ -57,15 +69,80 @@ const AdminStudents = () => {
 		<AdminLayout>
 			<MlActionModal
 				isOpen={canShowMoveToModal}
+				// isOpen
 				onClose={handleCloseMoveToModal}
 				title='Move Student'
 				variant='transparent'
 				actionButtonLabel='Move'
 				styles={{ maxHeight: '80vh', overflow: 'auto' }}
 				closeButtonLabel='Cancel'
+				// onAction={() => {
+				// 	if (selectedMoveTo) {
+				// 		handleRelocateStudent(selectedUser.id, selectedMoveTo?.value);
+				// 	}
+				// }}
 				onAction={() => {
-					if (selectedMoveTo) {
-						handleRelocateStudent(selectedUser.id, selectedMoveTo?.value);
+					if (moveToType === 'groups') {
+						if (!selectedMoveTo) {
+							toast.error('Please select a group');
+						}
+						if (selectedMoveTo) {
+							handleRelocateStudent(selectedUser.id, selectedMoveTo?.value);
+						}
+					}
+
+					if (moveToType === 'location') {
+						if (!externalTransferChoice) {
+							toast.error('Please select an option');
+						}
+
+						if (
+							externalTransferChoice ===
+							ExternalTransferChoiceEnum.TO_ANOTHER_INSTITUTION
+						) {
+							if (!selectedMoveTo) {
+								toast.error('Please select a location');
+							}
+
+							if (selectedMoveTo) {
+								handleRelocateStudent(selectedUser.id, selectedMoveTo?.value);
+							}
+						}
+
+						if (
+							externalTransferChoice ===
+							ExternalTransferChoiceEnum.TO_ANOTHER_WEEK
+						) {
+							if (!moveWeek.selected_semester) {
+								return toast.error('Please select a semester');
+							}
+
+							if (!moveWeek.selected_course) {
+								return toast.error('Please select a course');
+							}
+
+							if (!moveWeek.selected_origin_week) {
+								return toast.error('Please select a origin week');
+							}
+
+							if (!moveWeek.selected_destination_week) {
+								return toast.error('Please select a destination week');
+							}
+
+							if (
+								moveWeek.selected_semester &&
+								moveWeek.selected_course &&
+								moveWeek.selected_origin_week &&
+								moveWeek.selected_destination_week
+							) {
+								handleRelocateStudentInWeek(
+									selectedUser.id,
+									moveWeek.selected_origin_week.value,
+									moveWeek.selected_destination_week.value
+								);
+								alert('GUardar');
+							}
+						}
 					}
 				}}
 			>
@@ -81,6 +158,7 @@ const AdminStudents = () => {
 						{selectedUser.group ? selectedUser.group : 'N/A'}
 					</div>
 				</div>
+
 				<div className='group mt-4'>
 					<p className='font-medium pb-2'>Select Type</p>
 					<Select
@@ -103,14 +181,13 @@ const AdminStudents = () => {
 						placeholder='Select'
 						className='w-full h-full bg-white !placeholder:text-[#807f7f] !font-normal rounded-md'
 						onChange={(selected) => {
-							console.log('Selected', selected);
-
-							// if (selected && programSemesterId) {
-							// 	handleSelectChange(
-							// 		selected?.value as 'groups' | 'location',
-							// 		programSemesterId
-							// 	);
-							// }
+							if (selected && programSemesterId) {
+								handleSelectChange(
+									selected?.value as 'groups' | 'location',
+									programSemesterId,
+									selectedUser.group_id
+								);
+							}
 						}}
 					/>
 					{moveToType === 'groups' && (
@@ -133,94 +210,166 @@ const AdminStudents = () => {
 					)}
 				</div>
 
-				{/* Week Form */}
-				<div className='group mt-4'>
-					<p className='font-medium pb-2'>What kind of move do you want</p>
-					<Select
-						styles={{
-							control: (baseStyles, state) => ({
-								...baseStyles,
-								borderColor: state.isFocused ? 'grey' : '#b1b6c0',
-							}),
-						}}
-						options={[
-							{
-								label: 'Move to a group in another institution',
-								value: 'to-another-institution',
-							},
-							{
-								label: 'Move to a temporal week in another group',
-								value: 'to-another-week',
-							},
-						]}
-						placeholder='Select'
-						className='w-full h-full bg-white !placeholder:text-[#807f7f] !font-normal rounded-md'
-						onChange={(selected) => {
-							console.log('Selected', selected);
-							if (selected && programSemesterId) {
-								handleSelectChange(
-									selected?.value as 'groups' | 'location',
-									programSemesterId
-								);
-							}
-						}}
-					/>
-					<AtAlert
-						className='!py-2 mt-2 text-xs'
-						variant='info'
-						description='This action will transfer the student from Group A in Miami to Group B in New York.'
-					/>
+				{moveToType === 'location' && (
+					<>
+						{/* Week Form */}
+						<div className='group mt-4'>
+							<p className='font-medium pb-2'>What kind of move do you want</p>
+							<Select
+								styles={{
+									control: (baseStyles, state) => ({
+										...baseStyles,
+										borderColor: state.isFocused ? 'grey' : '#b1b6c0',
+									}),
+								}}
+								options={[
+									{
+										label: 'Move to a group in another institution',
+										value: 'to-another-institution',
+									},
+									{
+										label: 'Move to a temporal week in another group',
+										value: 'to-another-week',
+									},
+								]}
+								placeholder='Select'
+								className='w-full h-full bg-white !placeholder:text-[#807f7f] !font-normal rounded-md'
+								onChange={(selected) => {
+									console.log('Selected', selected);
+									if (selected && programSemesterId) {
+										handleChangeExternalTransferChoice(
+											selected.value as ExternalTransferChoice
+										);
+									}
+								}}
+							/>
 
-					<AtAlert
-						className='!py-2 mt-2 text-xs'
-						variant='info'
-						description='This action will temporarily transfer the student from Group A in Miami to Group B in New York for a specific week, after which the student will be relocated back to their original group.'
-					/>
-				</div>
+							{externalTransferChoice ===
+								ExternalTransferChoiceEnum.TO_ANOTHER_INSTITUTION && (
+								<AtAlert
+									className='!py-2 mt-2 text-xs'
+									variant='info'
+									description='This action will transfer the student from Group A in Miami to Group B in New York.'
+								/>
+							)}
 
-				<div className='group mt-4'>
-					<p className='font-medium pb-2'>Semester</p>
-					<AtSelectWithDescription
-						options={[
-							{ label: 'Fall 2026', description: 'CMVC MIAMI', value: 1 },
-						]}
-						onChange={() => {}}
-						isLoading={isLoadingGroups}
-						value={{ label: 'Fall 2026', description: 'CMVC MIAMI', value: 1 }}
-					/>
-				</div>
+							{externalTransferChoice ===
+								ExternalTransferChoiceEnum.TO_ANOTHER_WEEK && (
+								<AtAlert
+									className='!py-2 mt-2 text-xs'
+									variant='info'
+									description='This action will temporarily transfer the user from Week A to Week B, regardless of group or location.'
+								/>
+							)}
+						</div>
+					</>
+				)}
 
-				<div className='group mt-4'>
-					<p className='font-medium pb-2'>Course</p>
-					<AtSelectWithDescription
-						options={[
-							{ label: 'Enfermería', description: 'CMVC MIAMI', value: 1 },
-						]}
-						onChange={() => {}}
-						isLoading={isLoadingGroups}
-						value={{ label: 'Enfermería', description: 'CMVC MIAMI', value: 1 }}
-					/>
-				</div>
+				{moveToType === 'location' &&
+					externalTransferChoice ===
+						ExternalTransferChoiceEnum.TO_ANOTHER_WEEK && (
+						<>
+							<div className='group mt-4'>
+								<p className='font-medium pb-2'>Semester</p>
+
+								<AtSelectWithDescription
+									options={moveWeekOptions.semesters}
+									onChange={(selected) => {
+										if (selected) {
+											console.log('Selected', selected);
+											handleChangeSemester(selected);
+										}
+									}}
+									isLoading={isLoadingGroups}
+									value={moveWeek.selected_semester}
+									disabled={moveWeekOptions.semesters.length === 0}
+								/>
+							</div>
+
+							<div className='group mt-4'>
+								<p className='font-medium pb-2'>Course</p>
+								<AtSelectWithDescription
+									options={moveWeekOptions.courses}
+									onChange={(selected) => {
+										if (selected) {
+											handleChangeCourse(selected, selectedUser.id);
+										}
+									}}
+									isLoading={isLoadingGroups}
+									value={moveWeek.selected_course}
+									disabled={moveWeekOptions.courses.length === 0}
+								/>
+							</div>
+
+							<div className='group mt-4'>
+								<p className='font-medium pb-2'>Origin Week</p>
+								<AtSelectWithDescription
+									options={moveWeekOptions.originWeeks}
+									onChange={(selected) => {
+										if (selected && programSemesterId) {
+											handleChangeOriginWeek(
+												selected,
+												String(moveWeek.selected_course?.value)
+											);
+										}
+									}}
+									isLoading={isLoadingGroups}
+									value={moveWeek.selected_origin_week}
+									disabled={moveWeekOptions.originWeeks.length === 0}
+								/>
+
+								<AtAlert
+									className='!py-2 mt-2 text-xs'
+									variant='info'
+									description="This is the week you'll make changes for the student."
+								/>
+							</div>
+
+							<div className='group mt-4'>
+								<p className='font-medium pb-2'>Destination Week</p>
+								<AtSelectWithDescription
+									options={moveWeekOptions.destinationWeeks}
+									onChange={(selected) => {
+										if (selected) {
+											updateMoveWeek({ selected_destination_week: selected });
+										}
+									}}
+									isLoading={isLoadingGroups}
+									value={moveWeek.selected_destination_week}
+									disabled={moveWeekOptions.destinationWeeks.length === 0}
+								/>
+								<AtAlert
+									className='!py-2 mt-2 text-xs'
+									variant='info'
+									description='This is the week your student will be transfered for the selected week'
+								/>
+							</div>
+						</>
+					)}
 				{/* End Week */}
 
-				<div className='group mt-4'>
-					<p className='font-medium pb-2'>Move to:</p>
-					<AtSelectWithDescription
-						disabled={groups.length == 0}
-						options={groups?.map((group) => ({
-							label: `${group.name}`,
-							description: `${group.headquarter}`,
-							value: group.id,
-						}))}
-						onChange={(selected) => {
-							if (selected) {
-								handleSelectMoveTo(selected);
-							}
-						}}
-						isLoading={isLoadingGroups}
-						value={selectedMoveTo}
-					/>
-				</div>
+				{(moveToType === 'groups' ||
+					externalTransferChoice ===
+						ExternalTransferChoiceEnum.TO_ANOTHER_INSTITUTION) && (
+					<div className='group mt-4'>
+						<p className='font-medium pb-2'>Move to:</p>
+						<AtSelectWithDescription
+							disabled={groups.length == 0}
+							options={groups?.map((group) => ({
+								label: `${group.name}`,
+								description: `${group.headquarter}`,
+								value: group.id,
+							}))}
+							onChange={(selected) => {
+								if (selected) {
+									handleSelectMoveTo(selected);
+								}
+							}}
+							isLoading={isLoadingGroups}
+							value={selectedMoveTo}
+						/>
+					</div>
+				)}
 
 				{selectedMoveTo && moveToType && (
 					<div className='my-4 flex flex-col items-center py-4 border-y border-primary'>
@@ -426,6 +575,7 @@ const AdminStudents = () => {
 															name: student.name,
 															email: student.email,
 															group: student.request.requested_group_name,
+															group_id: student.request.requested_group_id,
 														})
 													}
 												>

@@ -16,6 +16,7 @@ import {
 } from './types';
 import { isBooleanString } from '../utils/isBooleanString';
 import { toBoolean } from '../utils/toBoolean';
+import { TableFilters } from '../views/Admin/Students/types';
 
 export const getLocations = async (): Promise<AdminHeadquarter[]> => {
 	const response = await api.get(`${import.meta.env.VITE_API_URL}admin/info`);
@@ -189,13 +190,22 @@ export const desactivateCourse = async (
 };
 
 export const getStudentsByProgramSemesterId = async (
-	program_semester_id: string
+	program_semester_id: string,
+	filters: TableFilters
 ): Promise<StudentsResponse[]> => {
+	const currentFilters = {
+		...(filters.name && { name: filters.name }),
+		...(filters.email && { email: filters.email }),
+		...(filters.phone && { phone: filters.phone }),
+		...(filters.group && { group: filters.group }),
+		...(filters.request_status && { request_status: filters.request_status }),
+	};
+
 	const response = await api.post(
 		`${
 			import.meta.env.VITE_API_URL
 		}admin/program/students?program_semester_id=${program_semester_id}`,
-		{}
+		currentFilters
 	);
 
 	return response.data;

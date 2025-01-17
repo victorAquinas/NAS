@@ -28,6 +28,7 @@ export interface GroupResponse {
 }
 export interface Group {
 	headquarter: string;
+	program_name: string;
 	group_id: number;
 	group_name: string;
 	max_students: number;

@@ -56,12 +56,14 @@ interface AtSelectWithDescriptionProps {
 	placeholder?: string;
 	value?: SelectOptionDescription | null;
 	isLoading?: boolean;
+	disabled?: boolean;
 }
 export const AtSelectWithDescription = ({
 	value,
 	onChange,
 	options,
 	isLoading = false,
+	disabled = false,
 }: AtSelectWithDescriptionProps) => {
 	return (
 		<Select
@@ -71,7 +73,7 @@ export const AtSelectWithDescription = ({
 				SingleValue: CustomSingleValue,
 			}}
 			isLoading={isLoading}
-			isDisabled={isLoading}
+			isDisabled={isLoading || disabled}
 			options={options}
 			styles={customStyles}
 			placeholder='Move to'

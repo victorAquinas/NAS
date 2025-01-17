@@ -15,6 +15,8 @@ import {
 } from '../../../api/types';
 import { AtBadge, BadgeVariantType } from '../../../components/AtBadge';
 import { toast } from 'react-toastify';
+import { TableFilterOptions, TableFilters } from './types';
+import { getCalendarGroups } from '../../../api/services';
 
 interface User {
 	id: number;
@@ -29,23 +31,72 @@ export const useAdminStudents = () => {
 	const [groups, setGroups] = useState<ResponseGroups[]>([]);
 	const [selectedMoveTo, setSelectedMoveTo] =
 		useState<SelectOptionDescription | null>(null);
-	const [moveToType, setMoveToType] = useState<'groups' | 'location' | null>(
-		null
-	);
+	const [moveToType, setMoveToType] = useState<
+		'groups' | 'location' | 'week' | null
+	>(null);
 	const [isLoadingGroups, setIsLoadingGroups] = useState<boolean>(false);
 	const [canShowMoveToModal, setCanShowMoveToModal] = useState<boolean>(false);
+	const [tableFilterOptions, setTableFilterOptions] =
+		useState<TableFilterOptions>({
+			groups: [],
+			status: [
+				{ label: 'All', value: '' },
+				{ label: 'PENDING', value: UserStatus.PENDING },
+				{ label: 'ACCEPTED', value: UserStatus.ACCEPTED },
+				{ label: 'REJECTED', value: UserStatus.REJECTED },
+				{ label: 'REJECT', value: UserStatus.REJECT },
+				{ label: 'OPEN', value: UserStatus.OPEN },
+			],
+		});
 	const [selectedUser, setSelectedUser] = useState<User>({
 		id: 0,
 		name: '',
 		email: '',
 		group: '',
 	});
+	const [tableFilter, setTableFilter] = useState<TableFilters>({
+		name: '',
+		email: '',
+		phone: '',
+		group: '',
+		request_status: null,
+	});
 
-	const handleGetStudents = async (programSemesterId: string) => {
+	const initialFilters = {
+		name: '',
+		email: '',
+		phone: '',
+		request_status: null,
+		group: '',
+	};
+	const handleGetStudents = async (
+		programSemesterId: string,
+		filters: TableFilters | null
+	) => {
 		try {
-			const students = await getStudentsByProgramSemesterId(programSemesterId);
+			const students = await getStudentsByProgramSemesterId(
+				programSemesterId,
+				filters || initialFilters
+			);
 			setStudents(students);
 			console.log(students);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const handleGetGroupsFilters = async (programSemesterId: string) => {
+		try {
+			const groups = await getCalendarGroups(programSemesterId);
+			const filterGroups = groups.data.map((group) => ({
+				label: group.group_name,
+				value: String(group.group_id),
+			}));
+
+			updateTableFilterOptions({
+				// groups: filterGroups,
+				groups: [{ label: 'All', value: '' }, ...filterGroups],
+			});
 		} catch (error) {
 			console.error(error);
 		}
@@ -57,7 +108,7 @@ export const useAdminStudents = () => {
 			await acceptUserInGroup(email, groupId);
 
 			if (programSemesterId) {
-				handleGetStudents(programSemesterId);
+				handleGetStudents(programSemesterId, tableFilter);
 			}
 
 			toast.update(idLoading, {
@@ -84,7 +135,7 @@ export const useAdminStudents = () => {
 			await rejectUserInGroup(email, groupId);
 
 			if (programSemesterId) {
-				handleGetStudents(programSemesterId);
+				handleGetStudents(programSemesterId, tableFilter);
 			}
 
 			toast.update(idLoading, {
@@ -171,6 +222,22 @@ export const useAdminStudents = () => {
 		}));
 	};
 
+	const updateTableFilter = (updatedFields: Partial<TableFilters>) => {
+		setTableFilter((prevUser) => ({
+			...prevUser,
+			...updatedFields,
+		}));
+	};
+
+	const updateTableFilterOptions = (
+		updatedFields: Partial<TableFilterOptions>
+	) => {
+		setTableFilterOptions((prevUser) => ({
+			...prevUser,
+			...updatedFields,
+		}));
+	};
+
 	const handleShowMoveToModal = (updateFields: Partial<User>) => {
 		setCanShowMoveToModal(true);
 		updateSelectedUser(updateFields);
@@ -208,7 +275,7 @@ export const useAdminStudents = () => {
 			handleCloseMoveToModal();
 
 			if (programSemesterId) {
-				handleGetStudents(programSemesterId);
+				handleGetStudents(programSemesterId, tableFilter);
 			}
 		} catch (error) {
 			toast.update(idLoading, {
@@ -223,10 +290,24 @@ export const useAdminStudents = () => {
 
 	useEffect(() => {
 		if (programSemesterId) {
-			handleGetStudents(programSemesterId);
+			handleGetStudents(programSemesterId, tableFilter);
 			// handleGetGroups(programSemesterId);
+			handleGetGroupsFilters(programSemesterId);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [programSemesterId]);
+
+	useEffect(() => {
+		if (tableFilter && programSemesterId) {
+			handleGetStudents(programSemesterId, tableFilter);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [
+		tableFilter.email,
+		tableFilter.group,
+		tableFilter.request_status,
+		programSemesterId,
+	]);
 
 	return {
 		students,
@@ -247,5 +328,9 @@ export const useAdminStudents = () => {
 		handleRelocateStudent,
 		semesterId,
 		locationId,
+		updateTableFilter,
+		tableFilter,
+		handleGetStudents,
+		tableFilterOptions,
 	};
 };

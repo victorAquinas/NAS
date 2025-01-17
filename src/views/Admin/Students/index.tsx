@@ -13,6 +13,8 @@ import { AtSelectWithDescription } from '../../../components/AtSelectWithDescrip
 import { BiTransfer } from 'react-icons/bi';
 import { Tooltip } from 'react-tooltip';
 import AtBreadcrumb from '../../../components/AtBreadCrumb';
+import { AtAlert } from '../../../components/AtAlert';
+import AtButton from '../../../components/AtButton';
 
 const AdminStudents = () => {
 	const {
@@ -34,6 +36,10 @@ const AdminStudents = () => {
 		handleRelocateStudent,
 		semesterId,
 		locationId,
+		tableFilter,
+		updateTableFilter,
+		handleGetStudents,
+		tableFilterOptions,
 	} = useAdminStudents();
 
 	const breadcrumbItems = [
@@ -54,8 +60,8 @@ const AdminStudents = () => {
 				title='Move Student'
 				variant='transparent'
 				actionButtonLabel='Move'
+				styles={{ maxHeight: '80vh', overflow: 'auto' }}
 				closeButtonLabel='Cancel'
-				// onAction={() => console.log('Hola')}
 				onAction={() => {
 					if (selectedMoveTo) {
 						handleRelocateStudent(selectedUser.id, selectedMoveTo?.value);
@@ -85,12 +91,65 @@ const AdminStudents = () => {
 						}}
 						options={[
 							{
-								label: 'Group',
+								label: 'Move inside the same course',
 								value: 'groups',
 							},
 							{
-								label: 'Location',
+								label: 'Move to a different location',
 								value: 'location',
+							},
+						]}
+						placeholder='Select'
+						className='w-full h-full bg-white !placeholder:text-[#807f7f] !font-normal rounded-md'
+						onChange={(selected) => {
+							console.log('Selected', selected);
+
+							// if (selected && programSemesterId) {
+							// 	handleSelectChange(
+							// 		selected?.value as 'groups' | 'location',
+							// 		programSemesterId
+							// 	);
+							// }
+						}}
+					/>
+					{moveToType === 'groups' && (
+						<AtAlert
+							className='!py-2 mt-2 text-xs'
+							variant='info'
+							description='This action will assign the student to a different group. For
+							example, moving John Doe from Group A to Group B.'
+						/>
+					)}
+
+					{moveToType === 'location' && (
+						<AtAlert
+							className='!py-2 mt-2 text-xs'
+							variant='info'
+							description='This action will move the student to a different group in a new
+							location. For example, transferring John Doe from NAS Miami to NAS
+							New York.'
+						/>
+					)}
+				</div>
+
+				{/* Week Form */}
+				<div className='group mt-4'>
+					<p className='font-medium pb-2'>What kind of move do you want</p>
+					<Select
+						styles={{
+							control: (baseStyles, state) => ({
+								...baseStyles,
+								borderColor: state.isFocused ? 'grey' : '#b1b6c0',
+							}),
+						}}
+						options={[
+							{
+								label: 'Move to a group in another institution',
+								value: 'to-another-institution',
+							},
+							{
+								label: 'Move to a temporal week in another group',
+								value: 'to-another-week',
 							},
 						]}
 						placeholder='Select'
@@ -105,25 +164,48 @@ const AdminStudents = () => {
 							}
 						}}
 					/>
-					{moveToType === 'groups' && (
-						<div className='info text-sm text-gray-500 mt-2'>
-							This action will assign the student to a different group. For
-							example, moving John Doe from Group A to Group B.
-						</div>
-					)}
+					<AtAlert
+						className='!py-2 mt-2 text-xs'
+						variant='info'
+						description='This action will transfer the student from Group A in Miami to Group B in New York.'
+					/>
 
-					{moveToType === 'location' && (
-						<div className='info text-sm text-gray-500 mt-2'>
-							This action will move the student to a different group in a new
-							location. For example, transferring John Doe from NAS Miami to NAS
-							New York.
-						</div>
-					)}
+					<AtAlert
+						className='!py-2 mt-2 text-xs'
+						variant='info'
+						description='This action will temporarily transfer the student from Group A in Miami to Group B in New York for a specific week, after which the student will be relocated back to their original group.'
+					/>
 				</div>
+
+				<div className='group mt-4'>
+					<p className='font-medium pb-2'>Semester</p>
+					<AtSelectWithDescription
+						options={[
+							{ label: 'Fall 2026', description: 'CMVC MIAMI', value: 1 },
+						]}
+						onChange={() => {}}
+						isLoading={isLoadingGroups}
+						value={{ label: 'Fall 2026', description: 'CMVC MIAMI', value: 1 }}
+					/>
+				</div>
+
+				<div className='group mt-4'>
+					<p className='font-medium pb-2'>Course</p>
+					<AtSelectWithDescription
+						options={[
+							{ label: 'Enfermería', description: 'CMVC MIAMI', value: 1 },
+						]}
+						onChange={() => {}}
+						isLoading={isLoadingGroups}
+						value={{ label: 'Enfermería', description: 'CMVC MIAMI', value: 1 }}
+					/>
+				</div>
+				{/* End Week */}
 
 				<div className='group mt-4'>
 					<p className='font-medium pb-2'>Move to:</p>
 					<AtSelectWithDescription
+						disabled={groups.length == 0}
 						options={groups?.map((group) => ({
 							label: `${group.name}`,
 							description: `${group.headquarter}`,
@@ -181,6 +263,61 @@ const AdminStudents = () => {
 
 			{/* Table */}
 			<div className='mb-16 mt-8 bg-white shadow-md rounded-md py-4 px-3 border border-gray-300'>
+				<div className='flex items-center gap-x-4'>
+					<input
+						type='text'
+						value={tableFilter.name}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter') {
+								handleGetStudents(programSemesterId ?? '', tableFilter);
+							}
+						}}
+						onChange={(e) => updateTableFilter({ name: e.target.value })}
+						placeholder='Search by name...'
+						className='w-full h-full bg-white p-3 py-2 placeholder:text-[#807f7f] font-normal rounded-md border border-gray-400'
+					/>
+
+					<AtButton
+						variant='primary'
+						className='!py-2.5'
+						onClick={() =>
+							handleGetStudents(programSemesterId ?? '', tableFilter)
+						}
+					>
+						Search
+					</AtButton>
+				</div>
+
+				<div className='selectors flex items-center gap-x-4 flex-wrap'>
+					<div className='group mt-4 w-64'>
+						<p className='font-medium pb-2'>Filter by group</p>
+						<Select
+							options={tableFilterOptions.groups}
+							placeholder='Select'
+							className='w-full h-full bg-white !placeholder:text-[#807f7f] !font-normal rounded-md'
+							onChange={(selected) => {
+								updateTableFilter({
+									group: selected?.value,
+								});
+							}}
+						/>
+					</div>
+
+					<div className='group mt-4 w-64'>
+						<p className='font-medium pb-2'>Filter by Status</p>
+						<Select
+							options={tableFilterOptions.status}
+							placeholder='Select'
+							className='w-full h-full bg-white !placeholder:text-[#807f7f] !font-normal rounded-md'
+							onChange={(selected) => {
+								updateTableFilter({
+									request_status: selected?.value as UserStatus,
+								});
+							}}
+						/>
+					</div>
+				</div>
+
 				<div className='w-[initial] overflow-auto mt-12'>
 					<table className='border-collapse  w-full'>
 						<thead>
@@ -198,7 +335,7 @@ const AdminStudents = () => {
 									Group
 								</th>
 								<th className='border border-gray-200 bg-primary_light font-normal px-3 py-2 text-start'>
-									State
+									Status
 								</th>
 								<th className='border border-gray-200 bg-primary_light font-normal px-3 py-2 text-start'>
 									Actions

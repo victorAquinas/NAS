@@ -2,6 +2,8 @@ import { transformToUrlParams } from '../utils/stringToUrlParam';
 import api from './fetch';
 import {
 	AdminHeadquarter,
+	ApiNotificationResponse,
+	ApiNotificationSeenResponse,
 	GroupDetails,
 	ResponseCreateDay,
 	ResponseCreateGroupPlace,
@@ -287,6 +289,24 @@ export const relocateStudentInWeek = async (
 		`${import.meta.env.VITE_API_URL}relocations/week?${transformToUrlParams(
 			params
 		)}`
+	);
+	return response.data;
+};
+
+export const getNotifications = async (
+	user_email: string
+): Promise<ApiNotificationResponse> => {
+	const response = await api.get(
+		`${import.meta.env.VITE_API_URL}notifications/${user_email}`
+	);
+	return response.data;
+};
+
+export const setNotificationSeen = async (
+	notification_id: number
+): Promise<ApiNotificationSeenResponse> => {
+	const response = await api.put(
+		`${import.meta.env.VITE_API_URL}notification/seen/${notification_id}`
 	);
 	return response.data;
 };

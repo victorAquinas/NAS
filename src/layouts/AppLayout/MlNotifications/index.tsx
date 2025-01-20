@@ -1,50 +1,55 @@
-import { ReactNode, useState, useRef, useEffect } from 'react';
 import NotificationOn from '../../../assets/notification-on.svg';
-interface MlNotificationsProps {
-	children: ReactNode;
-}
+import { useAtUserNotifications } from '../../../components/AtUserNotifications/useAtUserNotifications';
+import AtNotificationItem from './AtNotificationItem';
 
-const MlNotifications = ({ children }: MlNotificationsProps) => {
-	const [isOpen, setIsOpen] = useState(false);
-	const containerRef = useRef<HTMLDivElement>(null);
-
-	const handleOpenNotifications = () => {
-		setIsOpen(!isOpen);
-	};
-
-	const handleClickOutside = (event: MouseEvent) => {
-		if (
-			containerRef.current &&
-			!containerRef.current.contains(event.target as Node)
-		) {
-			setIsOpen(false);
-		}
-	};
-
-	useEffect(() => {
-		document.addEventListener('mousedown', handleClickOutside);
-
-		return () => {
-			document.removeEventListener('mousedown', handleClickOutside);
-		};
-	}, []);
+const MlNotifications = () => {
+	const {
+		isOpen,
+		handleOpenNotifications,
+		containerRef,
+		notifications,
+		programSemesterId,
+		getNotificationType,
+		isLoading,
+	} = useAtUserNotifications();
 
 	return (
-		<>
-			<div ref={containerRef} className='right relative z-10'>
-				<div
-					className={`notification-list bg-white rounded-md shadow-md absolute right-0 top-6 w-[250px] border border-gray-200 ${
-						isOpen ? 'block' : 'hidden'
-					}`}
-				>
-					{children}
-				</div>
+		<div ref={containerRef} className='right relative z-10'>
+			<div
+				className={`notification-list max-h-[300px] overflow-y-auto bg-white rounded-md shadow-md absolute right-0 top-6 w-[350px] border border-gray-200 ${
+					isOpen ? 'block' : 'hidden'
+				}`}
+			>
+				{isLoading && (
+					<div className='text-sm border-b border-gray-200 p-4 hover:bg-gray-100 bg-white z-50 relative pr-6'>
+						Loading...
+					</div>
+				)}
+				{!isLoading &&
+					notifications
+						?.slice(0, 10)
+						?.map((notification) => (
+							<AtNotificationItem
+								key={`notification-${notification.id}`}
+								type={getNotificationType(notification.description)}
+								description={notification.description}
+								isNew={notification.status}
+								date={notification.created_at}
+								programSemesterId={programSemesterId ?? 0}
+							/>
+						))}
 
-				<button onClick={handleOpenNotifications}>
-					<img src={NotificationOn} alt='notification' className='w-[22px]' />
-				</button>
+				{!isLoading && notifications?.length === 0 && (
+					<div className='text-sm border-b border-gray-200 p-4 hover:bg-gray-100 bg-white z-50 relative pr-6'>
+						No notifications
+					</div>
+				)}
 			</div>
-		</>
+
+			<button onClick={handleOpenNotifications}>
+				<img src={NotificationOn} alt='notification' className='w-[22px]' />
+			</button>
+		</div>
 	);
 };
 

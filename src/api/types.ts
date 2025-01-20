@@ -316,3 +316,22 @@ export interface ResponseRelocateStudent {
 		message: string;
 	};
 }
+export interface Notification {
+	id: number;
+	title: string;
+	created_at: string; // ISO 8601 date string
+	user_id: number;
+	description: string;
+	status: boolean;
+}
+
+export interface ApiNotificationResponse {
+	success: boolean;
+	current_semester_id: number;
+	data: Notification[];
+}
+
+export interface ApiNotificationSeenResponse {
+	success: boolean;
+	data: Notification;
+}

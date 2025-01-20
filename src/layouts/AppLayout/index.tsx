@@ -5,10 +5,9 @@ import { AtSidebarItem } from '../../components/AtSidebarItem';
 import { LuCalendarDays } from 'react-icons/lu';
 import { IoBriefcaseOutline, IoSchoolOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
-import MlNotifications from './MlNotifications';
-import AtNotificationItem from './MlNotifications/AtNotificationItem';
 import { useAppLayout } from './useAppLayout';
 import { RiComputerLine } from 'react-icons/ri';
+import { AtUserNotifications } from '../../components/AtUserNotifications';
 
 interface AppLayoutProps {
 	children: ReactNode;
@@ -96,10 +95,7 @@ export const AppLayout = ({
 									)}
 								</div>
 							</div>
-							<MlNotifications>
-								<AtNotificationItem type='approved' group='1' />
-								<AtNotificationItem type='rejected' group='2' />
-							</MlNotifications>
+							<AtUserNotifications />
 						</div>
 					</div>
 

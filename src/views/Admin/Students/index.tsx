@@ -46,7 +46,7 @@ const AdminStudents = () => {
 		moveWeek,
 		moveWeekOptions,
 		externalTransferChoice,
-		setExternalTransferChoice,
+
 		handleChangeExternalTransferChoice,
 		handleChangeSemester,
 		handleChangeCourse,

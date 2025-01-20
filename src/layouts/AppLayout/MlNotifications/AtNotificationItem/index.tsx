@@ -17,7 +17,7 @@ const AtNotificationItem = ({
 	date,
 }: AtNotificationItemProps) => {
 	return (
-		<div className='notification-item text-sm border-b border-gray-200 p-4 hover:bg-gray-100 bg-white z-50 relative pr-6'>
+		<div className='notification-item text-sm border-b border-gray-200 p-4 hover:bg-gray-100 bg-white z-50 relative pr-[10%]'>
 			{type === 'accepted' && (
 				<>
 					<p className='text-primary font-medium'>{description}</p>

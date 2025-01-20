@@ -2,13 +2,12 @@ import NasLogoNoText from '../../assets/nas-logo-no-text.svg';
 import { ReactNode } from 'react';
 import { AtSidebarItem } from '../../components/AtSidebarItem';
 import { Link } from 'react-router-dom';
-import MlNotifications from './MlNotifications';
-import AtNotificationItem from './MlNotifications/AtNotificationItem';
 
 import { RiComputerLine } from 'react-icons/ri';
 import { useAdminLayout } from './useAppLayout';
 import { BsHouses } from 'react-icons/bs';
 import { MdOutlineAdminPanelSettings } from 'react-icons/md';
+import { AtUserNotifications } from '../../components/AtUserNotifications';
 
 interface AdminLayoutProps {
 	children: ReactNode;
@@ -65,10 +64,7 @@ export const AdminLayout = ({ children, className }: AdminLayoutProps) => {
 								</div>
 								<div className='content text-xs font-medium'>Administrator</div>
 							</div>
-							<MlNotifications>
-								<AtNotificationItem type='approved' group='1' />
-								<AtNotificationItem type='rejected' group='2' />
-							</MlNotifications>
+							<AtUserNotifications />
 						</div>
 					</div>
 

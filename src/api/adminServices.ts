@@ -15,6 +15,9 @@ import {
 	SourcesResponse,
 	StudentsResponse,
 	updateGroupType,
+	User,
+	UserResponse,
+	UsersFilters,
 } from './types';
 import { isBooleanString } from '../utils/isBooleanString';
 import { toBoolean } from '../utils/toBoolean';
@@ -308,5 +311,41 @@ export const setNotificationSeen = async (
 	const response = await api.put(
 		`${import.meta.env.VITE_API_URL}notification/seen/${notification_id}`
 	);
+	return response.data;
+};
+
+export const createUser = async (
+	name: string,
+	email: string,
+	password: string,
+	institution_id: string,
+	role_id: number,
+	phone: string
+): Promise<UserResponse> => {
+	const response = await api.put(`${import.meta.env.VITE_API_URL}user`, {
+		name,
+		email,
+		password,
+		institution_id,
+		role_id,
+		phone,
+	});
+	return response.data;
+};
+
+export const getUsers = async (filters: UsersFilters): Promise<User[]> => {
+	const currentFilters = {
+		...(filters.name && { name: filters.name }),
+		...(filters.role && { role: filters.role }),
+		...(filters.status && { status: filters.status }),
+		...(filters.page && { page: filters.page }),
+		...(filters.limit && { limit: filters.limit }),
+	};
+
+	const response = await api.post(
+		`${import.meta.env.VITE_API_URL}admin/people`,
+		currentFilters
+	);
+
 	return response.data;
 };

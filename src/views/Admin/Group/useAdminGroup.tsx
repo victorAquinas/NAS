@@ -150,7 +150,11 @@ export const useAdminGroup = () => {
 					value: place.id,
 				}));
 
-			setCoordinators(sources.instructors);
+			const activeCoordinators = sources?.instructors?.filter(
+				(coordinator) => coordinator.is_active
+			);
+
+			setCoordinators(activeCoordinators);
 			setPlaces(currentPlaces);
 
 			setInSitePlaces(InSitePlaces ?? []);

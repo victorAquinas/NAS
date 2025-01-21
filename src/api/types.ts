@@ -335,3 +335,42 @@ export interface ApiNotificationSeenResponse {
 	success: boolean;
 	data: Notification;
 }
+
+export interface UserResponse {
+	success: boolean;
+	data: {
+		institution_id: number;
+		id: number;
+		name: string;
+		role_id: number;
+		email: string;
+		is_active: boolean;
+		updated_at: string; // ISO date string
+		phone: string;
+		created_at: string; // ISO date string
+		password: string;
+	};
+}
+
+export enum Role {
+	ADMIN = 1,
+	COORDINATOR = 2,
+	STUDENT = 3,
+}
+
+export interface UsersFilters {
+	role: string;
+	name: string;
+	status: boolean | null;
+	page: number | null;
+	limit: number | null;
+}
+
+export interface User {
+	id: number;
+	name: string;
+	email: string;
+	phone: string | null;
+	role: string;
+	status: boolean;
+}

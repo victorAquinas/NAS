@@ -58,6 +58,7 @@ export const AtInputTime = forwardRef<HTMLDivElement, AtSelectProps>(
 					onChange={(time) => handleOnChange(time ? time : new Date())}
 					showTimeSelectOnly
 					timeIntervals={15}
+					timeFormat='HH:mm'
 					// dateFormat='h:mm aa'
 					dateFormat={'HH:mm'}
 					showIcon

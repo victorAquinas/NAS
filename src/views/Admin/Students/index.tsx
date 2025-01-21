@@ -69,18 +69,12 @@ const AdminStudents = () => {
 		<AdminLayout>
 			<MlActionModal
 				isOpen={canShowMoveToModal}
-				// isOpen
 				onClose={handleCloseMoveToModal}
 				title='Move Student'
 				variant='transparent'
 				actionButtonLabel='Move'
 				styles={{ maxHeight: '80vh', overflow: 'auto' }}
 				closeButtonLabel='Cancel'
-				// onAction={() => {
-				// 	if (selectedMoveTo) {
-				// 		handleRelocateStudent(selectedUser.id, selectedMoveTo?.value);
-				// 	}
-				// }}
 				onAction={() => {
 					if (moveToType === 'groups') {
 						if (!selectedMoveTo) {

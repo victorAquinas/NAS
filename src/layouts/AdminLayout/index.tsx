@@ -9,6 +9,8 @@ import { BsHouses } from 'react-icons/bs';
 import { MdOutlineAdminPanelSettings } from 'react-icons/md';
 import { AtUserNotifications } from '../../components/AtUserNotifications';
 
+import { FiSettings } from 'react-icons/fi';
+
 interface AdminLayoutProps {
 	children: ReactNode;
 	className?: string;
@@ -43,6 +45,13 @@ export const AdminLayout = ({ children, className }: AdminLayoutProps) => {
 								label='Locations'
 								isActive={isSidebarItemActive('locations')}
 								icon={BsHouses}
+							/>
+						</Link>
+						<Link to={`/admin/settings`}>
+							<AtSidebarItem
+								label='Settings'
+								isActive={isSidebarItemActive('settings')}
+								icon={FiSettings}
 							/>
 						</Link>
 					</div>

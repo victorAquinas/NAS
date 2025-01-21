@@ -10,6 +10,7 @@ import { MdOutlineAdminPanelSettings } from 'react-icons/md';
 import { AtUserNotifications } from '../../components/AtUserNotifications';
 
 import { FiSettings } from 'react-icons/fi';
+import { GrAnalytics } from 'react-icons/gr';
 
 interface AdminLayoutProps {
 	children: ReactNode;
@@ -52,6 +53,13 @@ export const AdminLayout = ({ children, className }: AdminLayoutProps) => {
 								label='Settings'
 								isActive={isSidebarItemActive('settings')}
 								icon={FiSettings}
+							/>
+						</Link>
+						<Link to={`/admin/reports`}>
+							<AtSidebarItem
+								label='Reports'
+								isActive={isSidebarItemActive('reports')}
+								icon={GrAnalytics}
 							/>
 						</Link>
 					</div>

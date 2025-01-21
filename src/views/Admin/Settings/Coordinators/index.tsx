@@ -20,7 +20,7 @@ const AdminCoordinatorSettings = () => {
 		handleGetCoordinators,
 		updateTableFilter,
 	} = useAdminCoordinators();
-
+	console.log('Meta', import.meta.env.DATAVISION_API);
 	return (
 		<AdminLayout>
 			<MlActionModal

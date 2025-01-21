@@ -15,6 +15,7 @@ import AdminGroup from '../views/Admin/Group';
 import AdminPrivateRoute from './AdminPrivateRoute';
 import AdminStudents from '../views/Admin/Students';
 import AdminCoordinatorSettings from '../views/Admin/Settings/Coordinators';
+import AdminReports from '../views/Admin/Reports';
 
 const Router = () => {
 	const routes = createBrowserRouter([
@@ -41,6 +42,10 @@ const Router = () => {
 				{
 					path: '/admin/settings',
 					element: <AdminCoordinatorSettings />,
+				},
+				{
+					path: '/admin/reports',
+					element: <AdminReports />,
 				},
 				{ path: '/admin/semester/:locationId', element: <AdminSemesters /> },
 				{

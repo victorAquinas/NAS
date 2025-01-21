@@ -4,6 +4,7 @@ import {
 	AdminHeadquarter,
 	ApiNotificationResponse,
 	ApiNotificationSeenResponse,
+	DashboardResponse,
 	GroupDetails,
 	ResponseCreateDay,
 	ResponseCreateGroupPlace,
@@ -22,6 +23,7 @@ import {
 import { isBooleanString } from '../utils/isBooleanString';
 import { toBoolean } from '../utils/toBoolean';
 import { TableFilters } from '../views/Admin/Students/types';
+import axios from 'axios';
 
 export const getLocations = async (): Promise<AdminHeadquarter[]> => {
 	const response = await api.get(`${import.meta.env.VITE_API_URL}admin/info`);
@@ -347,5 +349,35 @@ export const getUsers = async (filters: UsersFilters): Promise<User[]> => {
 		currentFilters
 	);
 
+	return response.data;
+};
+
+export const authDatavision = async (): Promise<{
+	access_token: string;
+	token_type: string;
+}> => {
+	const response = await axios.post(
+		`${import.meta.env.VITE_DATAVISION_API}auth`,
+		{
+			username: import.meta.env.VITE_DATAVISION_USERNAME,
+			password: import.meta.env.VITE_DATAVISION_PASSWORD,
+		}
+	);
+	return response.data;
+};
+export const getDashboard = async (
+	dashboard_id: number
+): Promise<DashboardResponse> => {
+	const auth = await authDatavision();
+
+	const response = await axios.post(
+		`${import.meta.env.VITE_DATAVISION_API}embed_token_by_id/${dashboard_id}`,
+		{},
+		{
+			headers: {
+				Authorization: `Bearer ${auth.access_token}`,
+			},
+		}
+	);
 	return response.data;
 };

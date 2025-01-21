@@ -374,3 +374,16 @@ export interface User {
 	role: string;
 	status: boolean;
 }
+
+export interface Dashboard {
+	id: number;
+	report_id: string;
+	name: string;
+	url: string;
+}
+export interface DashboardResponse {
+	embedToken: string;
+	embedTokenId: string;
+	report: Dashboard;
+	tokenExpiry: string;
+}

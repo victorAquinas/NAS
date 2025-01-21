@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getDashboard } from '../../../api/adminServices';
 import { DashboardResponse } from '../../../api/types';
+import { toast } from 'react-toastify';
 
 export const useAdminReports = () => {
 	const [dashboard, setDashboard] = useState<DashboardResponse>();
@@ -14,6 +15,7 @@ export const useAdminReports = () => {
 		} catch (error) {
 			console.error(error);
 			setIsLoading(false);
+			toast.error('Error');
 		}
 	};
 

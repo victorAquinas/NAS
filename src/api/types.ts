@@ -387,3 +387,9 @@ export interface DashboardResponse {
 	report: Dashboard;
 	tokenExpiry: string;
 }
+export interface ImportUsersResponse {
+	data: {
+		first_time_registers: string[]; // Array of strings for first-time registrations
+		only_register_in_program_semester: string[]; // Array of strings for users registered in the program semester
+	};
+}

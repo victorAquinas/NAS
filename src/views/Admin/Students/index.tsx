@@ -18,6 +18,9 @@ import AtButton from '../../../components/AtButton';
 import { ExternalTransferChoice, ExternalTransferChoiceEnum } from './types';
 import { toast } from 'react-toastify';
 
+import OrImportationModal from './Modals/ImportationModal';
+import { formatPhoneNumber } from '../../../utils/formatPhoneNumber';
+
 const AdminStudents = () => {
 	const {
 		students,
@@ -46,13 +49,14 @@ const AdminStudents = () => {
 		moveWeek,
 		moveWeekOptions,
 		externalTransferChoice,
-
 		handleChangeExternalTransferChoice,
 		handleChangeSemester,
 		handleChangeCourse,
 		handleChangeOriginWeek,
 		updateMoveWeek,
 		handleRelocateStudentInWeek,
+		setIsImportationModalOpen,
+		isImportationModalOpen,
 	} = useAdminStudents();
 
 	const breadcrumbItems = [
@@ -67,6 +71,20 @@ const AdminStudents = () => {
 
 	return (
 		<AdminLayout>
+			<OrImportationModal
+				isOpen={isImportationModalOpen}
+				onClose={() => setIsImportationModalOpen(false)}
+				updateTable={() => {
+					if (programSemesterId) {
+						handleGetStudents(programSemesterId, tableFilter);
+					}
+
+					if (!programSemesterId) {
+						toast.error('No program semester ID');
+					}
+				}}
+			/>
+
 			<MlActionModal
 				isOpen={canShowMoveToModal}
 				onClose={handleCloseMoveToModal}
@@ -391,8 +409,21 @@ const AdminStudents = () => {
 				)}
 			</MlActionModal>
 
-			<h2 className='text-xl font-semibold'>{location.headquarter_name}</h2>
-			<AtBreadcrumb items={breadcrumbItems} separator='/' />
+			<div className='flex items-center justify-between'>
+				<div>
+					{' '}
+					<h2 className='text-xl font-semibold'>{location.headquarter_name}</h2>
+					<AtBreadcrumb items={breadcrumbItems} separator='/' />
+				</div>
+				<div className='flex justify-end '>
+					<AtButton
+						variant='secondary'
+						onClick={() => setIsImportationModalOpen(true)}
+					>
+						Add students
+					</AtButton>
+				</div>
+			</div>
 
 			<h2 className='text-xl font-medium pt-4'>{location.program_name}</h2>
 			<ul className='sub-menu flex items-center w-full gap-x-4 mt-6 border-b border-gray-300'>
@@ -497,7 +528,7 @@ const AdminStudents = () => {
 											{student.email}{' '}
 										</td>
 										<td className='border-b border-gray-200 px-3 p-3  text-start'>
-											{student.phone ?? 'N/A'}
+											{student.phone ? formatPhoneNumber(student.phone) : 'N/A'}
 										</td>
 										<td className='border-b border-gray-200 px-3 p-3  text-start uppercase'>
 											{student.request.requested_group_name ?? 'N/A'}

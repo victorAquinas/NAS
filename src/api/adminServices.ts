@@ -6,6 +6,7 @@ import {
 	ApiNotificationSeenResponse,
 	DashboardResponse,
 	GroupDetails,
+	ImportUsersResponse,
 	ResponseCreateDay,
 	ResponseCreateGroupPlace,
 	ResponseCreateLocation,
@@ -379,5 +380,28 @@ export const getDashboard = async (
 			},
 		}
 	);
+	return response.data;
+};
+
+export const importUsers = async (
+	programSemesterId: number,
+	file: File
+): Promise<ImportUsersResponse> => {
+	const formData = new FormData();
+	formData.append('file', file, file.name);
+
+	const response = await api.post(
+		`${
+			import.meta.env.VITE_API_URL
+		}admin/import/users?program_semester_id=${programSemesterId}`,
+		formData,
+		{
+			headers: {
+				'Content-Type': 'multipart/form-data',
+				Accept: 'application/json',
+			},
+		}
+	);
+
 	return response.data;
 };

@@ -2,7 +2,7 @@ export const formatPhoneNumber = (phone: string): string => {
 	const cleaned = phone.replace(/\D/g, '');
 
 	if (cleaned.length !== 10) {
-		throw new Error('Invalid phone number. Must be 10 digits.');
+		return phone;
 	}
 
 	const formatted = `(${cleaned.slice(0, 3)}) ${cleaned.slice(

@@ -43,8 +43,10 @@ export const MlActionModal = ({
 			marginRight: '-50%',
 			transform: 'translate(-50%, -50%)',
 			padding: '4rem',
+			paddingTop: '2.5rem',
 			width: '650px',
 			borderRadius: '0.5rem',
+			position: 'relative',
 			...styles,
 		},
 	};

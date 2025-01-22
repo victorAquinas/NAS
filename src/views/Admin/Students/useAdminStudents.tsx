@@ -100,6 +100,8 @@ export const useAdminStudents = () => {
 		headquarter_name: '',
 		program_name: '',
 	});
+	const [isImportationModalOpen, setIsImportationModalOpen] =
+		useState<boolean>(false);
 
 	const initialFilters = {
 		name: '',
@@ -617,5 +619,7 @@ export const useAdminStudents = () => {
 		handleChangeOriginWeek,
 		updateMoveWeek,
 		handleRelocateStudentInWeek,
+		setIsImportationModalOpen,
+		isImportationModalOpen,
 	};
 };

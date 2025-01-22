@@ -81,16 +81,17 @@ export const useCourses = () => {
 		}
 	};
 
+	const clearModal = () => {
+		setCourseName('');
+		setMaxEnrollmentDate(null);
+	};
 	const handleAddCourse = async (
 		name: string,
 		semesterId: string,
 		maxEnrollmentDate: Date | null,
 		locationId: string
 	) => {
-		const clearModal = () => {
-			setCourseName('');
-			setMaxEnrollmentDate(null);
-		};
+		const idLoading = toast.loading('Adding course');
 		try {
 			if (name === '' || maxEnrollmentDate === null) {
 				return toast.warning('All fields should be filled');
@@ -113,11 +114,22 @@ export const useCourses = () => {
 					);
 				}
 			}
-
+			toast.update(idLoading, {
+				render: 'Course created',
+				type: 'success',
+				isLoading: false,
+				autoClose: 500,
+			});
 			clearModal();
 			handleCloseAddCourseModal();
 		} catch (error) {
 			console.error(error);
+			toast.update(idLoading, {
+				render: 'Error',
+				type: 'error',
+				isLoading: false,
+				autoClose: 1000,
+			});
 		}
 	};
 

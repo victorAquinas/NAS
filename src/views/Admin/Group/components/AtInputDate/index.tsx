@@ -55,6 +55,7 @@ export const AtInputDate = forwardRef<HTMLDivElement, AtInputDateProps>(
 					calendarIconClassName='top-1'
 					dateFormat='yyyy-MM-dd'
 					showIcon
+					onKeyDown={(e) => e.preventDefault()}
 				/>
 			</div>
 		);

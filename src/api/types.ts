@@ -77,6 +77,11 @@ export enum PracticaPlaceTypeName {
 	OFF_SITE = 'Off-Site',
 }
 
+export enum PracticaPlaceTypeId {
+	OFF_SITE = 1,
+	IN_SITE = 2,
+}
+
 export interface PracticaPlace {
 	program_semester_id: number;
 	name: string;
@@ -389,7 +394,21 @@ export interface DashboardResponse {
 }
 export interface ImportUsersResponse {
 	data: {
-		first_time_registers: string[]; // Array of strings for first-time registrations
-		only_register_in_program_semester: string[]; // Array of strings for users registered in the program semester
+		first_time_registers: string[];
+		only_register_in_program_semester: string[];
 	};
+}
+
+export interface GroupPlacesResponse {
+	success: boolean;
+	data: GroupPlace[];
+}
+
+export interface GroupPlace {
+	status: boolean;
+	address: string;
+	name: string;
+	institution_id: number;
+	id: number;
+	type_id: number;
 }

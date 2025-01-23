@@ -95,7 +95,7 @@ const AdminCoordinatorSettings = () => {
 			<ul className='sub-menu flex items-center w-full gap-x-4 mt-6 border-b border-gray-300'>
 				<li className='border-b border-b-primary text-primary'>Coordinators</li>
 
-				<Link to={`/admin/settings/coordinators`}>
+				<Link to={`/admin/settings/group-location`}>
 					<li>In-site/Off-site</li>
 				</Link>
 			</ul>
@@ -123,55 +123,56 @@ const AdminCoordinatorSettings = () => {
 						Search
 					</AtButton>
 				</div>
-
-				<table className='border-collapse  w-full'>
-					<thead>
-						<tr>
-							<th className='border border-gray-200 bg-primary_light font-normal px-3 py-2 text-start'>
-								Name
-							</th>
-							<th className='border border-gray-200 bg-primary_light font-normal px-3 py-2 text-start'>
-								Email
-							</th>
-							<th className='border border-gray-200 bg-primary_light font-normal px-3 py-2 text-start'>
-								Phone
-							</th>
-							<th className='border border-gray-200 bg-primary_light font-normal px-3 py-2 text-start'>
-								Is active
-							</th>
-							<th className='border border-gray-200 bg-primary_light font-normal px-3 py-2 text-start'>
-								Actions
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						{coordinators?.map((coordinator) => (
-							<tr className='text-center bg-white' key={coordinator.id}>
-								<td className='border-b border-gray-200 px-3 p-3  text-start'>
-									{coordinator.name ? coordinator.name : 'N/A'}
-								</td>
-								<td className='border-b border-gray-200 px-3 p-3  text-start'>
-									{coordinator.email ? coordinator.email : 'N/A'}
-								</td>
-								<td className='border-b border-gray-200 px-3 p-3  text-start'>
-									{coordinator.phone
-										? formatPhoneNumber(coordinator.phone)
-										: 'N/A'}
-								</td>
-								<td className='border-b border-gray-200 px-3 p-3  text-start'>
-									{coordinator.status ? (
-										<AtBadge variant='primary' label='Active' />
-									) : (
-										<AtBadge variant='danger' label='Inactive' />
-									)}
-								</td>
-								<td className='border-b border-gray-200 px-3 p-3  text-start'>
+				<div className='mb-16 mt-8 bg-white shadow-md rounded-md py-4 px-3 border border-gray-300'>
+					<table className='border-collapse  w-full'>
+						<thead>
+							<tr>
+								<th className='border border-gray-200 bg-primary_light font-normal px-3 py-2 text-start'>
+									Name
+								</th>
+								<th className='border border-gray-200 bg-primary_light font-normal px-3 py-2 text-start'>
+									Email
+								</th>
+								<th className='border border-gray-200 bg-primary_light font-normal px-3 py-2 text-start'>
+									Phone
+								</th>
+								<th className='border border-gray-200 bg-primary_light font-normal px-3 py-2 text-start'>
+									Is active
+								</th>
+								<th className='border border-gray-200 bg-primary_light font-normal px-3 py-2 text-start'>
 									Actions
-								</td>
+								</th>
 							</tr>
-						))}
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+							{coordinators?.map((coordinator) => (
+								<tr className='text-center bg-white' key={coordinator.id}>
+									<td className='border-b border-gray-200 px-3 p-3  text-start'>
+										{coordinator.name ? coordinator.name : 'N/A'}
+									</td>
+									<td className='border-b border-gray-200 px-3 p-3  text-start'>
+										{coordinator.email ? coordinator.email : 'N/A'}
+									</td>
+									<td className='border-b border-gray-200 px-3 p-3  text-start'>
+										{coordinator.phone
+											? formatPhoneNumber(coordinator.phone)
+											: 'N/A'}
+									</td>
+									<td className='border-b border-gray-200 px-3 p-3  text-start'>
+										{coordinator.status ? (
+											<AtBadge variant='primary' label='Active' />
+										) : (
+											<AtBadge variant='danger' label='Inactive' />
+										)}
+									</td>
+									<td className='border-b border-gray-200 px-3 p-3  text-start'>
+										Actions
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</AdminLayout>
 	);

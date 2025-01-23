@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const selectOptionSchema = z.object({
+export const selectOptionSchema = z.object({
 	label: z.string().min(1, { message: 'Label must not be empty' }),
 	value: z.number().min(1, { message: 'Value must not be empty' }),
 	description: z.optional(z.string()),

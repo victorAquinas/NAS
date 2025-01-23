@@ -86,10 +86,7 @@ const AdminGroup = () => {
 		handleOpenAddGroupModal,
 		groups,
 		coordinators,
-		places,
 		handleUpdateGroup,
-		inSitePlaces,
-		offSitesPlaces,
 		handleCreateDayInWeek,
 		handleDeleteDayInWeek,
 		handleCreateWeek,
@@ -113,8 +110,8 @@ const AdminGroup = () => {
 		locationId,
 		semesterId,
 		location,
-		// inSiteOptions,
-		// offsiteOptions,
+		inSiteOptions,
+		offsiteOptions,
 	} = useAdminGroup();
 
 	const groupNameRefs = useRef<{
@@ -461,20 +458,20 @@ const AdminGroup = () => {
 							render={({ field }) => (
 								<Select
 									{...field}
-									options={places[0]?.available_places
-										.filter((place) => {
-											return place.type.name === 'Off-Site';
-										})
-										.map((place) => ({
-											label: place.name,
-											value: place.id,
-										}))}
+									// options={places[0]?.available_places
+									// 	.filter((place) => {
+									// 		return place.type.name === 'Off-Site';
+									// 	})
+									// 	.map((place) => ({
+									// 		label: place.name,
+									// 		value: place.id,
+									// 	}))}
 									components={{
 										Option: CustomOption,
 										SingleValue: CustomSingleValue,
 									}}
 									styles={customStyles}
-									// options={offsiteOptions}
+									options={offsiteOptions}
 									placeholder='Select Off-site place'
 									className='w-full h-full bg-white !placeholder:text-[#807f7f] !font-normal rounded-md'
 									onChange={(selected) => {
@@ -519,15 +516,7 @@ const AdminGroup = () => {
 										SingleValue: CustomSingleValue,
 									}}
 									styles={customStyles}
-									// options={inSiteOptions}
-									options={places[0]?.available_places
-										.filter((place) => {
-											return place.type.name === 'In-Site';
-										})
-										.map((place) => ({
-											label: place.name,
-											value: place.id,
-										}))}
+									options={inSiteOptions}
 									placeholder='Select In-site place'
 									className='w-full h-full bg-white !placeholder:text-[#807f7f] !font-normal rounded-md'
 									onChange={(selected) => {
@@ -780,7 +769,7 @@ const AdminGroup = () => {
 																	<div
 																		className={`pr-2 pb-6 text-2xl rounded-tl-md rounded-tr-md font-medium w-full ${
 																			placeData.type === 'in-site'
-																				? 'bg-blue-600 text-white '
+																				? 'bg-yellow-500 text-white '
 																				: 'bg-secondary text-white '
 																		} p-4 lg:p-8 mb-6`}
 																	>
@@ -788,7 +777,10 @@ const AdminGroup = () => {
 																			? 'IN-SITE'
 																			: 'OFF-SITE'}
 																	</div>
-																	<div className='right px-4 lg:px-8'>
+																	<div className='right px-4 lg:px-8 flex items-center'>
+																		<p className='text-lg font-medium pr-4'>
+																			Shift:
+																		</p>
 																		<div className='flex items-center w-full pb-2'>
 																			<AtInputTime
 																				selectedTime={
@@ -913,7 +905,62 @@ const AdminGroup = () => {
 																	<div className='left px-4 lg:px-8'>
 																		<div className='title text-primary font-medium lg:text-lg '>
 																			<div className='py-2'>
-																				{placeData.place_id &&
+																				<Select
+																					styles={{
+																						control: (baseStyles, state) => ({
+																							...baseStyles,
+																							borderColor: state.isFocused
+																								? 'grey'
+																								: '#b1b6c0',
+																						}),
+																					}}
+																					options={
+																						placeData.type === 'in-site'
+																							? inSiteOptions
+																							: offsiteOptions
+																					}
+																					value={
+																						placeData.type === 'in-site'
+																							? inSiteOptions.filter(
+																									(option) =>
+																										option.value ===
+																										placeData.place_id
+																							  )
+																							: offsiteOptions.filter(
+																									(option) =>
+																										option.value ===
+																										placeData.place_id
+																							  )
+																					}
+																					components={{
+																						Option: CustomOption,
+																						SingleValue: CustomSingleValue,
+																					}}
+																					placeholder='Select Coordinator'
+																					className='w-full h-full bg-white !placeholder:text-[#807f7f] !font-normal rounded-md'
+																					onChange={(selected) => {
+																						if (selected) {
+																							const weeksScheduleIds =
+																								placeData.weeks.map(
+																									(week) =>
+																										week.week_schedule
+																											.week_schedule_id
+																								);
+																							weeksScheduleIds.forEach(
+																								(weeksScheduleId) => {
+																									handleUpdateGroup(
+																										weeksScheduleId,
+																										'practice_place_id',
+																										selected.value,
+																										'week_schedule'
+																									);
+																								}
+																							);
+																						}
+																					}}
+																				/>
+
+																				{/* {placeData.place_id &&
 																					places?.[0]?.available_places.length >
 																						0 && (
 																						<select
@@ -953,11 +1000,8 @@ const AdminGroup = () => {
 																								</option>
 																							))}
 																						</select>
-																					)}
+																					)} */}
 																			</div>
-																		</div>
-																		<div className='text-sm lg:text-base'>
-																			{placeData.address}
 																		</div>
 																	</div>
 																</div>
@@ -1044,6 +1088,9 @@ const AdminGroup = () => {
 																											className='w-full h-full bg-white p-1 placeholder:text-gray-950 font-normal rounded-md border border-gray-400 lg:text-lg'
 																											selected={
 																												currentSelectedDate
+																											}
+																											onKeyDown={(e) =>
+																												e.preventDefault()
 																											}
 																											onChange={(
 																												selectedDate

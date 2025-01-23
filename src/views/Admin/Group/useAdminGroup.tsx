@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getCalendarGroups } from '../../../api/services';
 import {
-	AvailablePlace,
+	// AvailablePlace,
 	Group,
 	GroupDetails,
 	Instructor,
 	Place,
+	PracticaPlaceTypeId,
 	SelectOptionDescription,
 	updateGroupType,
 } from '../../../api/types';
@@ -16,6 +17,7 @@ import {
 	createWeek,
 	deleteDayInWeek,
 	deleteWeek,
+	getPlaces,
 	getSources,
 	updateGroup,
 	// createGroupPlace,
@@ -41,9 +43,6 @@ export const useAdminGroup = () => {
 	const [isDeletingGroup, setIsDeletingGroup] = useState<boolean>(false);
 	const [hasActiveGroup, seHasActiveGroups] = useState<boolean>(false);
 
-	// Estas opciones son para el grupo ya creado (las que estan asignado al curso)
-	const [inSitePlaces, setInSitePlaces] = useState<AvailablePlace[]>([]);
-	const [offSitesPlaces, setOffSitePlaces] = useState<AvailablePlace[]>([]);
 	// Estas son la que son para el formulario de creacion de grupo, son todas las ubicaciones
 	const [inSiteOptions, setInSiteOptions] = useState<SelectOptionDescription[]>(
 		[]
@@ -123,44 +122,38 @@ export const useAdminGroup = () => {
 	const getGroupSources = async () => {
 		try {
 			const sources = await getSources();
+			const places = await getPlaces(import.meta.env.VITE_INSTITUTION_ID);
+			const insitePlaces = places?.data
+				?.filter((place) => place.type_id === PracticaPlaceTypeId.IN_SITE)
+				.map((place) => ({
+					label: place.name,
+					value: place.id,
+					description: place.address,
+				}));
+			const offsitePlaces = places?.data
+				?.filter((place) => place.type_id === PracticaPlaceTypeId.OFF_SITE)
+				.map((place) => ({
+					label: place.name,
+					value: place.id,
+					description: place.address,
+				}));
+			console.log('Insite Places', insitePlaces);
+
 			const currentPlaces = sources?.places?.filter(
 				(place) =>
 					place.program_semester_id === parseInt(programSemesterId ?? '0')
 			);
-			const InSitePlaces = currentPlaces[0]?.available_places?.filter(
-				(place) => place.type.name === 'In-Site'
-			);
-			const OffSitePlaces = currentPlaces[0]?.available_places?.filter(
-				(place) => place.type.name === 'Off-Site'
-			);
-
-			console.log('Sources', sources);
-			const insitePlacesOptions = sources.only_places_without_repeat
-				.filter((place) => place.type.name.toLowerCase() === 'in-site')
-				.map((place) => ({
-					label: place.name,
-					description: place.address,
-					value: place.id,
-				}));
-			const offsitePlacesOptions = sources.only_places_without_repeat
-				.filter((place) => place.type.name.toLowerCase() === 'off-site')
-				.map((place) => ({
-					label: place.name,
-					description: place.address,
-					value: place.id,
-				}));
 
 			const activeCoordinators = sources?.instructors?.filter(
-				(coordinator) => coordinator.is_active
+				(coordinator) => coordinator?.is_active
 			);
 
 			setCoordinators(activeCoordinators);
 			setPlaces(currentPlaces);
 
-			setInSitePlaces(InSitePlaces ?? []);
-			setOffSitePlaces(OffSitePlaces ?? []);
-			setInSiteOptions(insitePlacesOptions ?? []);
-			setOffsiteOptions(offsitePlacesOptions ?? []);
+			// MODAL NUEVO GRUPO
+			setInSiteOptions(insitePlaces ?? []);
+			setOffsiteOptions(offsitePlaces ?? []);
 		} catch (error) {
 			console.error(error);
 		}
@@ -305,32 +298,6 @@ export const useAdminGroup = () => {
 				data.default_insite_practice_place_id.value,
 		};
 
-		// if (programSemesterId) {
-		// 	const offsitePlace = await createGroupPlace(
-		// 		data.default_offsite_practice_place_id.label,
-		// 		1, //Offsite = 1, In-Site = 2
-		// 		data.default_offsite_practice_place_id.description ?? '',
-		// 		programSemesterId
-		// 	);
-
-		// 	const insitePlace = await createGroupPlace(
-		// 		data.default_offsite_practice_place_id.label,
-		// 		2, //Offsite = 1, In-Site = 2
-		// 		data.default_offsite_practice_place_id.description ?? '',
-		// 		programSemesterId
-		// 	);
-
-		// 	const cleanData = {
-		// 		...data,
-		// 		default_instructor_id: data.default_instructor_id.value,
-		// 		default_offsite_practice_place_id: offsitePlace.data.id,
-		// 		default_insite_practice_place_id: insitePlace.data.id,
-		// 	};
-		// 	handleCreateGroup(cleanData);
-
-		// 	console.log('offsitePlace', offsitePlace);
-		// }
-		// console.log('Clean Data', cleanData);
 		handleCreateGroup(cleanData);
 	};
 
@@ -353,8 +320,6 @@ export const useAdminGroup = () => {
 		coordinators,
 		places,
 		handleUpdateGroup,
-		inSitePlaces,
-		offSitesPlaces,
 		handleCreateDayInWeek,
 		handleDeleteDayInWeek,
 		handleCreateWeek,

@@ -6,6 +6,7 @@ import {
 	ApiNotificationSeenResponse,
 	DashboardResponse,
 	GroupDetails,
+	GroupPlacesResponse,
 	ImportUsersResponse,
 	ResponseCreateDay,
 	ResponseCreateGroupPlace,
@@ -403,5 +404,50 @@ export const importUsers = async (
 		}
 	);
 
+	return response.data;
+};
+
+export const getPlaces = async (
+	institution_id: string
+): Promise<GroupPlacesResponse> => {
+	const response = await api.get(
+		`${import.meta.env.VITE_API_URL}places?institution_id=${institution_id}`
+	);
+	return response.data;
+};
+
+export const createNewGroupPlace = async (
+	name: string,
+	address: string,
+	typeId: number,
+	institutionId: number
+): Promise<GroupPlacesResponse> => {
+	const response = await api.put(`${import.meta.env.VITE_API_URL}places`, {
+		name,
+		type_id: typeId,
+		address,
+		institution_id: institutionId,
+	});
+	return response.data;
+};
+
+export const updateGroupPlace = async (
+	practicePlaceId: number,
+	name: string,
+	typeId: number,
+	address: string,
+	institutionId: number
+): Promise<void> => {
+	const response = await api.patch(
+		`${
+			import.meta.env.VITE_API_URL
+		}places/?practice_place_id=${practicePlaceId}`,
+		{
+			name,
+			type_id: typeId,
+			address,
+			institution_id: institutionId,
+		}
+	);
 	return response.data;
 };

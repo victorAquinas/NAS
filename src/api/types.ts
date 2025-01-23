@@ -24,6 +24,9 @@ export interface Semester {
 }
 export interface GroupResponse {
 	data: Group[];
+	max_enrollment_date: string;
+	semester_status: boolean;
+	let_enrollment: boolean;
 	success: boolean;
 }
 export interface Group {
@@ -411,4 +414,19 @@ export interface GroupPlace {
 	institution_id: number;
 	id: number;
 	type_id: number;
+}
+
+export interface ProgramSemester {
+	semester_id: number;
+	program_id: number;
+	max_enrollment_date: string;
+	id: number;
+	created_at: string;
+	updated_at: string;
+	let_enrollment: boolean;
+	status: boolean;
+}
+export interface UpdateProgramSemesterResponse {
+	success: true;
+	data: ProgramSemester;
 }

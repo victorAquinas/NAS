@@ -9,7 +9,10 @@ import {
 	SelectOptionDescription,
 } from '../../../api/types';
 import DatePicker from 'react-datepicker';
-import { IoIosAddCircleOutline } from 'react-icons/io';
+import {
+	IoIosAddCircleOutline,
+	IoIosInformationCircleOutline,
+} from 'react-icons/io';
 import { transformDateString } from '../../../utils/transformDateString';
 import moment from 'moment';
 import { AtInputTime } from './components/AtInputTime';
@@ -33,6 +36,7 @@ import { AtLoadingWrapper } from '../../../components/AtLoadingWrapper';
 import AtInputGroup from './components/AtInputGroup';
 import { Link } from 'react-router-dom';
 import AtBreadcrumb from '../../../components/AtBreadCrumb';
+import { Tooltip } from 'react-tooltip';
 
 const CustomOption = ({
 	data,
@@ -112,6 +116,10 @@ const AdminGroup = () => {
 		location,
 		inSiteOptions,
 		offsiteOptions,
+		handlePublishCourse,
+		maxEnrollmentDate,
+		isPublished,
+		handleUpdateMaxEnrollmentDate,
 	} = useAdminGroup();
 
 	const groupNameRefs = useRef<{
@@ -588,9 +596,25 @@ const AdminGroup = () => {
 				variant='danger'
 			></MlActionModal>
 
-			<AtLoadingWrapper isLoading={isLoading} />
-			<h2 className='text-xl font-semibold'>{location.headquarter_name}</h2>
-			<AtBreadcrumb items={breadcrumbItems} separator='/' />
+			<div className='flex justify-between items-start'>
+				<div>
+					<AtLoadingWrapper isLoading={isLoading} />
+					<h2 className='text-xl font-semibold'>{location.headquarter_name}</h2>
+					<AtBreadcrumb items={breadcrumbItems} separator='/' />
+				</div>
+
+				{}
+				<AtButton
+					variant={isPublished ? 'primary' : 'secondary'}
+					onClick={() => {
+						if (programSemesterId) {
+							handlePublishCourse(programSemesterId, isPublished);
+						}
+					}}
+				>
+					{isPublished ? 'Unpublish course' : 'Release course'}
+				</AtButton>
+			</div>
 
 			<h2 className='text-xl font-medium pt-4'>{groups[0]?.program_name}</h2>
 
@@ -617,6 +641,52 @@ const AdminGroup = () => {
 								Get started by clicking the "Add New Group" button to create
 								your first group!
 							</p>
+						</div>
+					)}
+					{groups.length > 0 && (
+						<div className='bg-white shadow-md rounded-md py-4 px-3 border border-gray-300 mb-8'>
+							<p className='text-xl font-medium'> General Settings</p>
+
+							<div className='pt-2 '>
+								<div className='flex items-center'>
+									{/* </Tooltip> */}
+									<div className='pr-4'>Max Enrollment Date: </div>{' '}
+									<div>
+										<DatePicker
+											placeholderText='Max Enrollment date'
+											wrapperClassName='w-full'
+											value={maxEnrollmentDate ? maxEnrollmentDate : undefined}
+											onChange={(date) => {
+												if (date && programSemesterId) {
+													const dateString = date?.toISOString();
+
+													handleUpdateMaxEnrollmentDate(
+														programSemesterId,
+														transformDateString(dateString, 'YYYY-MM-DD'),
+														isPublished
+													);
+												}
+											}}
+											className='w-full h-full bg-white p-1 placeholder:text-gray-950 font-normal rounded-md border border-gray-400 lg:text-lg'
+											onKeyDown={(e) => e.preventDefault()}
+										/>
+									</div>
+									<Tooltip
+										id={`maxEnrollmentDateInfo`}
+										place='top'
+										content={
+											'This is the deadline for students to request a group. After this date, they will no longer be able to join'
+										}
+										className='!text-sm'
+									/>
+									<div
+										data-tooltip-id='maxEnrollmentDateInfo'
+										className='ml-4 text-2xl'
+									>
+										<IoIosInformationCircleOutline />
+									</div>
+								</div>
+							</div>
 						</div>
 					)}
 					{groups.map((group) => {
@@ -959,48 +1029,6 @@ const AdminGroup = () => {
 																						}
 																					}}
 																				/>
-
-																				{/* {placeData.place_id &&
-																					places?.[0]?.available_places.length >
-																						0 && (
-																						<select
-																							className='w-full h-full bg-white p-1 placeholder:text-gray-400 font-normal rounded-md border border-gray-400 lg:text-lg'
-																							defaultValue={placeData.place_id}
-																							onChange={(e) => {
-																								const weeksScheduleIds =
-																									placeData.weeks.map(
-																										(week) =>
-																											week.week_schedule
-																												.week_schedule_id
-																									);
-																								weeksScheduleIds.forEach(
-																									(weeksScheduleId) => {
-																										handleUpdateGroup(
-																											weeksScheduleId,
-																											'practice_place_id',
-																											e.target.value,
-																											'week_schedule'
-																										);
-																									}
-																								);
-																							}}
-																						>
-																							<option disabled>
-																								Select location
-																							</option>
-																							{(placeData.type === 'in-site'
-																								? inSitePlaces
-																								: offSitesPlaces
-																							).map((place) => (
-																								<option
-																									value={place.id}
-																									key={place.id}
-																								>
-																									{place.name}
-																								</option>
-																							))}
-																						</select>
-																					)} */}
 																			</div>
 																		</div>
 																	</div>

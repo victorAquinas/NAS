@@ -20,6 +20,7 @@ import {
 	getPlaces,
 	getSources,
 	updateGroup,
+	updateProgramSemester,
 	// createGroupPlace,
 } from '../../../api/adminServices';
 import { useForm } from 'react-hook-form';
@@ -42,6 +43,10 @@ export const useAdminGroup = () => {
 	const [isCreatingGroup, setIsCreatingGroup] = useState<boolean>(false);
 	const [isDeletingGroup, setIsDeletingGroup] = useState<boolean>(false);
 	const [hasActiveGroup, seHasActiveGroups] = useState<boolean>(false);
+	const [maxEnrollmentDate, setMaxEnrollmentDate] = useState<string | null>(
+		null
+	);
+	const [isPublished, setIsPublished] = useState<boolean>(false);
 
 	// Estas son la que son para el formulario de creacion de grupo, son todas las ubicaciones
 	const [inSiteOptions, setInSiteOptions] = useState<SelectOptionDescription[]>(
@@ -104,7 +109,8 @@ export const useAdminGroup = () => {
 	const getCourseGroups = async () => {
 		try {
 			const groups = await getCalendarGroups(programSemesterId ?? '');
-			console.log('Groups', groups);
+			setMaxEnrollmentDate(groups?.max_enrollment_date);
+			setIsPublished(groups?.let_enrollment);
 			const hasActiveGroups =
 				groups?.data.some((group) => group.is_active) || false;
 			console.log('HasActiveGroups', hasActiveGroups);
@@ -301,6 +307,64 @@ export const useAdminGroup = () => {
 		handleCreateGroup(cleanData);
 	};
 
+	const handlePublishCourse = async (
+		programSemesterId: string,
+		isPublished: boolean
+	) => {
+		const idLoading = toast.loading('Publishing Course');
+		try {
+			console.log('Is Publishe', isPublished);
+			await updateProgramSemester(programSemesterId, undefined, !isPublished);
+			toast.update(idLoading, {
+				render: 'Course published',
+				type: 'success',
+				isLoading: false,
+				autoClose: 1000,
+			});
+			getCourseGroups();
+		} catch (error) {
+			console.error(error);
+			toast.error('Error');
+			toast.update(idLoading, {
+				render: 'Error',
+				type: 'error',
+				isLoading: false,
+				autoClose: 1000,
+			});
+		}
+	};
+
+	const handleUpdateMaxEnrollmentDate = async (
+		programSemesterId: string,
+		enrollmentDate: string,
+		isPublished: boolean
+	) => {
+		const idLoading = toast.loading('Updating enrollment date');
+		try {
+			console.log('Is Publishe', isPublished);
+			await updateProgramSemester(
+				programSemesterId,
+				enrollmentDate,
+				isPublished
+			);
+			toast.update(idLoading, {
+				render: 'Enrollment date updated',
+				type: 'success',
+				isLoading: false,
+				autoClose: 1000,
+			});
+			getCourseGroups();
+		} catch (error) {
+			console.error(error);
+			toast.error('Error');
+			toast.update(idLoading, {
+				render: 'Error',
+				type: 'error',
+				isLoading: false,
+				autoClose: 1000,
+			});
+		}
+	};
 	useEffect(() => {
 		setIsLoading(true);
 		getCourseGroups().then(() => setIsLoading(false));
@@ -345,5 +409,9 @@ export const useAdminGroup = () => {
 		locationId,
 		semesterId,
 		location,
+		handlePublishCourse,
+		maxEnrollmentDate,
+		isPublished,
+		handleUpdateMaxEnrollmentDate,
 	};
 };

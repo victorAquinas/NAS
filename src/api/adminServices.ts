@@ -18,6 +18,7 @@ import {
 	SourcesResponse,
 	StudentsResponse,
 	updateGroupType,
+	UpdateProgramSemesterResponse,
 	User,
 	UserResponse,
 	UsersFilters,
@@ -448,6 +449,28 @@ export const updateGroupPlace = async (
 			address,
 			institution_id: institutionId,
 		}
+	);
+	return response.data;
+};
+
+export const updateProgramSemester = async (
+	programSemesterId: string,
+	maxEnrollmentDate?: string,
+	letEnrollment?: boolean
+): Promise<UpdateProgramSemesterResponse> => {
+	// const payload = {
+	// 	...(maxEnrollmentDate && { max_enrollment_date: maxEnrollmentDate }),
+	// 	...(letEnrollment && { let_enrollment: letEnrollment }),
+	// };
+	const payload = {
+		max_enrollment_date: maxEnrollmentDate,
+		let_enrollment: letEnrollment,
+	};
+	const response = await api.patch(
+		`${
+			import.meta.env.VITE_API_URL
+		}update-program-semester?program_semester_id=${programSemesterId}`,
+		payload
 	);
 	return response.data;
 };

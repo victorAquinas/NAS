@@ -28,8 +28,11 @@ export const useCourses = () => {
 			const semesters = await getSemesters(email);
 			const semester = getSemesterById(semesterID);
 			const courses = semester[0]?.student_programs;
+			const activeCourses = courses?.filter(
+				(course) => course.program_semester_let_enrollment
+			);
 
-			setCourses(courses);
+			setCourses(activeCourses);
 		} catch (error) {
 			console.error(error);
 		} finally {

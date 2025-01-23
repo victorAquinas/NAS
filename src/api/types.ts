@@ -7,6 +7,9 @@ export interface StudentProgram {
 	program_semester_id: number;
 	is_active: boolean;
 	has_register: boolean;
+	program_semester_let_enrollment: boolean;
+	program_semester_max_enrollment_date: string;
+	program_semester_status: boolean;
 }
 
 export interface SemesterResponse {

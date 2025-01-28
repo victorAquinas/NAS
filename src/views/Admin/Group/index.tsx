@@ -617,7 +617,7 @@ const AdminGroup = () => {
 				)}
 			</div>
 
-			<h2 className='text-xl font-medium pt-4'>{groups[0]?.program_name}</h2>
+			<h2 className='text-xl font-medium pt-4'>{location.course_name}</h2>
 
 			<ul className='sub-menu flex items-center w-full gap-x-4 mt-6 border-b border-gray-300'>
 				<li className='border-b border-b-primary text-primary'>Groups</li>

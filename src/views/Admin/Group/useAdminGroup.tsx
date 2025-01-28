@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getCalendarGroups } from '../../../api/services';
 import {
-	// AvailablePlace,
 	Group,
 	GroupDetails,
 	Instructor,
@@ -17,6 +16,7 @@ import {
 	createWeek,
 	deleteDayInWeek,
 	deleteWeek,
+	getAdminSemesters,
 	getPlaces,
 	getSources,
 	updateGroup,
@@ -57,8 +57,10 @@ export const useAdminGroup = () => {
 	>([]);
 	const [location, setLocation] = useState<{
 		headquarter_name: string;
+		course_name: string;
 	}>({
 		headquarter_name: '',
+		course_name: '',
 	});
 
 	const {
@@ -113,10 +115,24 @@ export const useAdminGroup = () => {
 			setIsPublished(groups?.let_enrollment);
 			const hasActiveGroups =
 				groups?.data.some((group) => group.is_active) || false;
-			console.log('HasActiveGroups', hasActiveGroups);
-			setLocation({
-				headquarter_name: groups?.data[0]?.headquarter,
-			});
+
+			if (groups?.data.length > 0) {
+				setLocation({
+					headquarter_name: groups?.data[0]?.headquarter,
+					course_name: groups?.data[0]?.program_name,
+				});
+			} else {
+				const semesters = await getAdminSemesters(semesterId ?? '');
+				const selectedCourse = semesters[0]?.program_semesters.filter(
+					(course) => String(course.id) === programSemesterId
+				);
+
+				setLocation({
+					headquarter_name: semesters[0]?.headquarter?.name,
+					course_name: selectedCourse[0].program.name,
+				});
+			}
+
 			seHasActiveGroups(hasActiveGroups);
 			setGroups(groups.data);
 		} catch (error) {
@@ -143,7 +159,6 @@ export const useAdminGroup = () => {
 					value: place.id,
 					description: place.address,
 				}));
-			console.log('Insite Places', insitePlaces);
 
 			const currentPlaces = sources?.places?.filter(
 				(place) =>
@@ -313,7 +328,6 @@ export const useAdminGroup = () => {
 	) => {
 		const idLoading = toast.loading('Publishing Course');
 		try {
-			console.log('Is Publishe', isPublished);
 			await updateProgramSemester(programSemesterId, undefined, !isPublished);
 			toast.update(idLoading, {
 				render: 'Course published',
@@ -341,7 +355,6 @@ export const useAdminGroup = () => {
 	) => {
 		const idLoading = toast.loading('Updating enrollment date');
 		try {
-			console.log('Is Publishe', isPublished);
 			await updateProgramSemester(
 				programSemesterId,
 				enrollmentDate,

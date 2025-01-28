@@ -428,8 +428,51 @@ export interface ProgramSemester {
 	updated_at: string;
 	let_enrollment: boolean;
 	status: boolean;
+	program: {
+		created_at: string;
+		id: number;
+		name: string;
+		updated_at: string;
+	};
 }
 export interface UpdateProgramSemesterResponse {
 	success: true;
 	data: ProgramSemester;
+}
+
+export interface Headquarter {
+	id: number;
+	name: string;
+	institution: Institution;
+	is_active: boolean;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface PracticePlace {
+	id: number;
+	name: string;
+	address: string;
+	status: boolean;
+}
+
+export interface Institution {
+	id: number;
+	name: string;
+	domain: string;
+	practice_places: PracticePlace[];
+	users: User[];
+}
+
+export interface ResponseGetSemesters {
+	id: number;
+	name: string;
+	start_date: string;
+	end_date: string;
+	headquarter: Headquarter;
+	status: boolean;
+	is_active: boolean;
+	created_at: string;
+	updated_at: string;
+	program_semesters: ProgramSemester[];
 }

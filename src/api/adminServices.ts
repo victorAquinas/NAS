@@ -14,6 +14,7 @@ import {
 	ResponseCreateWeek,
 	ResponseDeleteDay,
 	ResponseGetGroups,
+	ResponseGetSemesters,
 	ResponseRelocateStudent,
 	SourcesResponse,
 	StudentsResponse,
@@ -490,6 +491,15 @@ export const updateProgramSemester = async (
 			import.meta.env.VITE_API_URL
 		}update-program-semester?program_semester_id=${programSemesterId}`,
 		payload
+	);
+	return response.data;
+};
+
+export const getAdminSemesters = async (
+	semesterId: string
+): Promise<ResponseGetSemesters[]> => {
+	const response = await api.get(
+		`${import.meta.env.VITE_API_URL}get-semester?semester_id=${semesterId}`
 	);
 	return response.data;
 };

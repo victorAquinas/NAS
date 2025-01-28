@@ -4,7 +4,6 @@ import { MlActionModal } from '../../../components/MlModal/MlActionModal';
 import { useCourses } from './useCourses';
 import { RiBookMarkedLine } from 'react-icons/ri';
 import DatePicker from 'react-datepicker';
-import { toast } from 'react-toastify';
 import { AtLoadingWrapper } from '../../../components/AtLoadingWrapper';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 import AtBreadcrumb from '../../../components/AtBreadCrumb';
@@ -78,7 +77,6 @@ const AdminCourses = () => {
 					/>
 				</form>
 			</MlActionModal>
-
 			<MlActionModal
 				isOpen={showDeleteCourseModal}
 				onAction={() => {
@@ -92,7 +90,6 @@ const AdminCourses = () => {
 				actionButtonLabel='Delete'
 				variant='danger'
 			></MlActionModal>
-
 			<AtLoadingWrapper isLoading={isLoading} />
 			<div className='header flex justify-between'>
 				<div className='left'>
@@ -111,7 +108,6 @@ const AdminCourses = () => {
 					)}
 				</div>
 			</div>
-
 			{(programSemesterId === 'no-courses' || courses.length === 0) && (
 				<div className='content flex justify-center flex-col items-center mt-60'>
 					<h2 className='text-xl font-medium pb-6'>
@@ -130,7 +126,7 @@ const AdminCourses = () => {
 						href={`/admin/group/${course.program_semester_id}/semester/${semesterId}/location/${locationId}`}
 						label={course.program.name}
 						Icon={RiBookMarkedLine}
-						key={course.program.id}
+						key={course.program_semester_id}
 						tooltipId={`tooltip-${course.program_semester_id}`}
 						tooltipContent={'Delete course'}
 						deleteLocationClick={() =>

@@ -110,7 +110,7 @@ export const MlGroupDetailModal = ({
 						{event?.dates?.in_site?.map((date, index) => (
 							<li
 								className='listItem flex items-center justify-between border-b border-gray-300 pb-1 last:border-none'
-								key={`offsite-${index}`}
+								key={`insite-${index}`}
 							>
 								<div className='left flex items-center gap-x-4 font-medium w-[235px] justify-between'>
 									<p>{date.date}</p>

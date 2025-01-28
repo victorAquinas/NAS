@@ -54,18 +54,11 @@ const AdminCourses = () => {
 					justifyContent: 'center',
 				}}
 				onAction={() =>
-					toast.promise(
-						handleAddCourse(
-							courseName,
-							semesterId ?? '',
-							maxEnrollmentDate,
-							locationId ?? ''
-						),
-						{
-							pending: 'Adding course',
-							success: 'Course added successfully',
-							error: 'Error adding course',
-						}
+					handleAddCourse(
+						courseName,
+						semesterId ?? '',
+						maxEnrollmentDate,
+						locationId ?? ''
 					)
 				}
 			>

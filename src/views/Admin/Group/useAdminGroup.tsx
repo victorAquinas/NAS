@@ -173,7 +173,7 @@ export const useAdminGroup = () => {
 	) => {
 		try {
 			await updateGroup(id, field, value, level);
-			await getCourseGroups();
+			// await getCourseGroups();
 		} catch (error) {
 			console.error(error);
 		}

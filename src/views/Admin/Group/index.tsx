@@ -603,17 +603,18 @@ const AdminGroup = () => {
 					<AtBreadcrumb items={breadcrumbItems} separator='/' />
 				</div>
 
-				{}
-				<AtButton
-					variant={isPublished ? 'primary' : 'secondary'}
-					onClick={() => {
-						if (programSemesterId) {
-							handlePublishCourse(programSemesterId, isPublished);
-						}
-					}}
-				>
-					{isPublished ? 'Unpublish course' : 'Release course'}
-				</AtButton>
+				{groups.length > 0 && (
+					<AtButton
+						variant={isPublished ? 'primary' : 'secondary'}
+						onClick={() => {
+							if (programSemesterId) {
+								handlePublishCourse(programSemesterId, isPublished);
+							}
+						}}
+					>
+						{isPublished ? 'Unpublish course' : 'Release course'}
+					</AtButton>
+				)}
 			</div>
 
 			<h2 className='text-xl font-medium pt-4'>{groups[0]?.program_name}</h2>

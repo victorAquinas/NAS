@@ -5,6 +5,8 @@ import { MlActionModal } from '../../../../components/MlModal/MlActionModal';
 import { useAdminCoordinators } from './useAdminCoordinators';
 import { AtBadge } from '../../../../components/AtBadge';
 import { formatPhoneNumber } from '../../../../utils/formatPhoneNumber';
+import { TbEdit } from 'react-icons/tb';
+import { BsToggle2Off, BsToggle2On } from 'react-icons/bs';
 
 const AdminCoordinatorSettings = () => {
 	const {
@@ -13,12 +15,15 @@ const AdminCoordinatorSettings = () => {
 		onSubmit,
 		errors,
 		isModalOpen,
-		setIsModalOpen,
+		modalType,
 		handleCloseModal,
 		coordinators,
 		tableFilter,
 		handleGetCoordinators,
 		updateTableFilter,
+		handleOpenModal,
+		handleOpenEditModal,
+		handleChangeStatus,
 	} = useAdminCoordinators();
 	console.log('Meta', import.meta.env.DATAVISION_API);
 	return (
@@ -26,7 +31,7 @@ const AdminCoordinatorSettings = () => {
 			<MlActionModal
 				isOpen={isModalOpen}
 				variant='transparent'
-				title='Add coordinator'
+				title={`${modalType === 'new' ? 'Add' : 'Edit'} coordinator`}
 				styles={{
 					height: '550px',
 					display: 'flex',
@@ -76,7 +81,7 @@ const AdminCoordinatorSettings = () => {
 							Cancel
 						</AtButton>
 						<AtButton variant='primary' type='submit'>
-							Add Coordinator
+							{modalType === 'new' ? 'Add' : 'Edit'} Coordinator
 						</AtButton>
 					</div>
 				</form>
@@ -86,7 +91,7 @@ const AdminCoordinatorSettings = () => {
 				<h2 className='text-xl font-medium pt-4'>Settings - Coordinators</h2>
 
 				<div className='flex justify-end '>
-					<AtButton variant='secondary' onClick={() => setIsModalOpen(true)}>
+					<AtButton variant='secondary' onClick={() => handleOpenModal('new')}>
 						Add Coordinator
 					</AtButton>
 				</div>
@@ -166,7 +171,39 @@ const AdminCoordinatorSettings = () => {
 										)}
 									</td>
 									<td className='border-b border-gray-200 px-3 p-3  text-start'>
-										Actions
+										<div className='btns flex items-center'>
+											<button
+												className='edit text-2xl'
+												onClick={() =>
+													handleOpenEditModal(
+														String(coordinator.id),
+														coordinator.name,
+														coordinator.email,
+														coordinator.phone ?? ''
+													)
+												}
+											>
+												<TbEdit />
+											</button>
+											<button
+												className='text-3xl ml-4'
+												onClick={async () =>
+													handleChangeStatus(
+														String(coordinator.id),
+														coordinator.name,
+														coordinator.email,
+														coordinator.phone ?? '',
+														!coordinator.status
+													)
+												}
+											>
+												{coordinator.status ? (
+													<BsToggle2On className='text-primary' />
+												) : (
+													<BsToggle2Off className='text-red_primary' />
+												)}
+											</button>
+										</div>
 									</td>
 								</tr>
 							))}

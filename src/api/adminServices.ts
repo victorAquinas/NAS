@@ -338,6 +338,25 @@ export const createUser = async (
 	return response.data;
 };
 
+export const updateUser = async (
+	user_id: string,
+	name: string,
+	email: string,
+	phone: string,
+	is_active?: boolean
+): Promise<UserResponse> => {
+	const response = await api.patch(
+		`${import.meta.env.VITE_API_URL}user/update?user_id=${user_id}`,
+		{
+			name,
+			email,
+			phone,
+			status: is_active,
+		}
+	);
+	return response.data;
+};
+
 export const getUsers = async (filters: UsersFilters): Promise<User[]> => {
 	const currentFilters = {
 		...(filters.name && { name: filters.name }),

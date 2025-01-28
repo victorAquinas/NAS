@@ -80,7 +80,6 @@ export const useAdminStudents = () => {
 				{ label: 'All', value: '' },
 				{ label: 'PENDING', value: UserStatus.PENDING },
 				{ label: 'ACCEPTED', value: UserStatus.ACCEPTED },
-				{ label: 'REJECTED', value: UserStatus.REJECTED },
 				{ label: 'REJECT', value: UserStatus.REJECT },
 				{ label: 'OPEN', value: UserStatus.OPEN },
 			],

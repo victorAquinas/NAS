@@ -17,10 +17,12 @@ import AdminStudents from '../views/Admin/Students';
 import AdminCoordinatorSettings from '../views/Admin/Settings/Coordinators';
 import AdminReports from '../views/Admin/Reports';
 import AdminGroupLocations from '../views/Admin/Settings/GroupLocations';
+import { RecoverPass } from '../views/RecoverPass';
 
 const Router = () => {
 	const routes = createBrowserRouter([
 		{ path: '/', element: <Login /> },
+		{ path: '/recover-password', element: <RecoverPass /> },
 		{ path: '*', element: <NotFoundPage /> },
 		{
 			element: <PrivateRoute />,

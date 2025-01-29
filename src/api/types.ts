@@ -488,3 +488,10 @@ export interface ResponseSemesterDetails {
 	created_at: string;
 	updated_at: string;
 }
+
+export interface ResponseRecoverPass {
+	success: boolean;
+	data: {
+		message: string;
+	};
+}

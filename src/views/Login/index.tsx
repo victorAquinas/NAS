@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import NasLogoText from '../../assets/nas-logo.svg';
 import AtButton from '../../components/AtButton';
 import { useLogin } from './useLogin';
@@ -42,9 +43,11 @@ export const Login = () => {
 								{errors.password && <>{errors.password.message}</>}
 							</div>
 						</div>
-						<div className='text-gray-400 text-sm text-end'>
-							Forgot Password
-						</div>
+						<Link to={'/recover-password'}>
+							<div className='text-gray-400 text-sm text-end'>
+								Forgot Password
+							</div>
+						</Link>
 						<AtButton variant='primary' type='submit'>
 							Login
 						</AtButton>

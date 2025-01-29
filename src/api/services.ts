@@ -5,6 +5,7 @@ import {
 	GroupResponse,
 	LoginUserResponse,
 	RequestGroupResponse,
+	ResponseRecoverPass,
 	SemesterResponse,
 	UserStatusResponse,
 } from './types';
@@ -108,6 +109,18 @@ export const loginUser = async (
 		`${import.meta.env.VITE_API_URL}${`login?${transformToUrlParams(
 			emailUrlParams
 		)}`}`
+	);
+	return response.data;
+};
+
+export const recoverPassword = async (
+	email: string
+): Promise<ResponseRecoverPass> => {
+	const response = await api.post(
+		`${import.meta.env.VITE_API_URL}recover-password?email=${encodeURIComponent(
+			email
+		)}`,
+		{}
 	);
 	return response.data;
 };

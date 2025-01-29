@@ -278,9 +278,10 @@ export const getGroups = async (
 
 export const relocateStudent = async (
 	student_id: number,
-	new_group_id: number
+	new_group_id: number,
+	program_semester_id_origin: number
 ): Promise<ResponseRelocateStudent> => {
-	const params = `student_id=${student_id}&new_group_id=${new_group_id}`;
+	const params = `student_id=${student_id}&new_group_id=${new_group_id}&program_semester_id_origin=${program_semester_id_origin}`;
 	const response = await api.post(
 		`${
 			import.meta.env.VITE_API_URL

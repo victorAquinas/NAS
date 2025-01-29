@@ -98,8 +98,12 @@ const AdminStudents = () => {
 						if (!selectedMoveTo) {
 							toast.error('Please select a group');
 						}
-						if (selectedMoveTo) {
-							handleRelocateStudent(selectedUser.id, selectedMoveTo?.value);
+						if (selectedMoveTo && programSemesterId) {
+							handleRelocateStudent(
+								selectedUser.id,
+								selectedMoveTo?.value,
+								parseInt(programSemesterId)
+							);
 						}
 					}
 
@@ -116,8 +120,12 @@ const AdminStudents = () => {
 								toast.error('Please select a location');
 							}
 
-							if (selectedMoveTo) {
-								handleRelocateStudent(selectedUser.id, selectedMoveTo?.value);
+							if (selectedMoveTo && programSemesterId) {
+								handleRelocateStudent(
+									selectedUser.id,
+									selectedMoveTo?.value,
+									parseInt(programSemesterId)
+								);
 							}
 						}
 
@@ -239,10 +247,10 @@ const AdminStudents = () => {
 										label: 'Move to a group in another institution',
 										value: 'to-another-institution',
 									},
-									{
-										label: 'Move to a temporal week in another group',
-										value: 'to-another-week',
-									},
+									// {
+									// 	label: 'Move to a temporal week in another group',
+									// 	value: 'to-another-week',
+									// },
 								]}
 								placeholder='Select'
 								className='w-full h-full bg-white !placeholder:text-[#807f7f] !font-normal rounded-md'

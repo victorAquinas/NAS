@@ -509,11 +509,12 @@ export const useAdminStudents = () => {
 
 	const handleRelocateStudent = async (
 		studentId: number,
-		newGroupId: number
+		newGroupId: number,
+		programSemesterIdOrigin: number
 	) => {
 		const idLoading = toast.loading('Transfering student');
 		try {
-			await relocateStudent(studentId, newGroupId);
+			await relocateStudent(studentId, newGroupId, programSemesterIdOrigin);
 			toast.update(idLoading, {
 				render: 'Student transfered',
 				type: 'success',

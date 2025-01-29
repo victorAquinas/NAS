@@ -32,6 +32,11 @@ export const useShiftsPage = () => {
 		}, 500);
 	};
 
+	const parseDate = (dateString: string): Date => {
+		const [month, day, year] = dateString.split('/').map(Number);
+		return new Date(year, month - 1, day);
+	};
+
 	const getCalendarWeeks = async (student_id: number) => {
 		setIsLoading(true);
 		try {
@@ -43,9 +48,16 @@ export const useShiftsPage = () => {
 				const transformedCalendarEvents = transformAndFillAddresses([
 					group.data,
 				]);
-				setActiveEvents(transformedCalendarEvents);
 
-				return transformedCalendarEvents;
+				const sortedEventsByDate = transformedCalendarEvents.sort((a, b) => {
+					return (
+						parseDate(a.rawDate).getTime() - parseDate(b.rawDate).getTime()
+					);
+				});
+
+				setActiveEvents(sortedEventsByDate);
+
+				return sortedEventsByDate;
 			}
 		} catch (error) {
 			console.error(error);

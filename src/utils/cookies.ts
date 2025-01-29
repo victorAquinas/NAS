@@ -3,12 +3,17 @@ import { decodeToken } from './decodeToken';
 
 const tokenCookieName = 'auth_token';
 const cookies = new Cookies();
+
 export const setTokenInCookies = (token: string, expirationTime: number) => {
 	const expires = new Date(expirationTime * 1000);
 	const decodedToken = decodeToken(token);
 
+	cookies.remove(tokenCookieName, { path: '/' });
+	cookies.remove('user_email', { path: '/' });
+
 	cookies.set(tokenCookieName, token, {
 		expires,
+		path: '/',
 	});
 
 	cookies.set('user_email', decodedToken?.user_email ?? '', {

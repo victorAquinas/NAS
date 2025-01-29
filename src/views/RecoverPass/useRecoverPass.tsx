@@ -20,7 +20,19 @@ export const useRecoverPass = () => {
 		const idLoading = toast.loading('Checking email');
 		setIsModalOpen(false);
 		try {
-			await recoverPassword(email);
+			const recoveredPassword = await recoverPassword(email);
+
+			if (!recoveredPassword.data) {
+				toast.update(idLoading, {
+					render: 'Email not found',
+					type: 'error',
+					isLoading: false,
+					autoClose: 1000,
+				});
+				setIsModalOpen(false);
+				return;
+			}
+
 			toast.update(idLoading, {
 				render: 'Password changed',
 				type: 'success',

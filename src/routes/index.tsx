@@ -73,7 +73,7 @@ const Router = () => {
 
 	return (
 		<>
-			<ToastContainer limit={2} />
+			<ToastContainer limit={1} />
 			<RouterProvider router={routes} />
 		</>
 	);

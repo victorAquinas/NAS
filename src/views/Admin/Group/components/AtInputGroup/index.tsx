@@ -12,6 +12,7 @@ type AtInputGroupProps = {
 		error: string;
 		pending: string;
 	};
+	disabled?: boolean;
 };
 
 const AtInputGroup = forwardRef<HTMLInputElement, AtInputGroupProps>(
@@ -23,6 +24,7 @@ const AtInputGroup = forwardRef<HTMLInputElement, AtInputGroupProps>(
 			defaultValue = '',
 			onUpdate,
 			toastMessages,
+			disabled = false,
 		},
 		ref
 	) => {
@@ -50,6 +52,7 @@ const AtInputGroup = forwardRef<HTMLInputElement, AtInputGroupProps>(
 				className={className}
 				defaultValue={defaultValue}
 				ref={ref}
+				disabled={disabled}
 				onBlur={handleBlur}
 			/>
 		);

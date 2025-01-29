@@ -62,6 +62,7 @@ export const useAdminGroup = () => {
 		headquarter_name: '',
 		course_name: '',
 	});
+	const [showReleaseModal, setShowReleaseModal] = useState<boolean>(false);
 
 	const {
 		register,
@@ -335,6 +336,7 @@ export const useAdminGroup = () => {
 				isLoading: false,
 				autoClose: 1000,
 			});
+			setShowReleaseModal(false);
 			getCourseGroups();
 		} catch (error) {
 			console.error(error);
@@ -426,5 +428,7 @@ export const useAdminGroup = () => {
 		maxEnrollmentDate,
 		isPublished,
 		handleUpdateMaxEnrollmentDate,
+		setShowReleaseModal,
+		showReleaseModal,
 	};
 };

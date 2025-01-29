@@ -37,6 +37,7 @@ import AtInputGroup from './components/AtInputGroup';
 import { Link } from 'react-router-dom';
 import AtBreadcrumb from '../../../components/AtBreadCrumb';
 import { Tooltip } from 'react-tooltip';
+import { AtAlert } from '../../../components/AtAlert';
 
 const CustomOption = ({
 	data,
@@ -120,6 +121,8 @@ const AdminGroup = () => {
 		maxEnrollmentDate,
 		isPublished,
 		handleUpdateMaxEnrollmentDate,
+		setShowReleaseModal,
+		showReleaseModal,
 	} = useAdminGroup();
 
 	const groupNameRefs = useRef<{
@@ -596,6 +599,21 @@ const AdminGroup = () => {
 				variant='danger'
 			></MlActionModal>
 
+			<MlActionModal
+				isOpen={showReleaseModal}
+				onAction={() => {
+					if (programSemesterId) {
+						handlePublishCourse(programSemesterId, isPublished);
+					}
+				}}
+				onClose={() => setShowReleaseModal(false)}
+				title='Are you sure you want to release this course?'
+				description='Once you release this course, you will not be able to unpublish or edit it. This action is irreversible.'
+				closeButtonLabel='Cancel'
+				actionButtonLabel='Release'
+				variant='transparent'
+			></MlActionModal>
+
 			<div className='flex justify-between items-start'>
 				<div>
 					<AtLoadingWrapper isLoading={isLoading} />
@@ -603,17 +621,19 @@ const AdminGroup = () => {
 					<AtBreadcrumb items={breadcrumbItems} separator='/' />
 				</div>
 
-				{groups.length > 0 && (
-					<AtButton
-						variant={isPublished ? 'primary' : 'secondary'}
-						onClick={() => {
-							if (programSemesterId) {
-								handlePublishCourse(programSemesterId, isPublished);
-							}
-						}}
-					>
-						{isPublished ? 'Unpublish course' : 'Release course'}
-					</AtButton>
+				{!isPublished && (
+					<>
+						{groups.length > 0 && (
+							<AtButton
+								variant={isPublished ? 'primary' : 'secondary'}
+								onClick={() => {
+									setShowReleaseModal(true);
+								}}
+							>
+								{isPublished ? 'Unpublish course' : 'Release course'}
+							</AtButton>
+						)}
+					</>
 				)}
 			</div>
 
@@ -630,8 +650,16 @@ const AdminGroup = () => {
 			</ul>
 
 			{/* If there are groups */}
-			<div className='group-list mt-4'>
+			<div className='group-list mt-4 relative'>
 				<div className='group-container pt-6'>
+					{isPublished && (
+						<div className='fixed top-16 right-14 z-10'>
+							<AtAlert
+								variant='warning'
+								description='This course is published. You can view it, but editing is not allowed.'
+							/>
+						</div>
+					)}
 					{!hasActiveGroup && (
 						<div className='content flex justify-center flex-col items-center mt-60'>
 							<h2 className='text-xl font-medium'>No Groups Found</h2>
@@ -656,6 +684,7 @@ const AdminGroup = () => {
 										<DatePicker
 											placeholderText='Max Enrollment date'
 											wrapperClassName='w-full'
+											disabled={isPublished}
 											value={maxEnrollmentDate ? maxEnrollmentDate : undefined}
 											onChange={(date) => {
 												if (date && programSemesterId) {
@@ -668,7 +697,9 @@ const AdminGroup = () => {
 													);
 												}
 											}}
-											className='w-full h-full bg-white p-1 placeholder:text-gray-950 font-normal rounded-md border border-gray-400 lg:text-lg'
+											className={`w-full h-full ${
+												isPublished ? 'bg-black/10' : 'bg-white'
+											} p-1 placeholder:text-gray-950 font-normal rounded-md border border-gray-400 lg:text-lg`}
 											onKeyDown={(e) => e.preventDefault()}
 										/>
 									</div>
@@ -761,8 +792,10 @@ const AdminGroup = () => {
 								{group.is_active && (
 									<div
 										key={group.group_id}
-										className='mb-16 bg-white shadow-md rounded-md py-4 px-3 border border-gray-300'
+										className='relative mb-16 bg-white shadow-md rounded-md py-4 px-3 border border-gray-300'
 									>
+										<div className='absolute z-10  top-0 right-0 left-0 bottom-0 bg-transparent'></div>
+
 										<div className='group-header flex items-center mb-4'>
 											<div className='group-name max-w-[300px]'>
 												<AtInputGroup
@@ -814,14 +847,16 @@ const AdminGroup = () => {
 											</div>
 
 											<div className='delete-group pl-12'>
-												<AtButton
-													variant='danger'
-													onClick={() =>
-														handleShowDeleteGroupModal(group.group_id)
-													}
-												>
-													Delete group
-												</AtButton>
+												{!isPublished && (
+													<AtButton
+														variant='danger'
+														onClick={() =>
+															handleShowDeleteGroupModal(group.group_id)
+														}
+													>
+														Delete group
+													</AtButton>
+												)}
 											</div>
 										</div>
 										<div className='group-section flex flex-col gap-y-8 xl:flex-row xl:gap-x-8 pb-8 '>
@@ -1042,32 +1077,38 @@ const AdminGroup = () => {
 																				key={week.week_id}
 																				className='week-card border border-black rounded-md flex relative'
 																			>
-																				{placeData.weeks.length > 1 && (
-																					<AtButton
-																						tooltipId={`${Math.random()}_delete_week`}
-																						tooltipContent='Delete week'
-																						variant='no-style'
-																						className='delete-week text-3xl absolute top-[-0.8rem] left-[-0.5rem] text-red_primary bg-white flex items-center justify-center rounded-full '
-																						onClick={() =>
-																							toast.promise(
-																								handleDeleteWeek(
-																									group.group_id,
-																									week.week_id
-																								),
-																								{
-																									success: 'Week deleted',
-																									error: 'Error deleting week',
-																									pending: 'Deleting week',
-																								},
-																								{
-																									autoClose: 500,
+																				{!isPublished && (
+																					<>
+																						{placeData.weeks.length > 1 && (
+																							<AtButton
+																								tooltipId={`${Math.random()}_delete_week`}
+																								tooltipContent='Delete week'
+																								variant='no-style'
+																								className='delete-week text-3xl absolute top-[-0.8rem] left-[-0.5rem] text-red_primary bg-white flex items-center justify-center rounded-full '
+																								onClick={() =>
+																									toast.promise(
+																										handleDeleteWeek(
+																											group.group_id,
+																											week.week_id
+																										),
+																										{
+																											success: 'Week deleted',
+																											error:
+																												'Error deleting week',
+																											pending: 'Deleting week',
+																										},
+																										{
+																											autoClose: 500,
+																										}
+																									)
 																								}
-																							)
-																						}
-																					>
-																						<FaRegCalendarXmark />
-																					</AtButton>
+																							>
+																								<FaRegCalendarXmark />
+																							</AtButton>
+																						)}
+																					</>
 																				)}
+
 																				<div className='week-number flex-col flex justify-center items-center w-[100px] border-r border-black p-2 lg:text-lg'>
 																					Week
 																					<input
@@ -1187,67 +1228,72 @@ const AdminGroup = () => {
 																												);
 																											}}
 																										/>
-																										<AtButton
-																											variant='no-style'
-																											className='text-3xl !pl-4'
-																											onClick={() =>
-																												toast.promise(
-																													handleDeleteDayInWeek(
-																														week.week_schedule
-																															.week_schedule_id,
-																														datePlace.day_id
-																													),
-																													{
-																														success:
-																															'Day deleted',
-																														error:
-																															'Error deleting day',
-																														pending:
-																															'Deleting day',
-																													},
-																													{
-																														autoClose: 500,
-																													}
-																												)
-																											}
-																											tooltipId={`${Math.random()}_delete_day`}
-																											tooltipContent={`Delete day`}
-																										>
-																											<MdOutlineDelete className='text-red_primary' />
-																										</AtButton>
+																										{!isPublished && (
+																											<AtButton
+																												variant='no-style'
+																												className='text-3xl !pl-4'
+																												onClick={() =>
+																													toast.promise(
+																														handleDeleteDayInWeek(
+																															week.week_schedule
+																																.week_schedule_id,
+																															datePlace.day_id
+																														),
+																														{
+																															success:
+																																'Day deleted',
+																															error:
+																																'Error deleting day',
+																															pending:
+																																'Deleting day',
+																														},
+																														{
+																															autoClose: 500,
+																														}
+																													)
+																												}
+																												tooltipId={`${Math.random()}_delete_day`}
+																												tooltipContent={`Delete day`}
+																											>
+																												<MdOutlineDelete className='text-red_primary' />
+																											</AtButton>
+																										)}
 																									</div>
 																								</div>
 																							);
 																						}
 																					)}
 																					<div className=' text-primary flex justify-center pt-2'>
-																						<AtButton
-																							variant='no-style'
-																							onClick={() =>
-																								toast.promise(
-																									handleCreateDayInWeek(
-																										week.week_schedule
-																											.week_schedule_id
-																									),
-																									{
-																										success: 'Day created',
-																										error: 'Error creating day',
-																										pending: 'Creating day',
-																									},
-																									{
-																										autoClose: 500,
-																									}
-																								)
-																							}
-																							tooltipId={`${Math.random()}_add_day`}
-																							className='flex items-center !text-sm'
-																							tooltipContent='Add new day to the week'
-																						>
-																							Add day
-																							<span className='text-2xl pl-2'>
-																								<IoIosAddCircleOutline />
-																							</span>
-																						</AtButton>
+																						{!isPublished && (
+																							<AtButton
+																								variant='no-style'
+																								onClick={() =>
+																									toast.promise(
+																										handleCreateDayInWeek(
+																											week.week_schedule
+																												.week_schedule_id
+																										),
+																										{
+																											success: 'Day created',
+																											error:
+																												'Error creating day',
+																											pending: 'Creating day',
+																										},
+																										{
+																											autoClose: 500,
+																										}
+																									)
+																								}
+																								tooltipId={`${Math.random()}_add_day`}
+																								className='flex items-center !text-sm'
+																								tooltipContent='Add new day to the week'
+																							>
+																								Add day
+																								<span className='text-2xl pl-2'>
+																									<IoIosAddCircleOutline />
+																								</span>
+																							</AtButton>
+																						)}
 																					</div>
 																				</div>
 																			</div>
@@ -1255,31 +1301,33 @@ const AdminGroup = () => {
 																	})}
 																</div>
 																<div className='add-week-btn text-primary flex justify-center pt-6'>
-																	<AtButton
-																		variant='primary'
-																		className='text-sm flex items-center'
-																		onClick={() =>
-																			toast.promise(
-																				handleCreateWeek(
-																					group.group_id,
-																					placeData.type === 'in-site'
-																						? true
-																						: false
-																				),
-																				{
-																					success: 'Week created',
-																					error: 'Error creating week',
-																					pending: 'Creating week',
-																				},
-																				{
-																					autoClose: 500,
-																				}
-																			)
-																		}
-																	>
-																		<span className='pr-2'>Add new week</span>{' '}
-																		<LuCalendarPlus className='text-xl ' />
-																	</AtButton>
+																	{!isPublished && (
+																		<AtButton
+																			variant='primary'
+																			className='text-sm flex items-center'
+																			onClick={() =>
+																				toast.promise(
+																					handleCreateWeek(
+																						group.group_id,
+																						placeData.type === 'in-site'
+																							? true
+																							: false
+																					),
+																					{
+																						success: 'Week created',
+																						error: 'Error creating week',
+																						pending: 'Creating week',
+																					},
+																					{
+																						autoClose: 500,
+																					}
+																				)
+																			}
+																		>
+																			<span className='pr-2'>Add new week</span>{' '}
+																			<LuCalendarPlus className='text-xl ' />
+																		</AtButton>
+																	)}
 																</div>
 															</div>
 														</div>
@@ -1294,11 +1342,13 @@ const AdminGroup = () => {
 					})}
 				</div>
 
-				<div className='add-new-section flex justify-center py-4 pb-16 '>
-					<AtButton variant='primary' onClick={handleOpenAddGroupModal}>
-						Add New Group
-					</AtButton>
-				</div>
+				{!isPublished && (
+					<div className='add-new-section flex justify-center py-4 pb-16 '>
+						<AtButton variant='primary' onClick={handleOpenAddGroupModal}>
+							Add New Group
+						</AtButton>
+					</div>
+				)}
 			</div>
 		</AdminLayout>
 	);

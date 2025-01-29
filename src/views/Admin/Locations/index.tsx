@@ -36,7 +36,7 @@ const AdminLocations = () => {
 					toast.promise(
 						handleAddLocation(
 							locationName,
-							locations[0]?.institution_id?.toString()
+							import.meta.env.VITE_INSTITUTION_ID
 						),
 						{
 							pending: 'Adding location',

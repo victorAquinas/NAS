@@ -146,12 +146,19 @@ export const useCalendarPage = () => {
 
 	const getSelectedGroupWeeks = async (student_id: number) => {
 		try {
-			const group = await getCalendarWeeksByStudentId(student_id);
-			const transformedCalendarEvents = transformAndFillAddresses([group.data]);
-			console.log('Specific Group', transformedCalendarEvents);
-			setEvents(transformedCalendarEvents);
-			setEventsCopy(transformedCalendarEvents);
-			return transformedCalendarEvents;
+			if (programSemesterId) {
+				const group = await getCalendarWeeksByStudentId(
+					student_id,
+					programSemesterId
+				);
+				const transformedCalendarEvents = transformAndFillAddresses([
+					group.data,
+				]);
+
+				setEvents(transformedCalendarEvents);
+				setEventsCopy(transformedCalendarEvents);
+				return transformedCalendarEvents;
+			}
 		} catch (error) {
 			console.error(error);
 			toast.error(ErrorMessages.GENERAL_ERROR);

@@ -11,6 +11,8 @@ import { toast } from 'react-toastify';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 import { MdOutlineDelete } from 'react-icons/md';
 import AtBreadcrumb from '../../../components/AtBreadCrumb';
+import { TbRosetteDiscountCheck } from 'react-icons/tb';
+import { Tooltip } from 'react-tooltip';
 
 const AdminSemesters = () => {
 	const {
@@ -33,11 +35,11 @@ const AdminSemesters = () => {
 		handleCloseDeleteSemesterModal,
 		handleShowDeleteSemesterModal,
 		location,
+		handleCompleteSemester,
 	} = useAdminSemesters();
 	const breadcrumbItems = [
 		{ label: 'Locations', link: '/admin/locations' },
 		{ label: 'Semesters' },
-		// { label: 'Courses', link: '/admin/courses/4/semester/3/location/1' },
 	];
 
 	return (
@@ -164,7 +166,14 @@ const AdminSemesters = () => {
 								</td>
 								<td className='border-b border-gray-200 px-3 p-3  text-start '>
 									<div className='flex items-center'>
+										<Tooltip
+											id={`${semester?.programs_in[0]?.program_semester_id}-see-detail}`}
+											place='top-end'
+											content={'Go to courses'}
+											className='!text-sm'
+										/>
 										<Link
+											data-tooltip-id={`${semester?.programs_in[0]?.program_semester_id}-see-detail}`}
 											to={`/admin/courses/${
 												semester?.programs_in[0]?.program_semester_id ??
 												'no-courses'
@@ -177,7 +186,14 @@ const AdminSemesters = () => {
 											</span>
 										</Link>
 
+										<Tooltip
+											id={`${semester?.programs_in[0]?.program_semester_id}-delete-semester}`}
+											place='top-end'
+											content={'Delete semester'}
+											className='!text-sm'
+										/>
 										<button
+											data-tooltip-id={`${semester?.programs_in[0]?.program_semester_id}-delete-semester}`}
 											className='text-2xl pl-2'
 											onClick={() =>
 												handleShowDeleteSemesterModal(semester.semester_id)
@@ -185,6 +201,27 @@ const AdminSemesters = () => {
 										>
 											<MdOutlineDelete className='text-red_primary' />
 										</button>
+
+										{semester.semester_status && (
+											<>
+												<Tooltip
+													id={`${semester?.programs_in[0]?.program_semester_id}-finish-semester}`}
+													place='top-end'
+													content={'Finish semester'}
+													className='!text-sm'
+												/>
+
+												<button
+													onClick={() =>
+														handleCompleteSemester(semester.semester_id)
+													}
+													className='text-2xl pl-2'
+													data-tooltip-id={`${semester?.programs_in[0]?.program_semester_id}-finish-semester}`}
+												>
+													<TbRosetteDiscountCheck />
+												</button>
+											</>
+										)}
 									</div>
 								</td>
 							</tr>

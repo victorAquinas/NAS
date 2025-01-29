@@ -32,30 +32,21 @@ export const useShiftsPage = () => {
 		}, 500);
 	};
 
-	// const getCalendarGroupByIdEvents = async (group_id: string) => {
-	// 	setIsLoading(true);
-	// 	try {
-	// 		const group = await getCalendarGroupById(group_id);
-	// 		const transformedCalendarEvents = transformAndFillAddresses([group.data]);
-	// 		setActiveEvents(transformedCalendarEvents);
-
-	// 		return transformedCalendarEvents;
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		toast.error(ErrorMessages.GENERAL_ERROR);
-	// 	} finally {
-	// 		handleCloseLoading();
-	// 	}
-	// };
-
 	const getCalendarWeeks = async (student_id: number) => {
 		setIsLoading(true);
 		try {
-			const group = await getCalendarWeeksByStudentId(student_id);
-			const transformedCalendarEvents = transformAndFillAddresses([group.data]);
-			setActiveEvents(transformedCalendarEvents);
+			if (programSemesterId) {
+				const group = await getCalendarWeeksByStudentId(
+					student_id,
+					programSemesterId
+				);
+				const transformedCalendarEvents = transformAndFillAddresses([
+					group.data,
+				]);
+				setActiveEvents(transformedCalendarEvents);
 
-			return transformedCalendarEvents;
+				return transformedCalendarEvents;
+			}
 		} catch (error) {
 			console.error(error);
 			toast.error(ErrorMessages.GENERAL_ERROR);

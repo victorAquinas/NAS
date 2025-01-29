@@ -16,6 +16,7 @@ import {
 	ResponseGetGroups,
 	ResponseGetSemesters,
 	ResponseRelocateStudent,
+	ResponseSemesterDetails,
 	SourcesResponse,
 	StudentsResponse,
 	updateGroupType,
@@ -500,6 +501,18 @@ export const getAdminSemesters = async (
 ): Promise<ResponseGetSemesters[]> => {
 	const response = await api.get(
 		`${import.meta.env.VITE_API_URL}get-semester?semester_id=${semesterId}`
+	);
+	return response.data;
+};
+
+export const completeSemester = async (
+	semesterId: number
+): Promise<ResponseSemesterDetails> => {
+	const response = await api.patch(
+		`${
+			import.meta.env.VITE_API_URL
+		}complete-semester?semester_id=${semesterId}`,
+		{}
 	);
 	return response.data;
 };

@@ -375,8 +375,11 @@ export const useAdminStudents = () => {
 				originWeeks: [],
 				destinationWeeks: [],
 			});
-			if (course) {
-				const userWeek = await getCalendarWeeksByStudentId(studentId);
+			if (course && programSemesterId) {
+				const userWeek = await getCalendarWeeksByStudentId(
+					studentId,
+					programSemesterId
+				);
 				const weeks = userWeek.data.weeks.map((week) => ({
 					label: `Week ${week.week_number}`,
 					value: week.week_id,

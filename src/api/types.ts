@@ -476,3 +476,15 @@ export interface ResponseGetSemesters {
 	updated_at: string;
 	program_semesters: ProgramSemester[];
 }
+
+export interface ResponseSemesterDetails {
+	id: number;
+	name: string;
+	status: boolean;
+	start_date: string;
+	end_date: string;
+	headquarter_id: number;
+	is_active: boolean;
+	created_at: string;
+	updated_at: string;
+}

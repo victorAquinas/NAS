@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AdminHeadquarter } from '../../../api/types';
 import { useParams } from 'react-router-dom';
 import {
+	completeSemester,
 	createSemester,
 	desactivateSemester,
 	getLocations,
@@ -47,17 +48,23 @@ export const useAdminSemesters = () => {
 			const semesters = req.filter(
 				(location) => location.headquarter_id === parseInt(locationId)
 			);
+
+			const sortedSemesters = semesters[0].semesters_in.sort(
+				(a, b) => Number(b.semester_status) - Number(a.semester_status)
+			);
+
 			const currentActiveSemesters = {
 				...semesters[0],
-				semesters_in: semesters[0].semesters_in.filter(
+				semesters_in: sortedSemesters?.filter(
 					(semester) => semester.semester_is_active
 				),
 			};
+
 			setLocation({
 				headquarter_id: currentActiveSemesters.headquarter_id,
 				headquarter_name: currentActiveSemesters.headquarter_name,
 			});
-			console.log('Current Active Semester', currentActiveSemesters);
+
 			setSemesters(currentActiveSemesters);
 			return req;
 		} catch (error) {
@@ -65,6 +72,33 @@ export const useAdminSemesters = () => {
 			setSemesters(undefined);
 		} finally {
 			setIsLoading(false);
+		}
+	};
+
+	const handleCompleteSemester = async (semesterId: number) => {
+		const idLoading = toast.loading('Finishing semester');
+		try {
+			await completeSemester(semesterId);
+
+			console.log('Completed Semster', completeSemester);
+			if (locationId) {
+				getSemesters(locationId);
+			}
+
+			toast.update(idLoading, {
+				render: 'Semester finished',
+				type: 'success',
+				isLoading: false,
+				autoClose: 500,
+			});
+		} catch (error) {
+			console.error(error);
+			toast.update(idLoading, {
+				render: 'Error',
+				type: 'error',
+				isLoading: false,
+				autoClose: 1000,
+			});
 		}
 	};
 
@@ -158,5 +192,6 @@ export const useAdminSemesters = () => {
 		semesterIdToDelete,
 		showDeleteSemesterModal,
 		location,
+		handleCompleteSemester,
 	};
 };

@@ -800,72 +800,75 @@ const AdminGroup = () => {
 												</p>
 											</div>
 											<div className='buttons flex items-center flex-wrap'>
-												<div className='delete-group pl-12'>
-													{!isPublished && (
+												{!isPublished && (
+													<>
+														<div className='delete-group pl-12'>
+															<AtButton
+																variant='danger'
+																onClick={() =>
+																	handleShowDeleteGroupModal(group.group_id)
+																}
+															>
+																Delete group
+															</AtButton>
+														</div>
+
 														<AtButton
-															variant='danger'
-															onClick={() =>
-																handleShowDeleteGroupModal(group.group_id)
-															}
+															data-tooltip-id={`tooltip-make-variant-${group.group_id}`}
+															variant='primary'
+															className='ml-4'
+															onClick={() => {
+																const insitePlaces = group.weeks.filter(
+																	(week) =>
+																		week.week_schedule.practice_place.type
+																			.name === PracticaPlaceTypeName.IN_SITE
+																);
+																const offsitePlaces = group.weeks.filter(
+																	(week) =>
+																		week.week_schedule.practice_place.type
+																			.name === PracticaPlaceTypeName.OFF_SITE
+																);
+
+																const payload = {
+																	group_name: group.group_name + '-Variant',
+																	start_date: group.start_date,
+																	end_date: group.end_date,
+																	default_end_time:
+																		group.weeks[0].week_schedule.start_time,
+																	default_start_time:
+																		group.weeks[0].week_schedule.start_time,
+																	max_students: group.max_students,
+																	default_instructor_id:
+																		group.weeks[0].week_schedule.dates[0]
+																			.instructor.id,
+																	verity_group_id: group.verity_group_id,
+																	in_days: group.in_days,
+																	offsite_num_weeks_for_generate:
+																		offsitePlaces?.length ?? 1,
+																	default_insite_practice_place_id:
+																		insitePlaces[0].week_schedule.practice_place
+																			.id,
+																	default_offsite_practice_place_id:
+																		offsitePlaces[0].week_schedule
+																			.practice_place.id,
+																	insite_num_weeks_for_generate:
+																		insitePlaces?.length ?? 1,
+																	program_semester_id: parseInt(
+																		programSemesterId ?? '0'
+																	),
+																};
+
+																if (programSemesterId) {
+																	handleCreateGroup(payload);
+																}
+															}}
+															tooltipId='tooltip-make-variant'
+															tooltipContent='Create a similar group, but with potential differences.'
 														>
-															Delete group
+															Make a variant
 														</AtButton>
-													)}
-												</div>
-
-												<AtButton
-													data-tooltip-id={`tooltip-make-variant-${group.group_id}`}
-													variant='primary'
-													className='ml-4'
-													onClick={() => {
-														const insitePlaces = group.weeks.filter(
-															(week) =>
-																week.week_schedule.practice_place.type.name ===
-																PracticaPlaceTypeName.IN_SITE
-														);
-														const offsitePlaces = group.weeks.filter(
-															(week) =>
-																week.week_schedule.practice_place.type.name ===
-																PracticaPlaceTypeName.OFF_SITE
-														);
-
-														const payload = {
-															group_name: group.group_name + '-Variant',
-															start_date: group.start_date,
-															end_date: group.end_date,
-															default_end_time:
-																group.weeks[0].week_schedule.start_time,
-															default_start_time:
-																group.weeks[0].week_schedule.start_time,
-															max_students: group.max_students,
-															default_instructor_id:
-																group.weeks[0].week_schedule.dates[0].instructor
-																	.id,
-															verity_group_id: group.verity_group_id,
-															in_days: group.in_days,
-															offsite_num_weeks_for_generate:
-																offsitePlaces?.length ?? 1,
-															default_insite_practice_place_id:
-																insitePlaces[0].week_schedule.practice_place.id,
-															default_offsite_practice_place_id:
-																offsitePlaces[0].week_schedule.practice_place
-																	.id,
-															insite_num_weeks_for_generate:
-																insitePlaces?.length ?? 1,
-															program_semester_id: parseInt(
-																programSemesterId ?? '0'
-															),
-														};
-
-														if (programSemesterId) {
-															handleCreateGroup(payload);
-														}
-													}}
-													tooltipId='tooltip-make-variant'
-													tooltipContent='Create a similar group, but with potential differences.'
-												>
-													Make a variant
-												</AtButton>
+													</>
+												)}
 											</div>
 										</div>
 

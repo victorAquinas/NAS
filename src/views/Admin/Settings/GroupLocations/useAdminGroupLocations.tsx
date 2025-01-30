@@ -37,13 +37,17 @@ export const useAdminGroupLocations = () => {
 	];
 	const [modalType, setModalType] = useState<'new' | 'edit'>('new');
 	const [selectedPlace, setSelectedPlace] = useState<GroupPlace | null>(null);
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 
 	const handleGetPlaces = async () => {
+		setIsLoading(true);
 		try {
 			const places = await getPlaces(import.meta.env.VITE_INSTITUTION_ID);
 			console.log('Places', places);
 			setPlaces(places?.data);
+			setIsLoading(false);
 		} catch (error) {
+			setIsLoading(true);
 			toast.error('Error');
 			console.error(error);
 		}
@@ -186,5 +190,6 @@ export const useAdminGroupLocations = () => {
 		handleOpenNewModal,
 		modalType,
 		selectedPlace,
+		isLoading,
 	};
 };

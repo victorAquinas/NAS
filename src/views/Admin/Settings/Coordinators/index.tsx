@@ -7,6 +7,7 @@ import { AtBadge } from '../../../../components/AtBadge';
 import { formatPhoneNumber } from '../../../../utils/formatPhoneNumber';
 import { TbEdit } from 'react-icons/tb';
 import { BsToggle2Off, BsToggle2On } from 'react-icons/bs';
+import { AtLoadingWrapper } from '../../../../components/AtLoadingWrapper';
 
 const AdminCoordinatorSettings = () => {
 	const {
@@ -24,10 +25,12 @@ const AdminCoordinatorSettings = () => {
 		handleOpenModal,
 		handleOpenEditModal,
 		handleChangeStatus,
+		isLoading,
 	} = useAdminCoordinators();
 	console.log('Meta', import.meta.env.DATAVISION_API);
 	return (
 		<AdminLayout>
+			<AtLoadingWrapper isLoading={isLoading} />
 			<MlActionModal
 				isOpen={isModalOpen}
 				variant='transparent'
@@ -209,6 +212,12 @@ const AdminCoordinatorSettings = () => {
 							))}
 						</tbody>
 					</table>
+
+					{coordinators.length === 0 && (
+						<div className='text-lg py-4  w-full flex justify-center'>
+							Not found
+						</div>
+					)}
 				</div>
 			</div>
 		</AdminLayout>

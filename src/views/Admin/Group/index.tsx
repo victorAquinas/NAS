@@ -794,7 +794,9 @@ const AdminGroup = () => {
 										key={group.group_id}
 										className='relative mb-16 bg-white shadow-md rounded-md py-4 px-3 border border-gray-300'
 									>
-										<div className='absolute z-10  top-0 right-0 left-0 bottom-0 bg-transparent'></div>
+										{isPublished && (
+											<div className='absolute z-10  top-0 right-0 left-0 bottom-0 bg-transparent'></div>
+										)}
 
 										<div className='group-header flex items-center mb-4'>
 											<div className='group-name max-w-[300px]'>

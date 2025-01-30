@@ -8,6 +8,7 @@ import { MlActionModal } from '../../../../components/MlModal/MlActionModal';
 import Select from 'react-select';
 import { Controller } from 'react-hook-form';
 import { TbEdit } from 'react-icons/tb';
+import { AtLoadingWrapper } from '../../../../components/AtLoadingWrapper';
 
 const AdminGroupLocations = () => {
 	const {
@@ -23,9 +24,11 @@ const AdminGroupLocations = () => {
 		handleOpenEditModal,
 		typeOptions,
 		modalType,
+		isLoading,
 	} = useAdminGroupLocations();
 	return (
 		<AdminLayout>
+			<AtLoadingWrapper isLoading={isLoading} />
 			<MlActionModal
 				isOpen={isModalOpen}
 				variant='transparent'
@@ -208,6 +211,12 @@ const AdminGroupLocations = () => {
 							))}
 						</tbody>
 					</table>
+
+					{places.length === 0 && (
+						<div className='text-lg py-4  w-full flex justify-center'>
+							Not found
+						</div>
+					)}
 				</div>
 			</div>
 		</AdminLayout>

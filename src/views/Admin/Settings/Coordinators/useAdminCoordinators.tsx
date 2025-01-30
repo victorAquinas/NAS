@@ -49,6 +49,7 @@ export const useAdminCoordinators = () => {
 		page: null,
 		limit: null,
 	};
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 
 	const getEmailName = (email: string): string => {
 		const [name] = email.split('@');
@@ -200,10 +201,13 @@ export const useAdminCoordinators = () => {
 	};
 
 	const handleGetCoordinators = async (filters: UsersFilters) => {
+		setIsLoading(true);
 		try {
 			const coordinators = await getUsers(filters);
 			setCoordinators(coordinators);
+			setIsLoading(false);
 		} catch (error) {
+			setIsLoading(false);
 			console.error(error);
 		}
 	};
@@ -234,5 +238,6 @@ export const useAdminCoordinators = () => {
 		modalType,
 		handleOpenModal,
 		handleChangeStatus,
+		isLoading,
 	};
 };

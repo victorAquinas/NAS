@@ -207,7 +207,7 @@ export const transformAndFillAddresses = (data: Group[]): CalendarEvent[] => {
 	};
 
 	const events = transformToCalendarEvents(data);
-	console.log('Eventitos', events);
+
 	const eventsWithAddresses = fillAddressesForGroups(events);
 	const groupedDates = groupDatesByType(eventsWithAddresses);
 	const groupHours = calculateTotalHoursByGroup(eventsWithAddresses);

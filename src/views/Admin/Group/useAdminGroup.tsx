@@ -1,18 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getCalendarGroups } from '../../../api/services';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'react-toastify';
+import { AxiosError } from 'axios';
+
 import {
-	Group,
-	GroupDetails,
-	Instructor,
-	Place,
-	PracticaPlaceTypeId,
-	SelectOptionDescription,
-	updateGroupType,
-} from '../../../api/types';
-import {
-	createDayInWeek,
 	createGroup,
+	createDayInWeek,
 	createWeek,
 	deleteDayInWeek,
 	deleteWeek,
@@ -21,40 +16,57 @@ import {
 	getSources,
 	updateGroup,
 	updateProgramSemester,
-	// createGroupPlace,
 } from '../../../api/adminServices';
-import { useForm } from 'react-hook-form';
+
+import {
+	Group,
+	GroupDetails,
+	PracticaPlaceTypeId,
+	Instructor,
+	SelectOptionDescription,
+	updateGroupType,
+} from '../../../api/types';
+
 import { newGroupSchema, NewGroupSchema } from './modalAddGroupValidation';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'react-toastify';
-import { AxiosError } from 'axios';
+import { getCalendarGroups } from '../../../api/services';
 
+// ------------------------------------------
+// useAdminGroup Hook
+// ------------------------------------------
 export const useAdminGroup = () => {
+	// ====================================
+	// 1. Routing Params
+	// ====================================
 	const { programSemesterId, locationId, semesterId } = useParams();
-	const [isAddGroupModalOpen, setIsAddGroupModalOpen] =
-		useState<boolean>(false);
-	const [coordinators, setCoordinators] = useState<Instructor[]>([]);
-	const [places, setPlaces] = useState<Place[]>([]);
-	const [groups, setGroups] = useState<Group[]>([]);
-	const [groupIdToDelete, setGroupIdToDelete] = useState<number>(-99);
-	const [showDeleteGroupModal, setShowDeleteGroupModal] =
-		useState<boolean>(false);
-	const [isLoading, setIsLoading] = useState<boolean>(true);
-	const [isCreatingGroup, setIsCreatingGroup] = useState<boolean>(false);
-	const [isDeletingGroup, setIsDeletingGroup] = useState<boolean>(false);
-	const [hasActiveGroup, seHasActiveGroups] = useState<boolean>(false);
-	const [maxEnrollmentDate, setMaxEnrollmentDate] = useState<string | null>(
-		null
-	);
-	const [isPublished, setIsPublished] = useState<boolean>(false);
 
-	// Estas son la que son para el formulario de creacion de grupo, son todas las ubicaciones
+	// ====================================
+	// 2. Local state
+	// ====================================
+	const [isAddGroupModalOpen, setIsAddGroupModalOpen] = useState(false);
+	const [showDeleteGroupModal, setShowDeleteGroupModal] = useState(false);
+	const [groupIdToDelete, setGroupIdToDelete] = useState<number>(-99);
+	const [showReleaseModal, setShowReleaseModal] = useState(false);
+
+	const [groups, setGroups] = useState<Group[]>([]);
+	const [coordinators, setCoordinators] = useState<Instructor[]>([]);
+	const [places, setPlaces] = useState<SelectOptionDescription[]>([]); // Not always used, but left here if needed
 	const [inSiteOptions, setInSiteOptions] = useState<SelectOptionDescription[]>(
 		[]
 	);
 	const [offsiteOptions, setOffsiteOptions] = useState<
 		SelectOptionDescription[]
 	>([]);
+
+	const [isLoading, setIsLoading] = useState(true);
+	const [isCreatingGroup, setIsCreatingGroup] = useState(false);
+	const [isDeletingGroup, setIsDeletingGroup] = useState(false);
+
+	// For publishing
+	const [maxEnrollmentDate, setMaxEnrollmentDate] = useState<string | null>(
+		null
+	);
+	const [isPublished, setIsPublished] = useState<boolean>(false);
+
 	const [location, setLocation] = useState<{
 		headquarter_name: string;
 		course_name: string;
@@ -62,8 +74,10 @@ export const useAdminGroup = () => {
 		headquarter_name: '',
 		course_name: '',
 	});
-	const [showReleaseModal, setShowReleaseModal] = useState<boolean>(false);
 
+	// ====================================
+	// 3. Form setup (React Hook Form + Zod)
+	// ====================================
 	const {
 		register,
 		handleSubmit,
@@ -90,244 +104,297 @@ export const useAdminGroup = () => {
 		},
 	});
 
+	// ====================================
+	// 4. Derived States (Memoized)
+	// ====================================
+	const hasActiveGroup = useMemo(() => {
+		return groups.some((g) => g.is_active);
+	}, [groups]);
+
+	// ====================================
+	// 5. Data Fetching (initial + refresh)
+	// ====================================
+	/**
+	 * Fetches groups, sources, places, and adminSemesters concurrently
+	 * Sets states accordingly.
+	 */
+	const getInitialData = async () => {
+		setIsLoading(true);
+		try {
+			if (!programSemesterId) {
+				setIsLoading(false);
+				return;
+			}
+
+			const [groupRes, sources, placesRes, adminSemesters] = await Promise.all([
+				getCalendarGroups(programSemesterId),
+				getSources(),
+				getPlaces(import.meta.env.VITE_INSTITUTION_ID),
+				getAdminSemesters(semesterId ?? ''),
+			]);
+
+			// 1) Groups info
+			setGroups(groupRes.data);
+			setMaxEnrollmentDate(groupRes.max_enrollment_date);
+			setIsPublished(groupRes.let_enrollment);
+
+			// 2) Possibly set fallback location from adminSemesters
+			if (groupRes.data.length > 0) {
+				// If we have groups, set location from first
+				const firstGroup = groupRes.data[0];
+				setLocation({
+					headquarter_name: firstGroup.headquarter,
+					course_name: firstGroup.program_name,
+				});
+			} else {
+				// Otherwise, we try to read from adminSemesters
+				const [firstSemester] = adminSemesters ?? [];
+				if (firstSemester) {
+					const selectedCourse = firstSemester.program_semesters?.find(
+						(course) => String(course.id) === programSemesterId
+					);
+					setLocation({
+						headquarter_name: firstSemester.headquarter?.name ?? '',
+						course_name: selectedCourse?.program?.name ?? '',
+					});
+				}
+			}
+
+			// 3) Instructors
+			const allInstructors = sources.instructors || [];
+			const activeCoordinators = allInstructors.filter((c) => c.is_active);
+			setCoordinators(activeCoordinators);
+
+			// 4) Place Options
+
+			const allPlaces = placesRes.data || [];
+			const inSite = allPlaces
+				.filter((p) => p.type_id === PracticaPlaceTypeId.IN_SITE)
+				.map((p) => ({ label: p.name, value: p.id, description: p.address }));
+			const offSite = allPlaces
+				.filter((p) => p.type_id === PracticaPlaceTypeId.OFF_SITE)
+				.map((p) => ({ label: p.name, value: p.id, description: p.address }));
+			setInSiteOptions(inSite);
+			setOffsiteOptions(offSite);
+
+			const combinedOptions = [...inSite, ...offSite];
+			setPlaces(combinedOptions);
+		} catch (error) {
+			console.error(error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	/**
+	 * Refreshes the group data (and possibly sources) after any mutation
+	 */
+	const refreshGroups = async () => {
+		try {
+			const groupRes = await getCalendarGroups(programSemesterId ?? '');
+			setGroups(groupRes.data);
+			setMaxEnrollmentDate(groupRes.max_enrollment_date);
+			setIsPublished(groupRes.let_enrollment);
+			// If you need to refresh sources or places, you can do that here as well
+			// But that might not be needed after every single group mutation
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	// ====================================
+	// 6. Lifecycle: Load data on mount / changes
+	// ====================================
+	useEffect(() => {
+		getInitialData();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [programSemesterId]);
+
+	// ====================================
+	// 7. Handlers (Create / Update / Delete etc.)
+	// ====================================
+
+	// -- Open/Close modals
 	const handleOpenAddGroupModal = () => {
 		reset();
 		setIsAddGroupModalOpen(true);
 	};
-
+	const handleCloseAddGroupModal = () => {
+		setIsAddGroupModalOpen(false);
+	};
 	const handleShowDeleteGroupModal = (groupId: number) => {
 		setShowDeleteGroupModal(true);
 		setGroupIdToDelete(groupId);
 	};
-
 	const handleCloseDeleteGroupModal = () => {
 		setShowDeleteGroupModal(false);
 		setGroupIdToDelete(-99);
 	};
 
-	const handleCloseAddGroupModal = () => {
-		setIsAddGroupModalOpen(false);
-	};
-
-	const getCourseGroups = async () => {
-		try {
-			const groups = await getCalendarGroups(programSemesterId ?? '');
-			setMaxEnrollmentDate(groups?.max_enrollment_date);
-			setIsPublished(groups?.let_enrollment);
-			const hasActiveGroups =
-				groups?.data.some((group) => group.is_active) || false;
-
-			if (groups?.data.length > 0) {
-				setLocation({
-					headquarter_name: groups?.data[0]?.headquarter,
-					course_name: groups?.data[0]?.program_name,
-				});
-			} else {
-				const semesters = await getAdminSemesters(semesterId ?? '');
-				const selectedCourse = semesters[0]?.program_semesters.filter(
-					(course) => String(course.id) === programSemesterId
-				);
-
-				setLocation({
-					headquarter_name: semesters[0]?.headquarter?.name,
-					course_name: selectedCourse[0].program.name,
-				});
-			}
-
-			seHasActiveGroups(hasActiveGroups);
-			setGroups(groups.data);
-		} catch (error) {
-			console.error(error);
-			setIsLoading(false);
-		}
-	};
-
-	const getGroupSources = async () => {
-		try {
-			const sources = await getSources();
-			const places = await getPlaces(import.meta.env.VITE_INSTITUTION_ID);
-			const insitePlaces = places?.data
-				?.filter((place) => place.type_id === PracticaPlaceTypeId.IN_SITE)
-				.map((place) => ({
-					label: place.name,
-					value: place.id,
-					description: place.address,
-				}));
-			const offsitePlaces = places?.data
-				?.filter((place) => place.type_id === PracticaPlaceTypeId.OFF_SITE)
-				.map((place) => ({
-					label: place.name,
-					value: place.id,
-					description: place.address,
-				}));
-
-			const currentPlaces = sources?.places?.filter(
-				(place) =>
-					place.program_semester_id === parseInt(programSemesterId ?? '0')
-			);
-
-			const activeCoordinators = sources?.instructors?.filter(
-				(coordinator) => coordinator?.is_active
-			);
-
-			setCoordinators(activeCoordinators);
-			setPlaces(currentPlaces);
-
-			// MODAL NUEVO GRUPO
-			setInSiteOptions(insitePlaces ?? []);
-			setOffsiteOptions(offsitePlaces ?? []);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const handleUpdateGroup = async (
-		id: number,
-		field: string,
-		value: unknown,
-		level: updateGroupType
-	) => {
-		try {
-			await updateGroup(id, field, value, level);
-			// await getCourseGroups();
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const handleCreateDayInWeek = async (week_schedule_id: number) => {
-		try {
-			await createDayInWeek(week_schedule_id);
-			await getCourseGroups();
-			await getGroupSources();
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const handleDeleteDayInWeek = async (
-		week_schedule_id: number,
-		day_id: number
-	) => {
-		try {
-			await deleteDayInWeek(week_schedule_id, day_id);
-			await getCourseGroups();
-			await getGroupSources();
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const handleCreateWeek = async (group_id: number, is_insite: boolean) => {
-		try {
-			await createWeek(group_id, is_insite);
-			await getCourseGroups();
-			await getGroupSources();
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const handleDeleteWeek = async (group_id: number, week_id: number) => {
-		try {
-			await deleteWeek(group_id, week_id);
-			await getCourseGroups();
-			await getGroupSources();
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const handleDesactivateGroup = async (id: number) => {
-		const idLoading = toast.loading('Deleting group');
-		setIsDeletingGroup(true);
-		try {
-			await updateGroup(id, 'is_active', false, 'group');
-			await getCourseGroups();
-			await getGroupSources();
-			setIsDeletingGroup(false);
-			handleCloseDeleteGroupModal();
-			toast.update(idLoading, {
-				render: 'Group delete',
-				type: 'success',
-				isLoading: false,
-				autoClose: 1000,
-			});
-		} catch (error) {
-			const axiosError = error as AxiosError; // Assert the type
-			if (axiosError.response?.status === 409) {
-				toast.update(idLoading, {
-					render:
-						'This group has students assigned. Please reassign the students to another group before deleting this group.',
-					type: 'error',
-					isLoading: false,
-					autoClose: 3000,
-				});
-				console.error(error);
-				setIsDeletingGroup(false);
-				return;
-			}
-			console.error(error);
-			setIsDeletingGroup(false);
-			toast.update(idLoading, {
-				render: 'Error',
-				type: 'error',
-				isLoading: false,
-				autoClose: 1000,
-			});
-		}
-	};
-
+	// -- Create Group
 	const handleCreateGroup = async (data: GroupDetails) => {
-		const idLoading = toast.loading('Creating group...');
+		const idLoading = toast.loading('Creating group...', { autoClose: 2000 });
 		setIsCreatingGroup(true);
 		try {
-			const allData = {
-				...data,
-				program_semester_id: parseInt(programSemesterId ?? '0'),
-			};
-			await createGroup(allData);
-			await getCourseGroups();
-			await getGroupSources();
+			await createGroup(data);
 			toast.update(idLoading, {
 				render: 'Group created',
 				type: 'success',
 				isLoading: false,
 				autoClose: 1000,
 			});
-			setIsCreatingGroup(false);
+			// Refresh data
+			await refreshGroups();
+			// Close modal / reset
 			reset();
 			handleCloseAddGroupModal();
 		} catch (error) {
 			console.error(error);
 			toast.update(idLoading, {
-				render: 'Error',
+				render: 'Error creating group',
 				type: 'error',
 				isLoading: false,
 				autoClose: 1000,
 			});
+		} finally {
 			setIsCreatingGroup(false);
 		}
 	};
-
-	const onSubmit = async (data: NewGroupSchema) => {
-		const cleanData = {
+	// Form submit
+	const onSubmit = (data: NewGroupSchema) => {
+		const cleanData: GroupDetails = {
 			...data,
-			default_instructor_id: data.default_instructor_id.value,
+			default_instructor_id: data.default_instructor_id?.value,
 			default_offsite_practice_place_id:
-				data.default_offsite_practice_place_id.value,
+				data.default_offsite_practice_place_id?.value,
 			default_insite_practice_place_id:
-				data.default_insite_practice_place_id.value,
+				data.default_insite_practice_place_id?.value,
+			program_semester_id: parseInt(programSemesterId ?? '0', 10),
 		};
-
 		handleCreateGroup(cleanData);
 	};
 
+	const showToastError = () => {
+		toast.error('Error', { autoClose: 1000 });
+	};
+	// -- Update Group
+	const handleUpdateGroup = async (
+		id: number,
+		field: string,
+		value: unknown,
+		level: updateGroupType,
+		refresh?: boolean
+	) => {
+		try {
+			await updateGroup(id, field, value, level);
+
+			if (refresh) {
+				await refreshGroups();
+			}
+		} catch (error) {
+			showToastError();
+
+			console.error(error);
+		}
+	};
+
+	// -- Create a Day
+	const handleCreateDayInWeek = async (week_schedule_id: number) => {
+		try {
+			await createDayInWeek(week_schedule_id);
+			await refreshGroups();
+		} catch (error) {
+			showToastError();
+			console.error(error);
+		}
+	};
+
+	// -- Delete Day
+	const handleDeleteDayInWeek = async (
+		week_schedule_id: number,
+		day_id: number
+	) => {
+		try {
+			await deleteDayInWeek(week_schedule_id, day_id);
+
+			await refreshGroups();
+		} catch (error) {
+			showToastError();
+			console.error(error);
+		}
+	};
+
+	// -- Create Week
+	const handleCreateWeek = async (group_id: number, is_insite: boolean) => {
+		try {
+			await createWeek(group_id, is_insite);
+
+			await refreshGroups();
+		} catch (error) {
+			showToastError();
+			console.error(error);
+		}
+	};
+
+	// -- Delete Week
+	const handleDeleteWeek = async (group_id: number, week_id: number) => {
+		try {
+			await deleteWeek(group_id, week_id);
+
+			await refreshGroups();
+		} catch (error) {
+			showToastError();
+
+			console.error(error);
+		}
+	};
+
+	// -- Deactivate Group
+	const handleDesactivateGroup = async (id: number) => {
+		const idLoading = toast.loading('Deleting group...', { autoClose: 2000 });
+		setIsDeletingGroup(true);
+		try {
+			await updateGroup(id, 'is_active', false, 'group');
+			toast.update(idLoading, {
+				render: 'Group deleted',
+				type: 'success',
+				isLoading: false,
+				autoClose: 1000,
+			});
+			await refreshGroups();
+			handleCloseDeleteGroupModal();
+		} catch (error) {
+			const axiosError = error as AxiosError;
+			if (axiosError.response?.status === 409) {
+				toast.update(idLoading, {
+					render:
+						'This group has students assigned. Reassign them before deleting.',
+					type: 'error',
+					isLoading: false,
+					autoClose: 3000,
+				});
+			} else {
+				toast.update(idLoading, {
+					render: 'Error deleting group',
+					type: 'error',
+					isLoading: false,
+					autoClose: 2000,
+				});
+			}
+			console.error(error);
+		} finally {
+			setIsDeletingGroup(false);
+		}
+	};
+
+	// -- Publish Course or Update Enrollment Date
 	const handlePublishCourse = async (
 		programSemesterId: string,
 		isPublished: boolean
 	) => {
-		const idLoading = toast.loading('Publishing Course');
+		const idLoading = toast.loading('Publishing Course...', {
+			autoClose: 2000,
+		});
 		try {
 			await updateProgramSemester(programSemesterId, undefined, !isPublished);
 			toast.update(idLoading, {
@@ -337,15 +404,15 @@ export const useAdminGroup = () => {
 				autoClose: 1000,
 			});
 			setShowReleaseModal(false);
-			getCourseGroups();
+			// Refresh group data (since let_enrollment might have changed)
+			refreshGroups();
 		} catch (error) {
 			console.error(error);
-			toast.error('Error');
 			toast.update(idLoading, {
-				render: 'Error',
+				render: 'Error publishing course',
 				type: 'error',
 				isLoading: false,
-				autoClose: 1000,
+				autoClose: 2000,
 			});
 		}
 	};
@@ -355,80 +422,70 @@ export const useAdminGroup = () => {
 		enrollmentDate: string,
 		isPublished: boolean
 	) => {
-		const idLoading = toast.loading('Updating enrollment date');
 		try {
 			await updateProgramSemester(
 				programSemesterId,
 				enrollmentDate,
 				isPublished
 			);
-			toast.update(idLoading, {
-				render: 'Enrollment date updated',
-				type: 'success',
-				isLoading: false,
-				autoClose: 1000,
-			});
-			getCourseGroups();
+
+			refreshGroups();
 		} catch (error) {
 			console.error(error);
-			toast.error('Error');
-			toast.update(idLoading, {
-				render: 'Error',
-				type: 'error',
-				isLoading: false,
-				autoClose: 1000,
-			});
+			showToastError();
 		}
 	};
-	useEffect(() => {
-		setIsLoading(true);
-		getCourseGroups().then(() => setIsLoading(false));
-
-		if (programSemesterId) {
-			getGroupSources();
-		}
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [programSemesterId]);
 
 	return {
+		// UI States
 		isAddGroupModalOpen,
-		handleOpenAddGroupModal,
-		handleCloseAddGroupModal,
+		showDeleteGroupModal,
+		groupIdToDelete,
+		showReleaseModal,
+
+		// Data
 		groups,
 		coordinators,
-		places,
-		handleUpdateGroup,
+		places, // If you want to use them directly
+		inSiteOptions,
+		offsiteOptions,
+		location,
+		hasActiveGroup,
+		maxEnrollmentDate,
+		isPublished,
+
+		// Loading
+		isLoading,
+		isCreatingGroup,
+		isDeletingGroup,
+
+		// Param references
+		programSemesterId,
+		locationId,
+		semesterId,
+
+		// Handlers
+		handleOpenAddGroupModal,
+		handleCloseAddGroupModal,
+		handleShowDeleteGroupModal,
+		handleCloseDeleteGroupModal,
+		handleDesactivateGroup,
 		handleCreateDayInWeek,
 		handleDeleteDayInWeek,
 		handleCreateWeek,
 		handleDeleteWeek,
-		handleDesactivateGroup,
-		onSubmit,
+		handleUpdateGroup,
+		handlePublishCourse,
+		handleUpdateMaxEnrollmentDate,
+		setShowReleaseModal,
+
+		// Form
 		register,
 		handleSubmit,
 		setValue,
 		control,
 		errors,
-		groupIdToDelete,
-		showDeleteGroupModal,
-		handleShowDeleteGroupModal,
-		handleCloseDeleteGroupModal,
-		isLoading,
-		isCreatingGroup,
-		isDeletingGroup,
-		hasActiveGroup,
-		programSemesterId,
-		offsiteOptions,
-		inSiteOptions,
-		locationId,
-		semesterId,
-		location,
-		handlePublishCourse,
-		maxEnrollmentDate,
-		isPublished,
-		handleUpdateMaxEnrollmentDate,
-		setShowReleaseModal,
-		showReleaseModal,
+		onSubmit,
+		handleCreateGroup,
 	};
 };

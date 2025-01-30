@@ -1,4 +1,4 @@
-import { createRef, RefObject, useRef, useState, useEffect } from 'react';
+import { createRef, RefObject, useRef, useEffect } from 'react';
 import AtButton from '../../../components/AtButton';
 import { MlActionModal } from '../../../components/MlModal/MlActionModal';
 import { AdminLayout } from '../../../layouts/AdminLayout';
@@ -9,18 +9,12 @@ import {
 	SelectOptionDescription,
 } from '../../../api/types';
 import DatePicker from 'react-datepicker';
-import {
-	IoIosAddCircleOutline,
-	IoIosInformationCircleOutline,
-} from 'react-icons/io';
+import { IoIosInformationCircleOutline } from 'react-icons/io';
 import { transformDateString } from '../../../utils/transformDateString';
 import moment from 'moment';
 import { AtInputTime } from './components/AtInputTime';
 import { transformDateStringToTime } from '../../../utils/transformDateStringToTime';
-import { MdOutlineDelete } from 'react-icons/md';
-import { FaRegCalendarXmark } from 'react-icons/fa6';
 import { LuCalendarPlus } from 'react-icons/lu';
-import { AtSelectCoordinator } from './components/AtSelectCoordinator';
 import { Controller } from 'react-hook-form';
 
 import Select, {
@@ -31,13 +25,13 @@ import Select, {
 } from 'react-select';
 import { AtInputDate } from './components/AtInputDate';
 import { CgChevronRight } from 'react-icons/cg';
-import { toast } from 'react-toastify';
 import { AtLoadingWrapper } from '../../../components/AtLoadingWrapper';
 import AtInputGroup from './components/AtInputGroup';
 import { Link } from 'react-router-dom';
 import AtBreadcrumb from '../../../components/AtBreadCrumb';
 import { Tooltip } from 'react-tooltip';
 import { AtAlert } from '../../../components/AtAlert';
+import MlWeekSchedule from './components/MlWeekSchedule';
 
 const CustomOption = ({
 	data,
@@ -123,6 +117,7 @@ const AdminGroup = () => {
 		handleUpdateMaxEnrollmentDate,
 		setShowReleaseModal,
 		showReleaseModal,
+		handleCreateGroup,
 	} = useAdminGroup();
 
 	const groupNameRefs = useRef<{
@@ -152,8 +147,6 @@ const AdminGroup = () => {
 			[weekId: number]: RefObject<HTMLSelectElement>[];
 		};
 	}>({});
-
-	const [selectedDates, setSelectedDates] = useState<Record<string, Date>>({});
 
 	groups.forEach((group) => {
 		if (!groupNameRefs.current[group.group_id]) {
@@ -236,7 +229,6 @@ const AdminGroup = () => {
 				});
 			});
 		});
-		setSelectedDates(initialDates);
 	}, [groups]);
 
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -531,7 +523,6 @@ const AdminGroup = () => {
 									placeholder='Select In-site place'
 									className='w-full h-full bg-white !placeholder:text-[#807f7f] !font-normal rounded-md'
 									onChange={(selected) => {
-										console.log('selected', selected);
 										field.onChange(selected ? selected : null);
 									}}
 								/>
@@ -701,6 +692,8 @@ const AdminGroup = () => {
 												isPublished ? 'bg-black/10' : 'bg-white'
 											} p-1 placeholder:text-gray-950 font-normal rounded-md border border-gray-400 lg:text-lg`}
 											onKeyDown={(e) => e.preventDefault()}
+											showMonthDropdown
+											showYearDropdown
 										/>
 									</div>
 									<Tooltip
@@ -798,8 +791,89 @@ const AdminGroup = () => {
 											<div className='absolute z-10  top-0 right-0 left-0 bottom-0 bg-transparent'></div>
 										)}
 
-										<div className='group-header flex items-center mb-4'>
-											<div className='group-name max-w-[300px]'>
+										<div className='flex items-center justify-between pb-4'>
+											<div className='left'>
+												{' '}
+												<p className='text-xl font-medium pb-1'>
+													{' '}
+													Group Settings
+												</p>
+											</div>
+											<div className='buttons flex items-center flex-wrap'>
+												<div className='delete-group pl-12'>
+													{!isPublished && (
+														<AtButton
+															variant='danger'
+															onClick={() =>
+																handleShowDeleteGroupModal(group.group_id)
+															}
+														>
+															Delete group
+														</AtButton>
+													)}
+												</div>
+
+												<AtButton
+													data-tooltip-id={`tooltip-make-variant-${group.group_id}`}
+													variant='primary'
+													className='ml-4'
+													onClick={() => {
+														const insitePlaces = group.weeks.filter(
+															(week) =>
+																week.week_schedule.practice_place.type.name ===
+																PracticaPlaceTypeName.IN_SITE
+														);
+														const offsitePlaces = group.weeks.filter(
+															(week) =>
+																week.week_schedule.practice_place.type.name ===
+																PracticaPlaceTypeName.OFF_SITE
+														);
+
+														const payload = {
+															group_name: group.group_name + '-Variant',
+															start_date: group.start_date,
+															end_date: group.end_date,
+															default_end_time:
+																group.weeks[0].week_schedule.start_time,
+															default_start_time:
+																group.weeks[0].week_schedule.start_time,
+															max_students: group.max_students,
+															default_instructor_id:
+																group.weeks[0].week_schedule.dates[0].instructor
+																	.id,
+															verity_group_id: group.verity_group_id,
+															in_days: group.in_days,
+															offsite_num_weeks_for_generate:
+																offsitePlaces?.length ?? 1,
+															default_insite_practice_place_id:
+																insitePlaces[0].week_schedule.practice_place.id,
+															default_offsite_practice_place_id:
+																offsitePlaces[0].week_schedule.practice_place
+																	.id,
+															insite_num_weeks_for_generate:
+																insitePlaces?.length ?? 1,
+															program_semester_id: parseInt(
+																programSemesterId ?? '0'
+															),
+														};
+
+														if (programSemesterId) {
+															handleCreateGroup(payload);
+														}
+													}}
+													tooltipId='tooltip-make-variant'
+													tooltipContent='Create a similar group, but with potential differences.'
+												>
+													Make a variant
+												</AtButton>
+											</div>
+										</div>
+
+										<hr />
+
+										<div className='group-header flex items-center mb-4 mt-4 gap-x-4'>
+											<div className='group-name max-w-[400px]'>
+												<div className='font-medium'>Group name: </div>{' '}
 												<AtInputGroup
 													type='text'
 													placeholder='Group Name'
@@ -811,20 +885,18 @@ const AdminGroup = () => {
 															group.group_id,
 															'name',
 															value,
-															'group'
+															'group',
+															false
 														)
 													}
-													toastMessages={{
-														success: 'Group name updated',
-														error: 'Error',
-														pending: 'Updating group name',
-													}}
 												/>
 											</div>
 
 											<div className='max-students flex items-center pl-4'>
-												<div className='w-[8rem]'> Max Students</div>
 												<div>
+													<div className='w-[8rem] font-medium'>
+														Max Students
+													</div>
 													<AtInputGroup
 														type='text'
 														placeholder='Ex: 10'
@@ -836,31 +908,107 @@ const AdminGroup = () => {
 																group.group_id,
 																'max_students',
 																value,
-																'group'
+																'group',
+																false
 															)
 														}
-														toastMessages={{
-															success: 'Max students updated',
-															error: 'Error',
-															pending: 'Updating max students',
-														}}
 													/>
 												</div>
 											</div>
 
-											<div className='delete-group pl-12'>
-												{!isPublished && (
-													<AtButton
-														variant='danger'
-														onClick={() =>
-															handleShowDeleteGroupModal(group.group_id)
+											<div className='group-name max-w-[300px]'>
+												<div className='font-medium'>Verity ID: </div>{' '}
+												<AtInputGroup
+													type='text'
+													placeholder='Verity ID'
+													className='w-full h-full bg-white p-3 py-2 placeholder:text-gray-400 font-normal rounded-md border border-gray-400'
+													defaultValue={group.verity_group_id}
+													ref={inputRef}
+													onUpdate={(value) =>
+														handleUpdateGroup(
+															group.group_id,
+															'verity_group_id',
+															value,
+															'group',
+															false
+														)
+													}
+												/>
+											</div>
+
+											<div className='flex items-center'>
+												<div>
+													<div className='font-medium'>Group start date: </div>{' '}
+													<DatePicker
+														dateFormat={'MM-dd-yyyy'}
+														placeholderText='Group Start date'
+														wrapperClassName='w-full'
+														value={
+															group?.start_date
+																? transformDateString(
+																		group.start_date,
+																		'MM/DD/YYYY'
+																  )
+																: undefined
 														}
-													>
-														Delete group
-													</AtButton>
-												)}
+														onChange={(date) => {
+															if (date && programSemesterId) {
+																const dateString = date?.toISOString();
+
+																handleUpdateGroup(
+																	group.group_id,
+																	'start_date',
+																	transformDateString(dateString, 'YYYY-MM-DD'),
+																	'group',
+																	true
+																);
+															}
+														}}
+														className={`w-full h-full  p-1 placeholder:text-gray-950 font-normal rounded-md border border-gray-400 lg:text-lg`}
+														onKeyDown={(e) => e.preventDefault()}
+														showMonthDropdown
+														showYearDropdown
+													/>
+												</div>
+											</div>
+
+											<div className='flex items-center'>
+												<div>
+													<div className='font-medium'>Group end date: </div>{' '}
+													<DatePicker
+														dateFormat={'MM-dd-yyyy'}
+														placeholderText='Group End date'
+														wrapperClassName='w-full'
+														value={
+															group?.end_date
+																? transformDateString(
+																		group.end_date,
+																		'MM/DD/YYYY'
+																  )
+																: undefined
+														}
+														onChange={(date) => {
+															if (date && programSemesterId) {
+																const dateString = date?.toISOString();
+
+																handleUpdateGroup(
+																	group.group_id,
+																	'end_date',
+																	transformDateString(dateString, 'YYYY-MM-DD'),
+																	'group',
+																	true
+																);
+															}
+														}}
+														showMonthDropdown
+														showYearDropdown
+														className={`w-full h-full  p-1 placeholder:text-gray-950 font-normal rounded-md border border-gray-400 lg:text-lg`}
+														onKeyDown={(e) => e.preventDefault()}
+													/>
+												</div>
 											</div>
 										</div>
+
 										<div className='group-section flex flex-col gap-y-8 xl:flex-row xl:gap-x-8 pb-8 '>
 											{my_group.map((currentGroup) => {
 												const placeData = currentGroup;
@@ -905,13 +1053,13 @@ const AdminGroup = () => {
 																									.week_schedule_id
 																						);
 
-																					const shiftStartTimeLoading =
-																						toast.loading('Creating group...');
-																					toast.update(shiftStartTimeLoading, {
-																						render: 'Updating shift start time',
-																						type: 'info',
-																						isLoading: false,
-																					});
+																					// const shiftStartTimeLoading =
+																					// 	toast.loading('Creating group...');
+																					// toast.update(shiftStartTimeLoading, {
+																					// 	render: 'Updating shift start time',
+																					// 	type: 'info',
+																					// 	isLoading: false,
+																					// });
 
 																					try {
 																						await Promise.all(
@@ -923,32 +1071,22 @@ const AdminGroup = () => {
 																										transformDateStringToTime(
 																											e
 																										),
-																										'week_schedule'
+																										'week_schedule',
+																										false
 																									)
 																							)
 																						);
-
-																						toast.update(
-																							shiftStartTimeLoading,
-																							{
-																								render:
-																									'Shift start time updated',
-																								type: 'success',
-																								isLoading: false,
-																								autoClose: 500,
-																							}
-																						);
 																					} catch (error) {
 																						console.error(error);
-																						toast.update(
-																							shiftStartTimeLoading,
-																							{
-																								render: 'Error',
-																								type: 'error',
-																								isLoading: false,
-																								autoClose: 500,
-																							}
-																						);
+																						// toast.update(
+																						// 	shiftStartTimeLoading,
+																						// 	{
+																						// 		render: 'Error',
+																						// 		type: 'error',
+																						// 		isLoading: false,
+																						// 		autoClose: 500,
+																						// 	}
+																						// );
 																					}
 																				}}
 																			/>
@@ -969,13 +1107,18 @@ const AdminGroup = () => {
 																								week.week_schedule
 																									.week_schedule_id
 																						);
-																					const shiftEndTimeLoading =
-																						toast.loading('Creating group...');
-																					toast.update(shiftEndTimeLoading, {
-																						render: 'Updating shift end time',
-																						type: 'info',
-																						isLoading: false,
-																					});
+
+																					console.log(
+																						'Esot que es',
+																						weeksScheduleIds
+																					);
+																					// const shiftEndTimeLoading =
+																					// 	toast.loading('Creating group...');
+																					// toast.update(shiftEndTimeLoading, {
+																					// 	render: 'Updating shift end time',
+																					// 	type: 'info',
+																					// 	isLoading: false,
+																					// });
 																					try {
 																						await Promise.all(
 																							weeksScheduleIds.map(
@@ -991,20 +1134,20 @@ const AdminGroup = () => {
 																							)
 																						);
 
-																						toast.update(shiftEndTimeLoading, {
-																							render: 'Shift end time updated',
-																							type: 'success',
-																							isLoading: false,
-																							autoClose: 500,
-																						});
+																						// toast.update(shiftEndTimeLoading, {
+																						// 	render: 'Shift end time updated',
+																						// 	type: 'success',
+																						// 	isLoading: false,
+																						// 	autoClose: 500,
+																						// });
 																					} catch (error) {
 																						console.error(error);
-																						toast.update(shiftEndTimeLoading, {
-																							render: 'Error',
-																							type: 'error',
-																							isLoading: false,
-																							autoClose: 500,
-																						});
+																						// toast.update(shiftEndTimeLoading, {
+																						// 	render: 'Error',
+																						// 	type: 'error',
+																						// 	isLoading: false,
+																						// 	autoClose: 500,
+																						// });
 																					}
 																				}}
 																			/>
@@ -1075,230 +1218,22 @@ const AdminGroup = () => {
 																<div className='group-weeks mt-10 flex flex-col gap-y-6 relative px-4 lg:px-8'>
 																	{placeData.weeks.map((week) => {
 																		return (
-																			<div
+																			<MlWeekSchedule
+																				placeData={placeData}
 																				key={week.week_id}
-																				className='week-card border border-black rounded-md flex relative'
-																			>
-																				{!isPublished && (
-																					<>
-																						{placeData.weeks.length > 1 && (
-																							<AtButton
-																								tooltipId={`${Math.random()}_delete_week`}
-																								tooltipContent='Delete week'
-																								variant='no-style'
-																								className='delete-week text-3xl absolute top-[-0.8rem] left-[-0.5rem] text-red_primary bg-white flex items-center justify-center rounded-full '
-																								onClick={() =>
-																									toast.promise(
-																										handleDeleteWeek(
-																											group.group_id,
-																											week.week_id
-																										),
-																										{
-																											success: 'Week deleted',
-																											error:
-																												'Error deleting week',
-																											pending: 'Deleting week',
-																										},
-																										{
-																											autoClose: 500,
-																										}
-																									)
-																								}
-																							>
-																								<FaRegCalendarXmark />
-																							</AtButton>
-																						)}
-																					</>
-																				)}
-
-																				<div className='week-number flex-col flex justify-center items-center w-[100px] border-r border-black p-2 lg:text-lg'>
-																					Week
-																					<input
-																						type='number'
-																						min={0}
-																						defaultValue={week.week_number}
-																						placeholder='Week'
-																						onBlur={(e) => {
-																							toast.promise(
-																								handleUpdateGroup(
-																									week.week_id,
-																									'week_number',
-																									e.target.value,
-																									'week'
-																								),
-																								{
-																									success:
-																										'Week number updated',
-																									error: 'Error ',
-																									pending:
-																										'Updating week number',
-																								},
-																								{
-																									autoClose: 500,
-																								}
-																							);
-																						}}
-																						className=' w-full flex  h-[30px] bg-white px-1 placeholder:text-gray-400 font-normal rounded-md border border-gray-400'
-																					/>
-																				</div>
-																				<div className='week-rows p-2 w-full gap-y-2 flex flex-col lg:p-5'>
-																					{week.week_schedule.dates.map(
-																						(datePlace, dateIndex) => {
-																							const dateKey = `${group.group_id}-${week.week_id}-${dateIndex}`;
-																							const currentSelectedDate =
-																								selectedDates[dateKey];
-
-																							return (
-																								<div
-																									key={dateIndex}
-																									className='week-row flex items-center px-2 gap-x-4'
-																								>
-																									<div className='w-1/2'>
-																										<DatePicker
-																											placeholderText='Date'
-																											wrapperClassName='w-full'
-																											className='w-full h-full bg-white p-1 placeholder:text-gray-950 font-normal rounded-md border border-gray-400 lg:text-lg'
-																											selected={
-																												currentSelectedDate
-																											}
-																											onKeyDown={(e) =>
-																												e.preventDefault()
-																											}
-																											onChange={(
-																												selectedDate
-																											) => {
-																												if (!selectedDate)
-																													return;
-
-																												toast.promise(
-																													handleUpdateGroup(
-																														datePlace.day_id,
-																														'date',
-																														transformDateString(
-																															selectedDate.toISOString(),
-																															'YYYY-MM-DD'
-																														),
-																														'day'
-																													),
-																													{
-																														success:
-																															'Date updated',
-																														error: 'Error',
-																														pending:
-																															'Updating date',
-																													},
-																													{
-																														autoClose: 500,
-																													}
-																												);
-																												setSelectedDates(
-																													(prev) => {
-																														return {
-																															...prev,
-																															[dateKey]:
-																																selectedDate,
-																														};
-																													}
-																												);
-																											}}
-																										/>
-																									</div>
-																									<div className='w-1/2 flex items-center'>
-																										<AtSelectCoordinator
-																											coordinators={
-																												coordinators
-																											}
-																											defaultValue={datePlace.instructor.id.toString()}
-																											onChangeSelect={(e) => {
-																												toast.promise(
-																													handleUpdateGroup(
-																														datePlace.day_id,
-																														'instructor_id',
-																														e,
-																														'day'
-																													),
-																													{
-																														success:
-																															'Coordinator updated',
-																														error: 'Error',
-																														pending:
-																															'Updating coordinator',
-																													},
-																													{
-																														autoClose: 500,
-																													}
-																												);
-																											}}
-																										/>
-																										{!isPublished && (
-																											<AtButton
-																												variant='no-style'
-																												className='text-3xl !pl-4'
-																												onClick={() =>
-																													toast.promise(
-																														handleDeleteDayInWeek(
-																															week.week_schedule
-																																.week_schedule_id,
-																															datePlace.day_id
-																														),
-																														{
-																															success:
-																																'Day deleted',
-																															error:
-																																'Error deleting day',
-																															pending:
-																																'Deleting day',
-																														},
-																														{
-																															autoClose: 500,
-																														}
-																													)
-																												}
-																												tooltipId={`${Math.random()}_delete_day`}
-																												tooltipContent={`Delete day`}
-																											>
-																												<MdOutlineDelete className='text-red_primary' />
-																											</AtButton>
-																										)}
-																									</div>
-																								</div>
-																							);
-																						}
-																					)}
-																					<div className=' text-primary flex justify-center pt-2'>
-																						{!isPublished && (
-																							<AtButton
-																								variant='no-style'
-																								onClick={() =>
-																									toast.promise(
-																										handleCreateDayInWeek(
-																											week.week_schedule
-																												.week_schedule_id
-																										),
-																										{
-																											success: 'Day created',
-																											error:
-																												'Error creating day',
-																											pending: 'Creating day',
-																										},
-																										{
-																											autoClose: 500,
-																										}
-																									)
-																								}
-																								tooltipId={`${Math.random()}_add_day`}
-																								className='flex items-center !text-sm'
-																								tooltipContent='Add new day to the week'
-																							>
-																								Add day
-																								<span className='text-2xl pl-2'>
-																									<IoIosAddCircleOutline />
-																								</span>
-																							</AtButton>
-																						)}
-																					</div>
-																				</div>
-																			</div>
+																				week={week}
+																				group={group}
+																				coordinators={coordinators}
+																				isPublished={isPublished}
+																				handleDeleteWeek={handleDeleteWeek}
+																				handleUpdateGroup={handleUpdateGroup}
+																				handleDeleteDayInWeek={
+																					handleDeleteDayInWeek
+																				}
+																				handleCreateDayInWeek={
+																					handleCreateDayInWeek
+																				}
+																			/>
 																		);
 																	})}
 																</div>
@@ -1308,21 +1243,11 @@ const AdminGroup = () => {
 																			variant='primary'
 																			className='text-sm flex items-center'
 																			onClick={() =>
-																				toast.promise(
-																					handleCreateWeek(
-																						group.group_id,
-																						placeData.type === 'in-site'
-																							? true
-																							: false
-																					),
-																					{
-																						success: 'Week created',
-																						error: 'Error creating week',
-																						pending: 'Creating week',
-																					},
-																					{
-																						autoClose: 500,
-																					}
+																				handleCreateWeek(
+																					group.group_id,
+																					placeData.type === 'in-site'
+																						? true
+																						: false
 																				)
 																			}
 																		>

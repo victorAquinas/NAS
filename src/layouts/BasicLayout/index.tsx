@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import AtButton from '../../components/AtButton';
 import { Link } from 'react-router-dom';
 import { useAdminLayout } from '../AdminLayout/useAppLayout';
+import { RiComputerLine } from 'react-icons/ri';
 
 interface BasicLayoutProps {
 	children: ReactNode;
@@ -13,14 +14,31 @@ export const BasicLayout = ({ children, className }: BasicLayoutProps) => {
 	const { handleLogOut } = useAdminLayout();
 	return (
 		<>
-			<div className=' bg-background flex items-center justify-center h-[70px] pt-4'>
+			<div className='md:hidden bg-primary h-full min-h-screen overflow-hidden flex items-center justify-center flex-col'>
+				<div className='text-center mt-4 text-[5rem] text-white'>
+					<RiComputerLine />
+				</div>
+				<div className='p-4 text-lg md:text-4xl text-white text-center'>
+					This content can only be accessed from a tablet device or higher.
+				</div>
+				<div className=' text-lg md:text-4xl text-white text-center'>
+					If you're using a tablet, please rotate your device to landscape mode
+					for optimal viewing.
+				</div>
+			</div>
+
+			<div className=' bg-background flex items-center justify-between h-[70px] pt-4'>
 				<div className='container px-4'>
 					<Link to={'/semesters'}>
 						<img src={NasLogo} alt='logo' className='object-contain' />
 					</Link>
 				</div>
 				<div className='buttons'>
-					<AtButton variant='secondary' onClick={handleLogOut}>
+					<AtButton
+						variant='secondary'
+						onClick={handleLogOut}
+						className='!w-max mr-4'
+					>
 						Log out
 					</AtButton>
 				</div>

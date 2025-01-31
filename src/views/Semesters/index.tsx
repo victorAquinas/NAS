@@ -16,7 +16,7 @@ export const Semesters = () => {
 					</p>
 				</div>
 				<div className='list flex justify-between mt-6 gap-6 max-w-[43rem]'>
-					{renderSemesterList(false, 'Closed')}
+					{renderSemesterList(false, 'Finished')}
 					{renderSemesterList(true, 'Active')}
 				</div>
 			</div>

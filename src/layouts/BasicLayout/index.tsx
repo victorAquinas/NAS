@@ -1,17 +1,28 @@
 import NasLogo from '../../assets/nas-logo.svg';
 import PoweredByAquinas from '../../assets/powered_aquinas.svg';
 import { ReactNode } from 'react';
+import AtButton from '../../components/AtButton';
+import { Link } from 'react-router-dom';
+import { useAdminLayout } from '../AdminLayout/useAppLayout';
 
 interface BasicLayoutProps {
 	children: ReactNode;
 	className?: string;
 }
 export const BasicLayout = ({ children, className }: BasicLayoutProps) => {
+	const { handleLogOut } = useAdminLayout();
 	return (
 		<>
-			<div className=' bg-background flex flex-col items-center justify-center h-[70px]'>
+			<div className=' bg-background flex items-center justify-center h-[70px] pt-4'>
 				<div className='container px-4'>
-					<img src={NasLogo} alt='logo' className='object-contain' />
+					<Link to={'/semesters'}>
+						<img src={NasLogo} alt='logo' className='object-contain' />
+					</Link>
+				</div>
+				<div className='buttons'>
+					<AtButton variant='secondary' onClick={handleLogOut}>
+						Log out
+					</AtButton>
 				</div>
 			</div>
 			<div

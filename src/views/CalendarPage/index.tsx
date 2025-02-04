@@ -257,6 +257,11 @@ const CalendarPage = () => {
 									))}
 								</tbody>
 							</table>
+							{opportunities.length === 0 && (
+								<div className='border w-full border-gray-200 text-center p-4 font-medium'>
+									No opportunities available.
+								</div>
+							)}
 						</div>
 						{canShowStatus(userStatus as UserStatus, [UserStatus.PENDING]) && (
 							<div className='p-2'>

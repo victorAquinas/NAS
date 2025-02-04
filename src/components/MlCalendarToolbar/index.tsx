@@ -1,4 +1,5 @@
-import { ToolbarProps, View } from 'react-big-calendar';
+import { ToolbarProps } from 'react-big-calendar';
+// View
 import { CalendarEvent } from '../../views/CalendarPage/types';
 import { LuCalendarDays } from 'react-icons/lu';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
@@ -10,7 +11,7 @@ export const MlCalendarToolbar: React.FC<
 	const goToNext = () => props.onNavigate('NEXT');
 	const goToToday = () => props.onNavigate('TODAY');
 
-	const setView = (view: View) => props.onView(view);
+	// const setView = (view: View) => props.onView(view);
 
 	return (
 		<div className='custom-toolbar flex flex-wrap items-center justify-between gap-4 pb-4'>
@@ -45,22 +46,22 @@ export const MlCalendarToolbar: React.FC<
 			</div>
 
 			<div className='view-switcher flex items-center gap-2'>
-				<button
+				{/* <button
 					className={`toolbar-button rounded-md flex items-center p-3 bg-gray-100 ${
 						props.view === 'month' ? 'bg-secondary text-white' : 'bg-gray-100'
 					}`}
 					onClick={() => setView('month')}
 				>
 					Month
-				</button>
-				<button
+				</button> */}
+				{/* <button
 					className={`toolbar-button rounded-md flex items-center p-3  ${
 						props.view === 'agenda' ? 'bg-secondary text-white' : 'bg-gray-100'
 					}`}
 					onClick={() => setView('agenda')}
 				>
 					Agenda
-				</button>
+				</button> */}
 			</div>
 		</div>
 	);

@@ -43,7 +43,7 @@ export const useAdminGroupLocations = () => {
 		setIsLoading(true);
 		try {
 			const places = await getPlaces(import.meta.env.VITE_INSTITUTION_ID);
-			console.log('Places', places);
+
 			setPlaces(places?.data);
 			setIsLoading(false);
 		} catch (error) {
@@ -158,8 +158,6 @@ export const useAdminGroupLocations = () => {
 	const onSubmit = (data: FormValidationSchema) => {
 		const { name, address, type } = data;
 
-		console.log('Selected Plcae', selectedPlace);
-		console.log('Modal Type', modalType);
 		if (modalType === 'new') {
 			return handleCreateNewPlace(name, address, type);
 		}
@@ -167,7 +165,6 @@ export const useAdminGroupLocations = () => {
 		if (selectedPlace) {
 			return handleUpdatePlace(selectedPlace?.id, name, type, address);
 		}
-		console.log('Data', data);
 	};
 
 	useEffect(() => {

@@ -80,7 +80,6 @@ export const useAdminSemesters = () => {
 		try {
 			await completeSemester(semesterId);
 
-			console.log('Completed Semster', completeSemester);
 			if (locationId) {
 				getSemesters(locationId);
 			}

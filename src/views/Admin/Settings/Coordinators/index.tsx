@@ -27,14 +27,14 @@ const AdminCoordinatorSettings = () => {
 		handleChangeStatus,
 		isLoading,
 	} = useAdminCoordinators();
-	console.log('Meta', import.meta.env.DATAVISION_API);
+
 	return (
 		<AdminLayout>
 			<AtLoadingWrapper isLoading={isLoading} />
 			<MlActionModal
 				isOpen={isModalOpen}
 				variant='transparent'
-				title={`${modalType === 'new' ? 'Add' : 'Edit'} coordinator`}
+				title={`${modalType === 'new' ? 'Add' : 'Edit'} instructor`}
 				styles={{
 					height: '550px',
 					display: 'flex',
@@ -84,24 +84,24 @@ const AdminCoordinatorSettings = () => {
 							Cancel
 						</AtButton>
 						<AtButton variant='primary' type='submit'>
-							{modalType === 'new' ? 'Add' : 'Edit'} Coordinator
+							{modalType === 'new' ? 'Add' : 'Edit'} Instructor
 						</AtButton>
 					</div>
 				</form>
 			</MlActionModal>
 
 			<div className='flex justify-between'>
-				<h2 className='text-xl font-medium pt-4'>Settings - Coordinators</h2>
+				<h2 className='text-xl font-medium pt-4'>Settings - Instructors</h2>
 
 				<div className='flex justify-end '>
 					<AtButton variant='secondary' onClick={() => handleOpenModal('new')}>
-						Add Coordinator
+						Add Instructor
 					</AtButton>
 				</div>
 			</div>
 
 			<ul className='sub-menu flex items-center w-full gap-x-4 mt-6 border-b border-gray-300'>
-				<li className='border-b border-b-primary text-primary'>Coordinators</li>
+				<li className='border-b border-b-primary text-primary'>Instructors</li>
 
 				<Link to={`/admin/settings/group-location`}>
 					<li>In-site/Off-site</li>

@@ -436,6 +436,17 @@ export const useAdminGroup = () => {
 		}
 	};
 
+	const getAvailableGroupLocations = (
+		locations: SelectOptionDescription[],
+		selectedLocation: number
+	) => {
+		const availableLocations = locations.filter(
+			(location) => location.value !== selectedLocation
+		);
+
+		return availableLocations;
+	};
+
 	return {
 		// UI States
 		isAddGroupModalOpen,
@@ -487,5 +498,6 @@ export const useAdminGroup = () => {
 		errors,
 		onSubmit,
 		handleCreateGroup,
+		getAvailableGroupLocations,
 	};
 };

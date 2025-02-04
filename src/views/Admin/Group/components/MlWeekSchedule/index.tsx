@@ -51,7 +51,6 @@ const MlWeekSchedule: React.FC<MlWeekScheduleProps> = ({
 	handleCreateDayInWeek,
 	placeData,
 }) => {
-	// console.log(group);
 	return (
 		<div
 			key={week.week_id}

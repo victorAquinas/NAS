@@ -15,7 +15,7 @@ export const AtSelectCoordinator = ({
 
 	const handleOnChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		setSelectedValue(e.target.value);
-		console.log('SelectedValue', e.target.value);
+
 		if (onChangeSelect) onChangeSelect(e.target.value);
 	};
 	useEffect(() => {

@@ -116,7 +116,10 @@ export const useCalendarPage = () => {
 				setHasGroups(false);
 			}
 
-			const transformedCalendarEvents = transformAndFillAddresses(groups.data);
+			const transformedCalendarEvents = transformAndFillAddresses(
+				groups.data,
+				userStatus ?? UserStatus.OPEN
+			);
 			const breadCrumb = [
 				{
 					label: groups.data[0].headquarter,
@@ -141,7 +144,10 @@ export const useCalendarPage = () => {
 	const getCalendarGroupByIdEvents = async (group_id: string) => {
 		try {
 			const group = await getCalendarGroupById(group_id);
-			const transformedCalendarEvents = transformAndFillAddresses([group.data]);
+			const transformedCalendarEvents = transformAndFillAddresses(
+				[group.data],
+				userStatus ?? UserStatus.OPEN
+			);
 
 			const breadCrumb = [
 				{
@@ -184,9 +190,10 @@ export const useCalendarPage = () => {
 					{ label: group.data.group_name },
 				];
 				setBreadCrumb(breadCrumb);
-				const transformedCalendarEvents = transformAndFillAddresses([
-					group.data,
-				]);
+				const transformedCalendarEvents = transformAndFillAddresses(
+					[group.data],
+					userStatus ?? UserStatus.OPEN
+				);
 
 				setEvents(transformedCalendarEvents);
 				setEventsCopy(transformedCalendarEvents);

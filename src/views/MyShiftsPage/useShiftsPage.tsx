@@ -46,9 +46,10 @@ export const useShiftsPage = () => {
 					student_id,
 					programSemesterId
 				);
-				const transformedCalendarEvents = transformAndFillAddresses([
-					group.data,
-				]);
+				const transformedCalendarEvents = transformAndFillAddresses(
+					[group.data],
+					userStatus ?? UserStatus.OPEN
+				);
 
 				const sortedEventsByDate = transformedCalendarEvents.sort((a, b) => {
 					return (

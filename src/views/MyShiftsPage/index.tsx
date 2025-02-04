@@ -11,6 +11,7 @@ import { AtLoadingWrapper } from '../../components/AtLoadingWrapper';
 import { Link } from 'react-router-dom';
 import { GENERAL_TEXT, MODAL_TEXT } from '../../constants/text';
 import { AtAlert } from '../../components/AtAlert';
+import AtBreadcrumb from '../../components/AtBreadCrumb';
 
 const MyShiftsPage = () => {
 	const {
@@ -21,6 +22,7 @@ const MyShiftsPage = () => {
 		navigate,
 		selectedCourse,
 		isSemesterOpen,
+		breadCrumb,
 	} = useShiftsPage();
 
 	return (
@@ -79,6 +81,12 @@ const MyShiftsPage = () => {
 						of each shift to stay informed and easily manage your upcoming
 						practices.
 					</p>
+
+					{breadCrumb && (
+						<div className='mt-4'>
+							<AtBreadcrumb items={breadCrumb} />
+						</div>
+					)}
 
 					<div className='active-shift bg-white rounded-md mt-6 shadow-md pb-4'>
 						<div className='p-4 font-medium'>Active Shifts</div>

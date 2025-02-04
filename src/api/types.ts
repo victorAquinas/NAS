@@ -46,6 +46,7 @@ export interface Group {
 	verity_group_id: string;
 	in_days: string[];
 	weeks: Week[];
+	semester_name: string;
 }
 
 export interface Week {

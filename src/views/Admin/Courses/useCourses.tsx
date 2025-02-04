@@ -66,8 +66,6 @@ export const useCourses = () => {
 				(program) => program.program_semester_status
 			);
 
-			console.log('Acive', activeCourses);
-
 			if (currentSemester) {
 				setCourses(activeCourses);
 			}

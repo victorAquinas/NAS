@@ -7,6 +7,7 @@ import {
 import { AdminHeadquarter } from '../../../api/types';
 import { toast } from 'react-toastify';
 import { ErrorMessages } from '../../../constants/text';
+import { AxiosError } from 'axios';
 
 export const useLocations = () => {
 	const [isAddLocationModalOpen, setIsAddLocationModalOpen] =
@@ -20,6 +21,7 @@ export const useLocations = () => {
 
 	const handleOpenAddLocationModal = () => {
 		setIsAddLocationModalOpen(true);
+		setLocationName('');
 	};
 
 	const handleCloseAddLocationModal = () => {
@@ -35,6 +37,12 @@ export const useLocations = () => {
 			setLocations(activeLocations);
 			return req;
 		} catch (error) {
+			const axiosError = error as AxiosError;
+
+			if (axiosError.status === 404) {
+				return;
+			}
+
 			console.error(error);
 			setLocations([]);
 			toast.error(ErrorMessages.GENERAL_ERROR);

@@ -89,9 +89,19 @@ const AdminLocations = () => {
 				</div>
 			</div>
 
-			<div className='location-list pt-6 flex flex-wrap gap-8 w-full justify-center lg:justify-start'>
+			<div
+				className={`location-list pt-6 flex flex-wrap gap-8 w-full  ${
+					locations.length === 0 ? 'lg:justify-center' : 'lg:justify-start'
+				}`}
+			>
 				{locations.length === 0 && (
-					<div className='font-medium text-lg'>No Locations Found</div>
+					<div className='flex flex-col items-center mt-16 justify-center'>
+						<div className='font-medium text-lg'>No Locations Found</div>
+						<p className=' mb-4'>Please, start adding a new location</p>
+						<AtButton variant='secondary' onClick={handleOpenAddLocationModal}>
+							Add Location
+						</AtButton>
+					</div>
 				)}
 
 				{locations.length > 0 &&

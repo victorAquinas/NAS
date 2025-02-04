@@ -75,7 +75,6 @@ export const useAdminCoordinators = () => {
 	) => {
 		const idLoading = toast.loading('Creating coordinator');
 		try {
-			console.log('Password', getEmailName(email));
 			const newCoordinator = await createUser(
 				name,
 				email,
@@ -92,7 +91,7 @@ export const useAdminCoordinators = () => {
 			});
 			await handleGetCoordinators(initialFilters);
 			handleCloseModal();
-			console.log('New Coordinator', newCoordinator);
+			console.log(newCoordinator);
 		} catch (error) {
 			const axiosError = error as AxiosError;
 
@@ -123,7 +122,7 @@ export const useAdminCoordinators = () => {
 		const idLoading = toast.loading('Editing coordinator');
 		try {
 			const updatedUser = await updateUser(user_id, name, email, phone);
-			console.log('Updated User', updatedUser);
+			console.log(updatedUser);
 			toast.update(idLoading, {
 				render: 'Coordinator edited',
 				type: 'success',

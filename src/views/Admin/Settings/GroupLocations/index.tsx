@@ -127,7 +127,7 @@ const AdminGroupLocations = () => {
 
 			<ul className='sub-menu flex items-center w-full gap-x-4 mt-6 border-b border-gray-300'>
 				<Link to={`/admin/settings`}>
-					<li>Coordinators</li>
+					<li>Instructors</li>
 				</Link>
 
 				<li className='border-b border-b-primary text-primary'>

@@ -395,7 +395,7 @@ const AdminStudents = () => {
 						<ul className='w-full'>
 							<li className='flex justify-between'>
 								<div>Moving student: </div>
-								<div className='font-medium'>Victor Escalona</div>
+								<div className='font-medium'>{selectedUser.name}</div>
 							</li>
 							<li className='flex justify-between'>
 								<div>To group:</div>

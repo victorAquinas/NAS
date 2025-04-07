@@ -119,7 +119,6 @@ export const useAdminStudents = () => {
 				filters || initialFilters
 			);
 			setStudents(students);
-			console.log(students);
 		} catch (error) {
 			console.error(error);
 		}
@@ -162,7 +161,6 @@ export const useAdminStudents = () => {
 				isLoading: false,
 				autoClose: 500,
 			});
-			console.log('Llegue aqui');
 		} catch (error) {
 			console.error(error);
 			toast.update(idLoading, {
@@ -189,7 +187,6 @@ export const useAdminStudents = () => {
 				isLoading: false,
 				autoClose: 500,
 			});
-			console.log('Llegue aqui');
 		} catch (error) {
 			console.error(error);
 			toast.update(idLoading, {
@@ -312,8 +309,6 @@ export const useAdminStudents = () => {
 				updateMoveWeekOptions({
 					semesters: allSemesters,
 				});
-				console.log('Semesters', allSemesters);
-				console.log('location', location);
 			}
 		} catch (error) {
 			console.error(error);

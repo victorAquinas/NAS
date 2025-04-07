@@ -49,6 +49,7 @@ export const useCalendarPage = () => {
 		const storedValue = localStorage.getItem('hasSeenTutorial');
 		return storedValue === 'true';
 	});
+	const [breadCrumb, setBreadCrumb] = useState<{ label: string }[]>();
 	const { programSemesterId } = useParams();
 	const navigate = useNavigate();
 
@@ -80,7 +81,6 @@ export const useCalendarPage = () => {
 	const handleShowEventDetailModal = (event: CalendarEvent) => {
 		setShowEventDetailModal(true);
 		setEventDetail(event);
-		console.log('Event', event);
 	};
 
 	const handleCloseEventDetailModal = () => {
@@ -116,7 +116,20 @@ export const useCalendarPage = () => {
 				setHasGroups(false);
 			}
 
-			const transformedCalendarEvents = transformAndFillAddresses(groups.data);
+			const transformedCalendarEvents = transformAndFillAddresses(
+				groups.data,
+				userStatus ?? UserStatus.OPEN
+			);
+			const breadCrumb = [
+				{
+					label: groups.data[0].headquarter,
+				},
+				{
+					label: groups.data[0].semester_name,
+				},
+				{ label: groups.data[0].program_name },
+			];
+			setBreadCrumb(breadCrumb);
 			setEvents(transformedCalendarEvents);
 			setEventsCopy(transformedCalendarEvents);
 			return transformedCalendarEvents;
@@ -131,8 +144,22 @@ export const useCalendarPage = () => {
 	const getCalendarGroupByIdEvents = async (group_id: string) => {
 		try {
 			const group = await getCalendarGroupById(group_id);
-			const transformedCalendarEvents = transformAndFillAddresses([group.data]);
-			console.log('Specific Group', transformedCalendarEvents);
+			const transformedCalendarEvents = transformAndFillAddresses(
+				[group.data],
+				userStatus ?? UserStatus.OPEN
+			);
+
+			const breadCrumb = [
+				{
+					label: group.data.headquarter,
+				},
+				{
+					label: group.data.semester_name,
+				},
+				{ label: group.data.program_name },
+				{ label: group.data.group_name },
+			];
+			setBreadCrumb(breadCrumb);
 			setEvents(transformedCalendarEvents);
 			setEventsCopy(transformedCalendarEvents);
 			return transformedCalendarEvents;
@@ -151,9 +178,22 @@ export const useCalendarPage = () => {
 					student_id,
 					programSemesterId
 				);
-				const transformedCalendarEvents = transformAndFillAddresses([
-					group.data,
-				]);
+
+				const breadCrumb = [
+					{
+						label: group.data.headquarter,
+					},
+					{
+						label: group.data.semester_name,
+					},
+					{ label: group.data.program_name },
+					{ label: group.data.group_name },
+				];
+				setBreadCrumb(breadCrumb);
+				const transformedCalendarEvents = transformAndFillAddresses(
+					[group.data],
+					userStatus ?? UserStatus.OPEN
+				);
 
 				setEvents(transformedCalendarEvents);
 				setEventsCopy(transformedCalendarEvents);
@@ -208,7 +248,6 @@ export const useCalendarPage = () => {
 
 			setShowEventDetailModal(false);
 			setShowGroupConfirmationModal(true);
-			console.log('Requested Group', requestedGroup);
 		} catch (error) {
 			console.error(error);
 		}
@@ -225,10 +264,7 @@ export const useCalendarPage = () => {
 	useEffect(() => {
 		if (programSemesterId && userEmail) {
 			handleUserStatus(userEmail, programSemesterId);
-			console.log(
-				'LocalStorage',
-				localStorage.getItem('hasSeenTutorial') ?? false
-			);
+
 			setHasSeenTutorial(localStorage.getItem('hasSeenTutorial') === 'true');
 		}
 	}, [programSemesterId, userEmail]);
@@ -257,7 +293,7 @@ export const useCalendarPage = () => {
 			setOpportunities(getOneEventPerGroup(events));
 		}
 	}, [events]);
-	console.log('Events', events);
+
 	return {
 		events,
 		eventsCopy,
@@ -286,5 +322,6 @@ export const useCalendarPage = () => {
 		selectedCourse,
 		isSemesterOpen,
 		canRequestGroup,
+		breadCrumb,
 	};
 };

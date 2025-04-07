@@ -85,12 +85,16 @@ const AdminSemesters = () => {
 						onChange={(date) => setStartDate(date)}
 						placeholderText='Start Date'
 						className='w-full h-full bg-white p-3 text-gray-700 placeholder:text-gray-400 font-normal rounded-md border border-gray-400'
+						showMonthDropdown
+						showYearDropdown
 					/>
 					<DatePicker
 						selected={endDate}
 						onChange={(date) => setEndDate(date)}
 						placeholderText='End date'
 						className='w-full h-full bg-white p-3 text-gray-700 placeholder:text-gray-400 font-normal rounded-md border border-gray-400'
+						showMonthDropdown
+						showYearDropdown
 					/>
 				</form>
 			</MlActionModal>

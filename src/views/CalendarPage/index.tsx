@@ -19,6 +19,7 @@ import { AtCalendarEvent } from '../../components/AtCalendarEvent';
 import { MlCalendarToolbar } from '../../components/MlCalendarToolbar';
 import Joyride from 'react-joyride';
 import { AtAlert } from '../../components/AtAlert';
+import AtBreadcrumb from '../../components/AtBreadCrumb';
 
 const localizer = momentLocalizer(moment);
 
@@ -49,6 +50,7 @@ const CalendarPage = () => {
 		selectedCourse,
 		isSemesterOpen,
 		canRequestGroup,
+		breadCrumb,
 	} = useCalendarPage();
 
 	return (
@@ -108,21 +110,25 @@ const CalendarPage = () => {
 						className='mb-2'
 					/>
 				)}
-
-				{!canRequestGroup && (
+				{!canRequestGroup && isSemesterOpen && (
 					<AtAlert
 						title={GENERAL_TEXT.CANNOT_REQUEST_GROUP_TITLE}
 						description={GENERAL_TEXT.CANNOT_REQUEST_GROUP_DESCRIPTION}
 						className='mb-2'
 					/>
 				)}
-
 				<h2 className='text-xl font-medium'>Monthly Calendar</h2>
 				<p className='text-sm max-w-[50rem]'>
 					Easily explore and select available shifts for your clinical
 					practices. View days and times at assigned hospitals and manage your
 					bookings quickly and effortlessly.
 				</p>
+
+				{breadCrumb && (
+					<div className='mt-4'>
+						<AtBreadcrumb items={breadCrumb} />
+					</div>
+				)}
 
 				{canShowStatus(userStatus as UserStatus, [UserStatus.OPEN]) &&
 					!hasSeenTutorial && (
@@ -152,7 +158,6 @@ const CalendarPage = () => {
 							/>
 						</>
 					)}
-
 				<div className='grid-container min-[1440px]:flex min-[1440px]:justify-between '>
 					<div
 						className={`opportunities-container bg-white rounded-md mt-10 h-max pb-6 ${
@@ -252,6 +257,11 @@ const CalendarPage = () => {
 									))}
 								</tbody>
 							</table>
+							{opportunities.length === 0 && (
+								<div className='border w-full border-gray-200 text-center p-4 font-medium'>
+									No opportunities available.
+								</div>
+							)}
 						</div>
 						{canShowStatus(userStatus as UserStatus, [UserStatus.PENDING]) && (
 							<div className='p-2'>
@@ -301,7 +311,7 @@ const CalendarPage = () => {
 							<Calendar
 								localizer={localizer}
 								events={eventsCopy}
-								views={['month', 'agenda']}
+								views={['month']}
 								endAccessor='end'
 								style={{ height: 800 }}
 								defaultDate={new Date()}

@@ -46,6 +46,7 @@ export interface Group {
 	verity_group_id: string;
 	in_days: string[];
 	weeks: Week[];
+	semester_name: string;
 }
 
 export interface Week {
@@ -169,6 +170,7 @@ export interface AdminHeadquarter {
 	institution_id: number;
 	semesters_in: AdminSemester[];
 	is_active: boolean;
+	error?: string;
 }
 
 export type HeadquartersData = AdminHeadquarter[];

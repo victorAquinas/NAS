@@ -23,6 +23,7 @@ export const useShiftsPage = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [selectedCourse, setSelectedCourse] = useState<string>('');
 	const [isSemesterOpen, setIsSemesterOpen] = useState<boolean>(false);
+	const [breadCrumb, setBreadCrumb] = useState<{ label: string }[]>();
 	const { programSemesterId } = useParams();
 	const navigate = useNavigate();
 
@@ -45,15 +46,28 @@ export const useShiftsPage = () => {
 					student_id,
 					programSemesterId
 				);
-				const transformedCalendarEvents = transformAndFillAddresses([
-					group.data,
-				]);
+				const transformedCalendarEvents = transformAndFillAddresses(
+					[group.data],
+					userStatus ?? UserStatus.OPEN
+				);
 
 				const sortedEventsByDate = transformedCalendarEvents.sort((a, b) => {
 					return (
 						parseDate(a.rawDate).getTime() - parseDate(b.rawDate).getTime()
 					);
 				});
+
+				const breadCrumb = [
+					{
+						label: group.data.headquarter,
+					},
+					{
+						label: group.data.semester_name,
+					},
+					{ label: group.data.program_name },
+					{ label: group.data.group_name },
+				];
+				setBreadCrumb(breadCrumb);
 
 				setActiveEvents(sortedEventsByDate);
 
@@ -122,5 +136,6 @@ export const useShiftsPage = () => {
 		navigate,
 		selectedCourse,
 		isSemesterOpen,
+		breadCrumb,
 	};
 };

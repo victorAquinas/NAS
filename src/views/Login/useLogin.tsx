@@ -43,7 +43,6 @@ export const useLogin = () => {
 	const onSubmit = (data: LoginFormSchema) => {
 		const { email, password } = data;
 		handleLogin(email, password);
-		console.log('Form Data:', data);
 	};
 	return { handleSubmit, onSubmit, register, errors };
 };

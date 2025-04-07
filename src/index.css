@@ -31,3 +31,11 @@ h6 {
 .react-datepicker__day-name {
 	color: white !important;
 }
+
+.react-datepicker__month-read-view--selected-month {
+	color: white !important;
+}
+
+.react-datepicker__year-read-view--selected-year {
+	color: white !important;
+}

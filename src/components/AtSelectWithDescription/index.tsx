@@ -3,6 +3,7 @@ import Select, {
 	OptionProps,
 	SingleValueProps,
 	StylesConfig,
+	components,
 } from 'react-select';
 import { SelectOptionDescription } from '../../api/types';
 
@@ -71,6 +72,7 @@ export const AtSelectWithDescription = ({
 			components={{
 				Option: CustomOption,
 				SingleValue: CustomSingleValue,
+				Input: (props) => <components.Input {...props} autoComplete='off' />,
 			}}
 			isLoading={isLoading}
 			isDisabled={isLoading || disabled}

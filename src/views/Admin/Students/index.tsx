@@ -255,7 +255,6 @@ const AdminStudents = () => {
 								placeholder='Select'
 								className='w-full h-full bg-white !placeholder:text-[#807f7f] !font-normal rounded-md'
 								onChange={(selected) => {
-									console.log('Selected', selected);
 									if (selected && programSemesterId) {
 										handleChangeExternalTransferChoice(
 											selected.value as ExternalTransferChoice
@@ -296,7 +295,6 @@ const AdminStudents = () => {
 									options={moveWeekOptions.semesters}
 									onChange={(selected) => {
 										if (selected) {
-											console.log('Selected', selected);
 											handleChangeSemester(selected);
 										}
 									}}
@@ -397,7 +395,7 @@ const AdminStudents = () => {
 						<ul className='w-full'>
 							<li className='flex justify-between'>
 								<div>Moving student: </div>
-								<div className='font-medium'>Victor Escalona</div>
+								<div className='font-medium'>{selectedUser.name}</div>
 							</li>
 							<li className='flex justify-between'>
 								<div>To group:</div>
@@ -506,6 +504,9 @@ const AdminStudents = () => {
 						<thead>
 							<tr>
 								<th className='border border-gray-200 bg-primary_light font-normal px-3 py-2 text-start'>
+									#
+								</th>
+								<th className='border border-gray-200 bg-primary_light font-normal px-3 py-2 text-start'>
 									Name
 								</th>
 								<th className='border border-gray-200 bg-primary_light font-normal px-3 py-2 text-start'>
@@ -527,8 +528,11 @@ const AdminStudents = () => {
 						</thead>
 						<tbody>
 							{students.length > 0 &&
-								students?.map((student) => (
+								students?.map((student, index) => (
 									<tr className='text-center bg-white' key={student.id}>
+										<td className='border-b border-gray-200 px-3 p-3  text-start'>
+											{index + 1}
+										</td>
 										<td className='border-b border-gray-200 px-3 p-3  text-start'>
 											{student.name}
 										</td>

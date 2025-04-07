@@ -11,7 +11,6 @@ export const useCourses = () => {
 	const userEmail = getCookieItem('user_email');
 
 	const { semesterID } = useParams();
-	console.log('SEMESTRE', semesterID);
 
 	const handleGetSemesterCourses = async (
 		email: string,

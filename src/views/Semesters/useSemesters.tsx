@@ -32,12 +32,9 @@ export const useSemesters = () => {
 						</AtButton>
 					)}
 					{!isLoading && filteredSemesters.length === 0 && (
-						<AtButton
-							variant={filterActive ? 'transparent' : 'white'}
-							className='w-full'
-						>
-							{filterActive ? 'No Active Semesters' : 'No Closed Semesters'}
-						</AtButton>
+						<div className='p-4'>
+							{filterActive ? 'No Active Semesters' : 'No Finished Semesters'}
+						</div>
 					)}
 					{!isLoading &&
 						filteredSemesters.map((semester) => (

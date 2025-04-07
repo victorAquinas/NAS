@@ -56,6 +56,8 @@ export const AtInputDate = forwardRef<HTMLDivElement, AtInputDateProps>(
 					dateFormat='yyyy-MM-dd'
 					showIcon
 					onKeyDown={(e) => e.preventDefault()}
+					showMonthDropdown
+					showYearDropdown
 				/>
 			</div>
 		);

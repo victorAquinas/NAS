@@ -118,6 +118,7 @@ const AdminGroup = () => {
 		setShowReleaseModal,
 		showReleaseModal,
 		handleCreateGroup,
+		getAvailableGroupLocations,
 	} = useAdminGroup();
 
 	const groupNameRefs = useRef<{
@@ -389,7 +390,7 @@ const AdminGroup = () => {
 									label: coordinator.name,
 									value: coordinator.id,
 								}))}
-								placeholder='Select Coordinator'
+								placeholder='Select Instructor'
 								className='w-full h-full bg-white !placeholder:text-[#807f7f] !font-normal rounded-md'
 								onChange={(selected) => {
 									field.onChange(selected ? selected : null);
@@ -676,7 +677,11 @@ const AdminGroup = () => {
 											placeholderText='Max Enrollment date'
 											wrapperClassName='w-full'
 											disabled={isPublished}
-											value={maxEnrollmentDate ? maxEnrollmentDate : undefined}
+											value={
+												maxEnrollmentDate
+													? transformDateString(maxEnrollmentDate, 'MM/DD/YYYY')
+													: undefined
+											}
 											onChange={(date) => {
 												if (date && programSemesterId) {
 													const dateString = date?.toISOString();
@@ -1111,10 +1116,6 @@ const AdminGroup = () => {
 																									.week_schedule_id
 																						);
 
-																					console.log(
-																						'Esot que es',
-																						weeksScheduleIds
-																					);
 																					// const shiftEndTimeLoading =
 																					// 	toast.loading('Creating group...');
 																					// toast.update(shiftEndTimeLoading, {
@@ -1168,10 +1169,21 @@ const AdminGroup = () => {
 																								: '#b1b6c0',
 																						}),
 																					}}
+																					// options={
+																					// 	placeData.type === 'in-site'
+																					// 		? inSiteOptions
+																					// 		: offsiteOptions
+																					// }
 																					options={
 																						placeData.type === 'in-site'
-																							? inSiteOptions
-																							: offsiteOptions
+																							? getAvailableGroupLocations(
+																									inSiteOptions,
+																									placeData.place_id
+																							  )
+																							: getAvailableGroupLocations(
+																									offsiteOptions,
+																									placeData.place_id
+																							  )
 																					}
 																					value={
 																						placeData.type === 'in-site'
@@ -1190,7 +1202,7 @@ const AdminGroup = () => {
 																						Option: CustomOption,
 																						SingleValue: CustomSingleValue,
 																					}}
-																					placeholder='Select Coordinator'
+																					placeholder='Select Instructor'
 																					className='w-full h-full bg-white !placeholder:text-[#807f7f] !font-normal rounded-md'
 																					onChange={(selected) => {
 																						if (selected) {
@@ -1200,13 +1212,15 @@ const AdminGroup = () => {
 																										week.week_schedule
 																											.week_schedule_id
 																								);
+
 																							weeksScheduleIds.forEach(
 																								(weeksScheduleId) => {
 																									handleUpdateGroup(
 																										weeksScheduleId,
 																										'practice_place_id',
 																										selected.value,
-																										'week_schedule'
+																										'week_schedule',
+																										true
 																									);
 																								}
 																							);

@@ -22,6 +22,7 @@ const AdminLocations = () => {
 		handleShowDeleteLocationModal,
 		handleCloseDeleteLocationModal,
 		locationIdToDelete,
+		institutionId,
 	} = useLocations();
 
 	return (
@@ -34,10 +35,7 @@ const AdminLocations = () => {
 				title='Add a location'
 				onAction={() =>
 					toast.promise(
-						handleAddLocation(
-							locationName,
-							import.meta.env.VITE_INSTITUTION_ID
-						),
+						handleAddLocation(locationName, institutionId?.toString() || ''),
 						{
 							pending: 'Adding location',
 							success: 'Location created successfully',

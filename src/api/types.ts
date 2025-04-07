@@ -170,6 +170,7 @@ export interface AdminHeadquarter {
 	institution_id: number;
 	semesters_in: AdminSemester[];
 	is_active: boolean;
+	error?: string;
 }
 
 export type HeadquartersData = AdminHeadquarter[];

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { GroupPlace } from '../../../../api/types';
+import { AdminHeadquarter, GroupPlace } from '../../../../api/types';
 import { toast } from 'react-toastify';
 import {
 	createNewGroupPlace,
+	getLocations,
 	getPlaces,
 	updateGroupPlace,
 } from '../../../../api/adminServices';
@@ -38,11 +39,27 @@ export const useAdminGroupLocations = () => {
 	const [modalType, setModalType] = useState<'new' | 'edit'>('new');
 	const [selectedPlace, setSelectedPlace] = useState<GroupPlace | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [institutionId, setInstitutionId] = useState<number>();
 
-	const handleGetPlaces = async () => {
+	const getAdminData = async () => {
+		try {
+			const response = (await getLocations()) as unknown as AdminHeadquarter;
+			if (response?.error) {
+				setInstitutionId(response?.institution_id);
+				return;
+			}
+
+			const fullResponse = response as unknown as AdminHeadquarter[];
+			setInstitutionId(fullResponse[0]?.institution_id);
+		} catch (error) {
+			console.error(error);
+			toast.error('Error');
+		}
+	};
+	const handleGetPlaces = async (institution_id: number) => {
 		setIsLoading(true);
 		try {
-			const places = await getPlaces(import.meta.env.VITE_INSTITUTION_ID);
+			const places = await getPlaces(institution_id?.toString());
 
 			setPlaces(places?.data);
 			setIsLoading(false);
@@ -57,7 +74,8 @@ export const useAdminGroupLocations = () => {
 		practicePlaceId: number,
 		name: string,
 		typeId: number,
-		address: string
+		address: string,
+		institutionId: number
 	) => {
 		const idLoading = toast.loading('Updating place');
 		try {
@@ -66,7 +84,7 @@ export const useAdminGroupLocations = () => {
 				name,
 				typeId,
 				address,
-				import.meta.env.VITE_INSTITUTION_ID
+				institutionId
 			);
 			toast.update(idLoading, {
 				render: 'Place updated',
@@ -74,7 +92,7 @@ export const useAdminGroupLocations = () => {
 				isLoading: false,
 				autoClose: 500,
 			});
-			handleGetPlaces();
+			handleGetPlaces(institutionId);
 			handleCloseModal();
 		} catch (error) {
 			console.error(error);
@@ -103,7 +121,8 @@ export const useAdminGroupLocations = () => {
 		name: string,
 		address: string,
 		type: number,
-		status: boolean
+		status: boolean,
+		institutionId: number
 	) => {
 		setModalType('edit');
 		setValue('name', name);
@@ -116,14 +135,15 @@ export const useAdminGroupLocations = () => {
 			address: address,
 			type_id: type,
 			status: status,
-			institution_id: import.meta.env.VITE_INSTITUTION_ID,
+			institution_id: institutionId,
 		});
 	};
 
 	const handleCreateNewPlace = async (
 		name: string,
 		address: string,
-		type: number
+		type: number,
+		institutionId: number
 	) => {
 		const idLoading = toast.loading('Creating place');
 		try {
@@ -131,7 +151,7 @@ export const useAdminGroupLocations = () => {
 				name,
 				address,
 				type,
-				import.meta.env.VITE_INSTITUTION_ID
+				institutionId
 			);
 			toast.update(idLoading, {
 				render: 'Place created',
@@ -139,7 +159,9 @@ export const useAdminGroupLocations = () => {
 				isLoading: false,
 				autoClose: 500,
 			});
-			handleGetPlaces();
+
+			handleGetPlaces(institutionId);
+
 			handleCloseModal();
 
 			console.log(newPlace);
@@ -159,17 +181,27 @@ export const useAdminGroupLocations = () => {
 		const { name, address, type } = data;
 
 		if (modalType === 'new') {
-			return handleCreateNewPlace(name, address, type);
+			return handleCreateNewPlace(name, address, type, institutionId || 0);
 		}
 
-		if (selectedPlace) {
-			return handleUpdatePlace(selectedPlace?.id, name, type, address);
+		if (selectedPlace && institutionId) {
+			return handleUpdatePlace(
+				selectedPlace?.id,
+				name,
+				type,
+				address,
+				institutionId
+			);
 		}
 	};
 
 	useEffect(() => {
-		handleGetPlaces();
-	}, []);
+		getAdminData();
+
+		if (institutionId) {
+			handleGetPlaces(institutionId);
+		}
+	}, [institutionId]);
 
 	return {
 		places,
@@ -188,5 +220,6 @@ export const useAdminGroupLocations = () => {
 		modalType,
 		selectedPlace,
 		isLoading,
+		institutionId,
 	};
 };

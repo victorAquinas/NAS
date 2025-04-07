@@ -16,6 +16,7 @@ import {
 	getSources,
 	updateGroup,
 	updateProgramSemester,
+	getLocations,
 } from '../../../api/adminServices';
 
 import {
@@ -25,6 +26,7 @@ import {
 	Instructor,
 	SelectOptionDescription,
 	updateGroupType,
+	AdminHeadquarter,
 } from '../../../api/types';
 
 import { newGroupSchema, NewGroupSchema } from './modalAddGroupValidation';
@@ -60,6 +62,7 @@ export const useAdminGroup = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isCreatingGroup, setIsCreatingGroup] = useState(false);
 	const [isDeletingGroup, setIsDeletingGroup] = useState(false);
+	const [institutionId, setInstitutionId] = useState<number>();
 
 	// For publishing
 	const [maxEnrollmentDate, setMaxEnrollmentDate] = useState<string | null>(
@@ -118,7 +121,24 @@ export const useAdminGroup = () => {
 	 * Fetches groups, sources, places, and adminSemesters concurrently
 	 * Sets states accordingly.
 	 */
-	const getInitialData = async () => {
+
+	const getAdminData = async () => {
+		try {
+			const response = (await getLocations()) as unknown as AdminHeadquarter;
+			if (response?.error) {
+				setInstitutionId(response?.institution_id);
+				return;
+			}
+
+			const fullResponse = response as unknown as AdminHeadquarter[];
+			setInstitutionId(fullResponse[0]?.institution_id);
+		} catch (error) {
+			console.error(error);
+			toast.error('Error');
+		}
+	};
+
+	const getInitialData = async (institutionId: string) => {
 		setIsLoading(true);
 		try {
 			if (!programSemesterId) {
@@ -129,7 +149,7 @@ export const useAdminGroup = () => {
 			const [groupRes, sources, placesRes, adminSemesters] = await Promise.all([
 				getCalendarGroups(programSemesterId),
 				getSources(),
-				getPlaces(import.meta.env.VITE_INSTITUTION_ID),
+				getPlaces(institutionId),
 				getAdminSemesters(semesterId ?? ''),
 			]);
 
@@ -206,9 +226,15 @@ export const useAdminGroup = () => {
 	// 6. Lifecycle: Load data on mount / changes
 	// ====================================
 	useEffect(() => {
-		getInitialData();
+		getAdminData();
+	}, []);
+
+	useEffect(() => {
+		if (institutionId) {
+			getInitialData(institutionId.toString());
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [programSemesterId]);
+	}, [programSemesterId, institutionId]);
 
 	// ====================================
 	// 7. Handlers (Create / Update / Delete etc.)

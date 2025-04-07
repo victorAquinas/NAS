@@ -25,6 +25,7 @@ const AdminGroupLocations = () => {
 		typeOptions,
 		modalType,
 		isLoading,
+		institutionId,
 	} = useAdminGroupLocations();
 	return (
 		<AdminLayout>
@@ -199,7 +200,8 @@ const AdminGroupLocations = () => {
 														place.name,
 														place.address,
 														place.type_id,
-														place.status
+														place.status,
+														institutionId ?? 0
 													)
 												}
 											>

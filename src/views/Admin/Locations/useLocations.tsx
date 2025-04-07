@@ -18,6 +18,7 @@ export const useLocations = () => {
 	const [showDeleteLocationModal, setShowDeleteLocationModal] =
 		useState<boolean>(false);
 	const [locationIdToDelete, setLocationIdToDelete] = useState<number>(-99);
+	const [institutionId, setInstitutionId] = useState<number>();
 
 	const handleOpenAddLocationModal = () => {
 		setIsAddLocationModalOpen(true);
@@ -31,11 +32,22 @@ export const useLocations = () => {
 	const getInstitutionLocations = async () => {
 		setIsLoading(true);
 		try {
-			const req = await getLocations();
-			const activeLocations = req?.filter((location) => location.is_active);
+			const response = (await getLocations()) as unknown as AdminHeadquarter;
+
+			if (response?.error) {
+				setLocations([]);
+				setInstitutionId(response?.institution_id);
+				return;
+			}
+			const fullResponse = response as unknown as AdminHeadquarter[];
+
+			const activeLocations = fullResponse?.filter(
+				(location) => location.is_active
+			);
 
 			setLocations(activeLocations);
-			return req;
+			setInstitutionId(fullResponse[0]?.institution_id);
+			return fullResponse;
 		} catch (error) {
 			const axiosError = error as AxiosError;
 
@@ -120,5 +132,6 @@ export const useLocations = () => {
 		handleShowDeleteLocationModal,
 		handleCloseDeleteLocationModal,
 		locationIdToDelete,
+		institutionId,
 	};
 };
